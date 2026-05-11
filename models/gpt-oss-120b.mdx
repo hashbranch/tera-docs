@@ -1,10 +1,10 @@
 ---
-title: "gpt-oss-20b"
-description: "openai/gpt-oss-20b on Tera"
+title: "gpt-oss-120b"
+description: "openai/gpt-oss-120b on Tera"
 ---
 
 <Info>
-  Model id: `openai/gpt-oss-20b` — pass this as the `model` field in API requests.
+  Model id: `openai/gpt-oss-120b` — pass this as the `model` field in API requests.
 </Info>
 
 ## Spec
@@ -12,7 +12,7 @@ description: "openai/gpt-oss-20b on Tera"
 | | |
 |---|---|
 | **Provider** | openai |
-| **HuggingFace** | [`openai/gpt-oss-20b`](https://huggingface.co/openai/gpt-oss-20b) |
+| **HuggingFace** | [`openai/gpt-oss-120b`](https://huggingface.co/openai/gpt-oss-120b) |
 | **Context length** | 131,072 tokens |
 | **Max output** | 4,096 tokens |
 | **Quantization** | `mxfp4` |
@@ -23,8 +23,8 @@ description: "openai/gpt-oss-20b on Tera"
 
 | | per million tokens |
 |---|---|
-| Input  | $0.75 |
-| Output | $4.00 |
+| Input  | $1.50 |
+| Output | $8.00 |
 
 ## Supported features
 
@@ -41,7 +41,7 @@ curl https://api.tera.gw/v1/chat/completions \
   -H "Content-Type: application/json" \
   -H "Authorization: Bearer $TERA_API_KEY" \
   -d '{
-    "model": "openai/gpt-oss-20b",
+    "model": "openai/gpt-oss-120b",
     "messages": [{"role": "user", "content": "Hello"}],
     "max_tokens": 64
   }'

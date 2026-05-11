@@ -1,21 +1,21 @@
 ---
-title: "gpt-oss-20b"
-description: "openai/gpt-oss-20b on Tera"
+title: "Qwen3.5-4B"
+description: "Qwen/Qwen3.5-4B on Tera"
 ---
 
 <Info>
-  Model id: `openai/gpt-oss-20b` — pass this as the `model` field in API requests.
+  Model id: `Qwen/Qwen3.5-4B` — pass this as the `model` field in API requests.
 </Info>
 
 ## Spec
 
 | | |
 |---|---|
-| **Provider** | openai |
-| **HuggingFace** | [`openai/gpt-oss-20b`](https://huggingface.co/openai/gpt-oss-20b) |
-| **Context length** | 131,072 tokens |
+| **Provider** | Qwen |
+| **HuggingFace** | [`Qwen/Qwen3.5-4B`](https://huggingface.co/Qwen/Qwen3.5-4B) |
+| **Context length** | 262,144 tokens |
 | **Max output** | 4,096 tokens |
-| **Quantization** | `mxfp4` |
+| **Quantization** | `bf16` |
 | **Input modalities** | text |
 | **Output modalities** | text |
 
@@ -23,12 +23,12 @@ description: "openai/gpt-oss-20b on Tera"
 
 | | per million tokens |
 |---|---|
-| Input  | $0.75 |
-| Output | $4.00 |
+| Input  | $0.04 |
+| Output | $0.08 |
 
 ## Supported features
 
-`tools`, `json_mode`, `structured_outputs`, `logprobs`
+`tools`, `json_mode`, `structured_outputs`, `reasoning`, `logprobs`
 
 ## Sampling parameters
 
@@ -41,7 +41,7 @@ curl https://api.tera.gw/v1/chat/completions \
   -H "Content-Type: application/json" \
   -H "Authorization: Bearer $TERA_API_KEY" \
   -d '{
-    "model": "openai/gpt-oss-20b",
+    "model": "Qwen/Qwen3.5-4B",
     "messages": [{"role": "user", "content": "Hello"}],
     "max_tokens": 64
   }'

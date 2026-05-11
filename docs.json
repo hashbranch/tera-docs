@@ -14,7 +14,7 @@
     }
   },
   "banner": {
-    "content": "Llama, Qwen, DeepSeek, Mistral — drop-in OpenAI-compatible.",
+    "content": "Llama, Qwen, DeepSeek, Mistral \u2014 drop-in OpenAI-compatible.",
     "dismissible": true
   },
   "favicon": "/favicon.png",
@@ -73,10 +73,12 @@
             "group": "Models",
             "pages": [
               "models/overview",
+              "models/gpt-oss-120b",
               "models/gpt-oss-20b",
               "models/kokoro-82m",
               "models/qwen2-5-7b-instruct",
-              "models/qwen3-5-27b"
+              "models/qwen3-5-27b",
+              "models/qwen3-5-4b"
             ]
           }
         ]

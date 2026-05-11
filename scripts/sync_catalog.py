@@ -57,8 +57,85 @@ def fmt_price(price_per_token: str) -> str:
     if v == 0:
         return "Free"
     per_mtok = v * 1_000_000
-    s = f"{per_mtok:.4f}".rstrip("0").rstrip(".")
+    if per_mtok < 0.01:
+        s = f"{per_mtok:.4f}".rstrip("0").rstrip(".") or "0"
+    elif per_mtok == int(per_mtok):
+        s = f"{int(per_mtok)}.00"
+    else:
+        s = f"{per_mtok:.2f}"
     return f"${s}"
+
+
+PRICING_LINE_RE = re.compile(
+    r"^\|\s*(?P<label>Input|Output)\s*\|\s*(?P<value>[^|]+?)\s*\|", re.MULTILINE
+)
+SPEC_LINE_RE = re.compile(
+    r"^\|\s*\*\*(?P<key>[^*]+)\*\*\s*\|\s*(?P<value>[^|]+?)\s*\|", re.MULTILINE
+)
+MODEL_ID_RE = re.compile(r"Model id:\s*`([^`]+)`")
+
+
+def parse_model_page(path: Path) -> dict | None:
+    """Extract id, spec, and pricing display strings from a hand-edited page.
+
+    Used so model .mdx files that are not in the catalog still get rows
+    in pricing.mdx and entries in docs.json without forcing them into
+    gateway/config.json.
+    """
+    text = path.read_text()
+    id_match = MODEL_ID_RE.search(text)
+    if not id_match:
+        return None
+    spec = {m.group("key"): m.group("value") for m in SPEC_LINE_RE.finditer(text)}
+    prices = {m.group("label"): m.group("value") for m in PRICING_LINE_RE.finditer(text)}
+
+    ctx_raw = spec.get("Context length", "").replace(",", "").split()[0]
+    try:
+        context_length = int(ctx_raw)
+    except ValueError:
+        context_length = None
+
+    quant = spec.get("Quantization", "—").strip("` ")
+    return {
+        "id": id_match.group(1),
+        "context_length": context_length,
+        "quantization": quant,
+        "_display_prompt": prices.get("Input", "—").strip(),
+        "_display_completion": prices.get("Output", "—").strip(),
+        "_source": "disk",
+    }
+
+
+def display_pricing(entry: dict) -> tuple[str, str]:
+    """Return (input, output) display strings for an entry, from either source."""
+    if entry.get("_source") == "disk":
+        return entry["_display_prompt"], entry["_display_completion"]
+    p = entry.get("pricing", {})
+    return fmt_price(p.get("prompt", "0")), fmt_price(p.get("completion", "0"))
+
+
+def price_sort_key(display: str) -> float:
+    if not display or display.lower() in ("free", "—"):
+        return 0.0
+    try:
+        return float(display.replace("$", "").replace(",", ""))
+    except ValueError:
+        return 0.0
+
+
+def collect_all_models(catalog: list[dict], models_dir: Path) -> list[dict]:
+    """Catalog entries + any model .mdx files not in the catalog."""
+    by_id: dict[str, dict] = {e["id"]: {**e, "_source": "catalog"} for e in catalog}
+    if models_dir.is_dir():
+        for path in sorted(models_dir.glob("*.mdx")):
+            if path.stem == "overview":
+                continue
+            parsed = parse_model_page(path)
+            if parsed and parsed["id"] not in by_id:
+                by_id[parsed["id"]] = parsed
+    entries = list(by_id.values())
+    entries.sort(key=lambda e: price_sort_key(display_pricing(e)[0]))
+    return entries
 
 
 def render_model_page(entry: dict) -> str:
@@ -132,15 +209,15 @@ curl https://api.tera.gw/v1/chat/completions \\
 """
 
 
-def render_pricing(catalog: list[dict]) -> str:
+def render_pricing(models: list[dict]) -> str:
     rows = []
-    for e in catalog:
-        p = e.get("pricing", {})
+    for e in models:
+        in_p, out_p = display_pricing(e)
+        ctx = e.get("context_length")
+        ctx_display = f"{ctx:,}" if isinstance(ctx, int) else "—"
         rows.append(
-            f"| `{e['id']}` | {fmt_price(p.get('prompt', '0'))} | "
-            f"{fmt_price(p.get('completion', '0'))} | "
-            f"`{e.get('quantization', '—')}` | "
-            f"{e.get('context_length', '—'):,} |"
+            f"| `{e['id']}` | {in_p} | {out_p} | "
+            f"`{e.get('quantization', '—')}` | {ctx_display} |"
         )
     table = "\n".join(rows)
     today = dt.date.today().isoformat()
@@ -189,13 +266,19 @@ def main() -> int:
         path.write_text(render_model_page(entry))
         written.append((entry["id"], slug, path))
 
-    PRICING_PATH.write_text(render_pricing(catalog))
+    all_models = collect_all_models(catalog, MODELS_DIR)
+    PRICING_PATH.write_text(render_pricing(all_models))
 
-    print(f"wrote {len(written)} model pages and pricing.mdx")
+    print(f"wrote {len(written)} catalog model pages and pricing.mdx")
     for model_id, slug, path in written:
         print(f"  {model_id} -> {path.relative_to(ROOT)}")
+    disk_only = [e for e in all_models if e.get("_source") == "disk"]
+    if disk_only:
+        print(f"preserved {len(disk_only)} hand-maintained model pages in pricing.mdx:")
+        for e in disk_only:
+            print(f"  {e['id']}")
 
-    expected_slugs = {f"models/{slug}" for _, slug, _ in written} | {"models/overview"}
+    expected_slugs = {f"models/{slugify(e['id'])}" for e in all_models} | {"models/overview"}
     docs = json.loads(DOCS_JSON.read_text())
     nav = docs.get("navigation", {})
     containers = (

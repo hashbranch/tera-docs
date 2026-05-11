@@ -3,7 +3,7 @@ title: Models overview
 description: "What's available on Tera today."
 ---
 
-Tera deploys open-weight models on dedicated GPUs (L4 24GB and A100 80GB). All models share the same OpenAI-compatible API surface — pick a model id and pass it as the `model` field.
+Tera serves open-weight models through a single OpenAI-compatible API surface. Pick a model id and pass it as the `model` field.
 
 This page is regenerated from the live model catalog. The authoritative source is [`GET /v1/models`](/api-reference/models).
 
@@ -14,7 +14,7 @@ This page is regenerated from the live model catalog. The authoritative source i
     Fast, general-purpose chat. 8k context. Tool calling.
   </Card>
   <Card title="Qwen3.5-27B" icon="brain" href="/models/qwen3-5-27b">
-    Reasoning model with `reasoning_content`. FP8 on A100.
+    Reasoning model with `reasoning_content`.
   </Card>
   <Card title="gpt-oss-20b" icon="microchip" href="/models/gpt-oss-20b">
     OpenAI's open-weight 20B with 131k context. MXFP4.

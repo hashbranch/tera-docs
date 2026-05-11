@@ -16,7 +16,7 @@ We run vLLM on dedicated GPUs in Google Cloud (L4 and A100 80GB), with models lo
 - **Model catalog** — `GET /v1/models`
 - **Text-to-speech** — `POST /v1/audio/speech` (Kokoro)
 - **Streaming** via Server-Sent Events
-- **Reasoning models** — Qwen3.5 surfaces `<think>` traces as a separate `reasoning_content` field
+- **Reasoning models** — Qwen3.5 surfaces chain-of-thought traces as a separate `reasoning_content` field
 - **Tool calling** — OpenAI-compatible `tools` and `tool_choice`
 
 ## Where to start

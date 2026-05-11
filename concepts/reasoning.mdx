@@ -1,6 +1,6 @@
 ---
 title: Reasoning models
-description: "How to use `<think>` traces with Qwen3.5 and other thinking models."
+description: "How to use chain-of-thought traces with Qwen3.5 and other thinking models."
 ---
 
 Some models in Tera's catalog produce **explicit reasoning traces** — the chain-of-thought the model used before arriving at its answer. Tera surfaces these as a separate `reasoning_content` field so they don't pollute the visible response.
@@ -76,4 +76,4 @@ Reasoning traces consume output tokens and contribute to your bill. Use `max_tok
 
 ## Why a separate field?
 
-OpenAI clients expect `content` to be the user-facing answer. Mixing `<think>...</think>` markers into `content` breaks downstream parsers. By separating the two, OpenAI SDKs work without modification and reasoning becomes an opt-in feature on the client side.
+OpenAI clients expect `content` to be the user-facing answer. Mixing reasoning markers (the literal `think` tags emitted by the model) into `content` breaks downstream parsers. By separating the two, OpenAI SDKs work without modification and reasoning becomes an opt-in feature on the client side.

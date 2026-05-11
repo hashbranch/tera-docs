@@ -1,0 +1,105 @@
+{
+  "$schema": "https://mintlify.com/docs.json",
+  "theme": "mint",
+  "name": "Tera",
+  "colors": {
+    "primary": "#0F766E",
+    "light": "#2DD4BF",
+    "dark": "#0F766E"
+  },
+  "favicon": "/favicon.png",
+  "navigation": {
+    "anchors": [
+      {
+        "anchor": "Documentation",
+        "icon": "book-open",
+        "groups": [
+          {
+            "group": "Get Started",
+            "pages": [
+              "introduction",
+              "quickstart",
+              "authentication"
+            ]
+          },
+          {
+            "group": "Concepts",
+            "pages": [
+              "concepts/openai-compat",
+              "concepts/streaming",
+              "concepts/reasoning",
+              "concepts/tool-calling"
+            ]
+          },
+          {
+            "group": "Reference",
+            "pages": [
+              "pricing"
+            ]
+          }
+        ]
+      },
+      {
+        "anchor": "API Reference",
+        "icon": "code",
+        "groups": [
+          {
+            "group": "API Reference",
+            "pages": [
+              "api-reference/chat-completions",
+              "api-reference/completions",
+              "api-reference/models",
+              "api-reference/audio-speech"
+            ]
+          }
+        ]
+      },
+      {
+        "anchor": "Models",
+        "icon": "microchip",
+        "groups": [
+          {
+            "group": "Models",
+            "pages": [
+              "models/overview",
+              "models/gpt-oss-20b",
+              "models/kokoro-82m",
+              "models/qwen2-5-7b-instruct",
+              "models/qwen3-5-27b"
+            ]
+          }
+        ]
+      }
+    ]
+  },
+  "api": {
+    "openapi": "openapi.yaml",
+    "playground": {
+      "display": "interactive"
+    },
+    "mdx": {
+      "server": "https://api.tera.gw",
+      "auth": {
+        "method": "bearer"
+      }
+    }
+  },
+  "navbar": {
+    "links": [
+      {
+        "label": "Status",
+        "href": "https://api.tera.gw/health"
+      }
+    ],
+    "primary": {
+      "type": "button",
+      "label": "Get API Key",
+      "href": "mailto:tom@hashbranch.com?subject=Tera%20API%20access"
+    }
+  },
+  "footer": {
+    "socials": {
+      "github": "https://github.com/hashbranch/tera"
+    }
+  }
+}

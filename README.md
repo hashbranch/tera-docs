@@ -14,7 +14,7 @@ Opens at http://localhost:3000 with hot reload.
 ## Structure
 
 ```
-mint.json            # Mintlify config (nav, branding, OpenAPI source)
+docs.json            # Mintlify config (nav, branding, OpenAPI source)
 openapi.yaml         # API spec — drives /api-reference/* playgrounds
 introduction.mdx
 quickstart.mdx

@@ -21,7 +21,7 @@ from pathlib import Path
 ROOT = Path(__file__).resolve().parent.parent
 MODELS_DIR = ROOT / "models"
 PRICING_PATH = ROOT / "pricing.mdx"
-MINT_JSON = ROOT / "mint.json"
+DOCS_JSON = ROOT / "docs.json"
 
 DEFAULT_SOURCE = "gs://tera-vllm-models/gateway-config.json"
 
@@ -196,16 +196,26 @@ def main() -> int:
         print(f"  {model_id} -> {path.relative_to(ROOT)}")
 
     expected_slugs = {f"models/{slug}" for _, slug, _ in written} | {"models/overview"}
-    mint = json.loads(MINT_JSON.read_text())
-    for group in mint.get("navigation", []):
-        if group.get("group") == "Models":
-            current = set(group["pages"])
-            if expected_slugs != current:
-                ordered = ["models/overview"] + sorted(s for s in expected_slugs if s != "models/overview")
-                group["pages"] = ordered
-                MINT_JSON.write_text(json.dumps(mint, indent=2) + "\n")
-                print("updated mint.json navigation")
-            break
+    docs = json.loads(DOCS_JSON.read_text())
+    nav = docs.get("navigation", {})
+    containers = (
+        nav.get("anchors", [])
+        + nav.get("tabs", [])
+        + nav.get("dropdowns", [])
+    )
+    updated = False
+    for container in containers:
+        for group in container.get("groups", []):
+            if group.get("group") == "Models":
+                current = set(group.get("pages", []))
+                if expected_slugs != current:
+                    ordered = ["models/overview"] + sorted(s for s in expected_slugs if s != "models/overview")
+                    group["pages"] = ordered
+                    updated = True
+                break
+    if updated:
+        DOCS_JSON.write_text(json.dumps(docs, indent=2) + "\n")
+        print("updated docs.json navigation")
 
     return 0
 

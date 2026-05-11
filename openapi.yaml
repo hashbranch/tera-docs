@@ -38,7 +38,7 @@ paths:
               $ref: "#/components/schemas/ChatCompletionRequest"
       responses:
         "200":
-          description: A chat completion (or an SSE stream when `stream: true`).
+          description: "A chat completion (or an SSE stream when `stream: true`)."
           content:
             application/json:
               schema:
@@ -65,7 +65,7 @@ paths:
               $ref: "#/components/schemas/CompletionRequest"
       responses:
         "200":
-          description: A text completion (or an SSE stream when `stream: true`).
+          description: "A text completion (or an SSE stream when `stream: true`)."
           content:
             application/json:
               schema:

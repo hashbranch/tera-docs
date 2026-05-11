@@ -1,0 +1,42 @@
+---
+title: Models overview
+description: "What's available on Tera today."
+---
+
+Tera deploys open-weight models on dedicated GPUs (L4 24GB and A100 80GB). All models share the same OpenAI-compatible API surface — pick a model id and pass it as the `model` field.
+
+This page is regenerated from the live model catalog. The authoritative source is [`GET /v1/models`](/api-reference/models).
+
+## Available now
+
+<CardGroup cols={2}>
+  <Card title="Qwen2.5-7B-Instruct" icon="bolt" href="/models/qwen2-5-7b-instruct">
+    Fast, general-purpose chat. 8k context. Tool calling.
+  </Card>
+  <Card title="Qwen3.5-27B" icon="brain" href="/models/qwen3-5-27b">
+    Reasoning model with `reasoning_content`. FP8 on A100.
+  </Card>
+  <Card title="gpt-oss-20b" icon="microchip" href="/models/gpt-oss-20b">
+    OpenAI's open-weight 20B with 131k context. MXFP4.
+  </Card>
+  <Card title="Kokoro-82M" icon="volume-high" href="/models/kokoro-82m">
+    Lightweight text-to-speech. Returns WAV bytes.
+  </Card>
+</CardGroup>
+
+## Choosing a model
+
+| If you want... | Use |
+|---|---|
+| Cheapest, fastest general chat | [Qwen2.5-7B-Instruct](/models/qwen2-5-7b-instruct) |
+| Reasoning / planning / math | [Qwen3.5-27B](/models/qwen3-5-27b) |
+| Long context (>32k) | [gpt-oss-20b](/models/gpt-oss-20b) |
+| Text-to-speech | [Kokoro-82M](/models/kokoro-82m) |
+
+## Pricing
+
+See the [pricing table](/pricing) for per-million-token rates.
+
+## Don't see what you need?
+
+We add models as customers ask for them. Email [tom@hashbranch.com](mailto:tom@hashbranch.com) with the HuggingFace id and we'll evaluate.

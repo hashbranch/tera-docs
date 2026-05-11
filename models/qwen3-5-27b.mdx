@@ -1,0 +1,48 @@
+---
+title: "Qwen3.5-27B"
+description: "Qwen/Qwen3.5-27B on Tera"
+---
+
+<Info>
+  Model id: `Qwen/Qwen3.5-27B` — pass this as the `model` field in API requests.
+</Info>
+
+## Spec
+
+| | |
+|---|---|
+| **Provider** | Qwen |
+| **HuggingFace** | [`Qwen/Qwen3.5-27B`](https://huggingface.co/Qwen/Qwen3.5-27B) |
+| **Context length** | 8,192 tokens |
+| **Max output** | 4,096 tokens |
+| **Quantization** | `fp8` |
+| **Input modalities** | text |
+| **Output modalities** | text |
+
+## Pricing
+
+| | per million tokens |
+|---|---|
+| Input  | $0.1 |
+| Output | $0.3 |
+
+## Supported features
+
+`tools`, `json_mode`, `structured_outputs`, `logprobs`
+
+## Sampling parameters
+
+`temperature`, `top_p`, `top_k`, `max_tokens`, `stop`, `seed`, `frequency_penalty`, `presence_penalty`, `repetition_penalty`, `logprobs`, `top_logprobs`
+
+## Example
+
+```bash
+curl https://api.tera.gw/v1/chat/completions \
+  -H "Content-Type: application/json" \
+  -H "Authorization: Bearer $TERA_API_KEY" \
+  -d '{
+    "model": "Qwen/Qwen3.5-27B",
+    "messages": [{"role": "user", "content": "Hello"}],
+    "max_tokens": 64
+  }'
+```

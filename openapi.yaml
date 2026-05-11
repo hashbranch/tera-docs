@@ -1,0 +1,431 @@
+openapi: 3.0.3
+info:
+  title: Tera API
+  description: |
+    OpenAI-compatible inference API. Existing OpenAI SDKs work without modification —
+    point them at `https://api.tera.gw` with your Tera API key.
+  version: "1.0.0"
+servers:
+  - url: https://api.tera.gw
+    description: Production
+security:
+  - bearerAuth: []
+tags:
+  - name: chat
+    description: Chat completions
+  - name: completions
+    description: Text completions
+  - name: models
+    description: Model catalog
+  - name: audio
+    description: Text-to-speech
+
+paths:
+  /v1/chat/completions:
+    post:
+      tags: [chat]
+      summary: Create a chat completion
+      description: |
+        OpenAI-compatible chat completions endpoint. Set `stream: true` for
+        Server-Sent Events. Some models also return a `reasoning_content` field
+        with chain-of-thought traces — see [Reasoning models](/concepts/reasoning).
+      operationId: createChatCompletion
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/ChatCompletionRequest"
+      responses:
+        "200":
+          description: A chat completion (or an SSE stream when `stream: true`).
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ChatCompletionResponse"
+        "400": { $ref: "#/components/responses/BadRequest" }
+        "401": { $ref: "#/components/responses/Unauthorized" }
+        "404": { $ref: "#/components/responses/NotFound" }
+        "429": { $ref: "#/components/responses/RateLimited" }
+        "500": { $ref: "#/components/responses/ServerError" }
+
+  /v1/completions:
+    post:
+      tags: [completions]
+      summary: Create a text completion
+      description: |
+        OpenAI-compatible legacy completions endpoint. Prefer
+        [chat completions](/api-reference/chat-completions) for new code.
+      operationId: createCompletion
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/CompletionRequest"
+      responses:
+        "200":
+          description: A text completion (or an SSE stream when `stream: true`).
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/CompletionResponse"
+        "400": { $ref: "#/components/responses/BadRequest" }
+        "401": { $ref: "#/components/responses/Unauthorized" }
+        "404": { $ref: "#/components/responses/NotFound" }
+        "429": { $ref: "#/components/responses/RateLimited" }
+        "500": { $ref: "#/components/responses/ServerError" }
+
+  /v1/models:
+    get:
+      tags: [models]
+      summary: List available models
+      description: |
+        Returns the catalog of models currently available on Tera, including
+        context length, pricing, supported features, and quantization.
+      operationId: listModels
+      responses:
+        "200":
+          description: Catalog
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ModelList"
+        "401": { $ref: "#/components/responses/Unauthorized" }
+
+  /v1/audio/speech:
+    post:
+      tags: [audio]
+      summary: Generate speech audio
+      description: |
+        OpenAI-compatible TTS endpoint backed by Kokoro. Returns raw audio bytes.
+      operationId: createSpeech
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/SpeechRequest"
+      responses:
+        "200":
+          description: Audio bytes (WAV by default).
+          content:
+            audio/wav:
+              schema:
+                type: string
+                format: binary
+        "400": { $ref: "#/components/responses/BadRequest" }
+        "401": { $ref: "#/components/responses/Unauthorized" }
+        "404": { $ref: "#/components/responses/NotFound" }
+
+components:
+  securitySchemes:
+    bearerAuth:
+      type: http
+      scheme: bearer
+      bearerFormat: "sk-tera-..."
+
+  responses:
+    BadRequest:
+      description: Malformed request.
+      content:
+        application/json:
+          schema: { $ref: "#/components/schemas/ErrorResponse" }
+    Unauthorized:
+      description: Missing or invalid API key.
+      content:
+        application/json:
+          schema: { $ref: "#/components/schemas/ErrorResponse" }
+    NotFound:
+      description: Model not found or not deployed.
+      content:
+        application/json:
+          schema: { $ref: "#/components/schemas/ErrorResponse" }
+    RateLimited:
+      description: Too many requests.
+      content:
+        application/json:
+          schema: { $ref: "#/components/schemas/ErrorResponse" }
+    ServerError:
+      description: Backend failure after retries.
+      content:
+        application/json:
+          schema: { $ref: "#/components/schemas/ErrorResponse" }
+
+  schemas:
+    ChatCompletionRequest:
+      type: object
+      required: [model, messages]
+      properties:
+        model:
+          type: string
+          description: HuggingFace model id. See `/v1/models`.
+          example: "Qwen/Qwen2.5-7B-Instruct"
+        messages:
+          type: array
+          items: { $ref: "#/components/schemas/ChatMessage" }
+        max_tokens:
+          type: integer
+          description: Maximum tokens to generate.
+          example: 256
+        temperature:
+          type: number
+          minimum: 0
+          maximum: 2
+          example: 0.7
+        top_p:
+          type: number
+          minimum: 0
+          maximum: 1
+        top_k:
+          type: integer
+          description: vLLM-specific. Top-k sampling.
+        stop:
+          oneOf:
+            - type: string
+            - type: array
+              items: { type: string }
+        seed:
+          type: integer
+          description: Deterministic seed for sampling.
+        frequency_penalty:
+          type: number
+          minimum: -2
+          maximum: 2
+        presence_penalty:
+          type: number
+          minimum: -2
+          maximum: 2
+        repetition_penalty:
+          type: number
+          description: vLLM-specific. Penalty for repeated tokens.
+        stream:
+          type: boolean
+          default: false
+        tools:
+          type: array
+          items: { $ref: "#/components/schemas/Tool" }
+        tool_choice:
+          oneOf:
+            - type: string
+              enum: [none, auto, required]
+            - type: object
+        response_format:
+          type: object
+          description: |
+            Optional response constraints — e.g. `{"type": "json_object"}`
+            for JSON mode, or `{"type": "json_schema", "json_schema": {...}}`
+            for structured outputs.
+
+    ChatMessage:
+      type: object
+      required: [role]
+      properties:
+        role:
+          type: string
+          enum: [system, user, assistant, tool]
+        content:
+          oneOf:
+            - type: string
+            - type: array
+        name:
+          type: string
+        tool_call_id:
+          type: string
+        tool_calls:
+          type: array
+          items: { $ref: "#/components/schemas/ToolCall" }
+
+    Tool:
+      type: object
+      properties:
+        type:
+          type: string
+          enum: [function]
+        function:
+          type: object
+          required: [name]
+          properties:
+            name: { type: string }
+            description: { type: string }
+            parameters:
+              type: object
+              description: JSON Schema describing the function arguments.
+
+    ToolCall:
+      type: object
+      properties:
+        id: { type: string }
+        type:
+          type: string
+          enum: [function]
+        function:
+          type: object
+          properties:
+            name: { type: string }
+            arguments:
+              type: string
+              description: JSON-encoded arguments.
+
+    ChatCompletionResponse:
+      type: object
+      properties:
+        id: { type: string }
+        object:
+          type: string
+          example: chat.completion
+        created: { type: integer }
+        model: { type: string }
+        choices:
+          type: array
+          items:
+            type: object
+            properties:
+              index: { type: integer }
+              message:
+                type: object
+                properties:
+                  role: { type: string }
+                  content: { type: string }
+                  reasoning_content:
+                    type: string
+                    description: |
+                      Chain-of-thought trace from reasoning models like Qwen3.5.
+                      Absent on non-reasoning models. See
+                      [Reasoning models](/concepts/reasoning).
+                  tool_calls:
+                    type: array
+                    items: { $ref: "#/components/schemas/ToolCall" }
+              finish_reason:
+                type: string
+                enum: [stop, length, tool_calls]
+        usage:
+          type: object
+          properties:
+            prompt_tokens: { type: integer }
+            completion_tokens: { type: integer }
+            total_tokens: { type: integer }
+
+    CompletionRequest:
+      type: object
+      required: [model, prompt]
+      properties:
+        model: { type: string, example: "Qwen/Qwen2.5-7B-Instruct" }
+        prompt:
+          oneOf:
+            - type: string
+            - type: array
+              items: { type: string }
+        max_tokens: { type: integer, example: 64 }
+        temperature: { type: number }
+        top_p: { type: number }
+        top_k: { type: integer }
+        stop:
+          oneOf:
+            - type: string
+            - type: array
+              items: { type: string }
+        seed: { type: integer }
+        stream: { type: boolean, default: false }
+
+    CompletionResponse:
+      type: object
+      properties:
+        id: { type: string }
+        object: { type: string, example: text_completion }
+        created: { type: integer }
+        model: { type: string }
+        choices:
+          type: array
+          items:
+            type: object
+            properties:
+              text: { type: string }
+              index: { type: integer }
+              finish_reason:
+                type: string
+                enum: [stop, length]
+        usage:
+          type: object
+          properties:
+            prompt_tokens: { type: integer }
+            completion_tokens: { type: integer }
+            total_tokens: { type: integer }
+
+    ModelList:
+      type: object
+      properties:
+        object: { type: string, example: list }
+        data:
+          type: array
+          items: { $ref: "#/components/schemas/Model" }
+
+    Model:
+      type: object
+      properties:
+        id: { type: string, example: "Qwen/Qwen2.5-7B-Instruct" }
+        object: { type: string, example: model }
+        created: { type: integer }
+        owned_by: { type: string }
+        context_length: { type: integer }
+        max_output_length: { type: integer }
+        input_modalities:
+          type: array
+          items: { type: string }
+        output_modalities:
+          type: array
+          items: { type: string }
+        supported_sampling_parameters:
+          type: array
+          items: { type: string }
+        supported_features:
+          type: array
+          items: { type: string }
+        pricing:
+          type: object
+          properties:
+            prompt: { type: string, description: USD per input token }
+            completion: { type: string, description: USD per output token }
+            image: { type: string }
+            request: { type: string }
+        quantization:
+          type: string
+          enum: [bf16, fp8, fp32, int4, mxfp4]
+        hugging_face_id: { type: string }
+
+    SpeechRequest:
+      type: object
+      required: [model, input]
+      properties:
+        model:
+          type: string
+          example: "hexgrad/Kokoro-82M"
+        input:
+          type: string
+          description: Text to synthesize.
+        voice:
+          type: string
+          description: Kokoro voice id.
+          example: af_bella
+        response_format:
+          type: string
+          enum: [wav, mp3]
+          default: wav
+        speed:
+          type: number
+          minimum: 0.25
+          maximum: 4
+          default: 1
+        lang_code:
+          type: string
+          description: BCP-47 language code, e.g. `en-US`.
+
+    ErrorResponse:
+      type: object
+      properties:
+        error:
+          type: object
+          properties:
+            message: { type: string }
+            type: { type: string }
+            code: { type: string }

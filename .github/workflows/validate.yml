@@ -1,0 +1,22 @@
+name: Validate docs
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+
+jobs:
+  validate:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "20"
+
+      - name: Check for broken links
+        run: npx -y mintlify@latest broken-links
+
+      - name: Validate OpenAPI spec
+        run: npx -y @redocly/cli@latest lint openapi.yaml

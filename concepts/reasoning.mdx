@@ -1,0 +1,79 @@
+---
+title: Reasoning models
+description: "How to use `<think>` traces with Qwen3.5 and other thinking models."
+---
+
+Some models in Tera's catalog produce **explicit reasoning traces** — the chain-of-thought the model used before arriving at its answer. Tera surfaces these as a separate `reasoning_content` field so they don't pollute the visible response.
+
+Thinking models in the catalog today:
+
+- [Qwen/Qwen3.5-27B](/models/qwen3-5-27b)
+
+## Response shape
+
+Non-streaming responses get a `reasoning_content` sibling of `content`:
+
+```json
+{
+  "choices": [
+    {
+      "index": 0,
+      "message": {
+        "role": "assistant",
+        "reasoning_content": "The user is asking about... I should consider...",
+        "content": "The answer is 42."
+      },
+      "finish_reason": "stop"
+    }
+  ]
+}
+```
+
+`reasoning_content` is the model's internal trace; `content` is the user-facing answer.
+
+## Streaming
+
+When `stream: true`, reasoning deltas arrive first, then content deltas:
+
+```text
+data: {"choices":[{"delta":{"role":"assistant","reasoning_content":"The user is"}}]}
+data: {"choices":[{"delta":{"reasoning_content":" asking about"}}]}
+...
+data: {"choices":[{"delta":{"content":"The answer is"}}]}
+data: {"choices":[{"delta":{"content":" 42."}}]}
+data: {"choices":[{"delta":{},"finish_reason":"stop"}]}
+data: [DONE]
+```
+
+```python
+from openai import OpenAI
+
+client = OpenAI(base_url="https://api.tera.gw/v1", api_key="sk-tera-...")
+
+stream = client.chat.completions.create(
+    model="Qwen/Qwen3.5-27B",
+    messages=[{"role": "user", "content": "What's 6 times 7?"}],
+    stream=True,
+)
+
+for chunk in stream:
+    delta = chunk.choices[0].delta
+    if reasoning := getattr(delta, "reasoning_content", None):
+        print(f"\033[2m{reasoning}\033[0m", end="", flush=True)
+    if content := delta.content:
+        print(content, end="", flush=True)
+```
+
+## Should you show reasoning to end users?
+
+Up to you. Common patterns:
+
+- **Hide entirely** — drop `reasoning_content`, display only `content`.
+- **Show collapsible** — UI affordance like "Show reasoning" that reveals the trace.
+- **Use for logging only** — keep traces server-side for debugging and feedback loops.
+
+Reasoning traces consume output tokens and contribute to your bill. Use `max_tokens` to bound total generation length.
+
+## Why a separate field?
+
+OpenAI clients expect `content` to be the user-facing answer. Mixing `<think>...</think>` markers into `content` breaks downstream parsers. By separating the two, OpenAI SDKs work without modification and reasoning becomes an opt-in feature on the client side.

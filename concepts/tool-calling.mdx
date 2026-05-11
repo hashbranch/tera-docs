@@ -1,0 +1,107 @@
+---
+title: Tool calling
+description: "OpenAI-compatible function calling."
+---
+
+Tera supports tool calling on models that advertise the `tools` feature in their [catalog entry](/api-reference/models). The request and response shapes match the OpenAI Chat Completions API.
+
+## Defining tools
+
+```python
+from openai import OpenAI
+
+client = OpenAI(base_url="https://api.tera.gw/v1", api_key="sk-tera-...")
+
+tools = [
+    {
+        "type": "function",
+        "function": {
+            "name": "get_weather",
+            "description": "Get current weather in a city",
+            "parameters": {
+                "type": "object",
+                "properties": {
+                    "city": {"type": "string", "description": "City name"},
+                    "unit": {"type": "string", "enum": ["celsius", "fahrenheit"]}
+                },
+                "required": ["city"]
+            }
+        }
+    }
+]
+
+resp = client.chat.completions.create(
+    model="Qwen/Qwen2.5-7B-Instruct",
+    messages=[{"role": "user", "content": "What's the weather in Paris?"}],
+    tools=tools,
+)
+
+print(resp.choices[0].message.tool_calls)
+```
+
+## Response
+
+When the model decides to call a tool, the response carries `tool_calls` and `finish_reason: "tool_calls"`:
+
+```json
+{
+  "choices": [
+    {
+      "message": {
+        "role": "assistant",
+        "content": null,
+        "tool_calls": [
+          {
+            "id": "call_abc123",
+            "type": "function",
+            "function": {
+              "name": "get_weather",
+              "arguments": "{\"city\":\"Paris\",\"unit\":\"celsius\"}"
+            }
+          }
+        ]
+      },
+      "finish_reason": "tool_calls"
+    }
+  ]
+}
+```
+
+## Returning tool results
+
+Append the assistant's tool call and your tool's output to `messages`, then call the API again:
+
+```python
+messages = [
+    {"role": "user", "content": "What's the weather in Paris?"},
+    resp.choices[0].message,  # the assistant tool call
+    {
+        "role": "tool",
+        "tool_call_id": "call_abc123",
+        "content": "18C, partly cloudy"
+    }
+]
+
+final = client.chat.completions.create(
+    model="Qwen/Qwen2.5-7B-Instruct",
+    messages=messages,
+    tools=tools,
+)
+print(final.choices[0].message.content)
+```
+
+## `tool_choice`
+
+Default is `"auto"` — the model decides whether to call a tool. Other modes:
+
+- `"none"` — disable tool calling for this request
+- `"required"` — force a tool call
+- `{"type": "function", "function": {"name": "..."}}` — force a specific tool
+
+## Streaming tool calls
+
+With `stream: true`, tool call arguments arrive as deltas. Concatenate `delta.tool_calls[i].function.arguments` strings across chunks to reconstruct the full JSON.
+
+## Model support
+
+Not every model in our catalog supports tools. Check `supported_features` in `/v1/models` — only models that include `"tools"` will reliably call functions. See [Models](/models/overview).

@@ -1,0 +1,40 @@
+---
+title: Authentication
+description: "How Tera API keys work."
+---
+
+## API keys
+
+Every request to Tera authenticates with a bearer token. Keys look like `sk-tera-<random>` and are issued per-customer.
+
+```bash
+Authorization: Bearer sk-tera-...
+```
+
+Pass it in the `Authorization` header for every request. The OpenAI SDKs handle this via `api_key=...` / `apiKey: ...`.
+
+## Requesting access
+
+Tera is in private access while we onboard with OpenRouter. Email [tom@hashbranch.com](mailto:tom@hashbranch.com?subject=Tera%20API%20access) with a one-line description of what you're building.
+
+## Errors
+
+<ResponseField name="401 Unauthorized" type="missing or invalid key">
+  Returned when the `Authorization` header is missing or the key is unknown or revoked.
+
+  ```json
+  { "error": { "message": "missing or invalid API key", "type": "authentication_error" } }
+  ```
+</ResponseField>
+
+<ResponseField name="403 Forbidden" type="key lacks access to model">
+  Some keys are scoped to specific models. Requests to other models return 403.
+</ResponseField>
+
+## Key rotation
+
+Keys are revocable at any time. If you suspect a key has leaked, email us — we'll issue a new one and revoke the old. We don't currently rotate keys on a schedule.
+
+## What we log
+
+For every request we record: timestamp, key name (not the secret), model, backend, status, duration, token counts, and a truncated copy of the prompt and response for debugging. See our [privacy policy](https://tera.gw/privacy) for retention details.

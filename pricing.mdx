@@ -1,0 +1,25 @@
+---
+title: Pricing
+description: "Per-token pricing for models on Tera."
+---
+
+All prices are in USD per **million tokens**. Updated 2026-05-11.
+
+| Model | Input | Output | Quant | Context |
+|---|---:|---:|---|---:|
+| `Qwen/Qwen2.5-7B-Instruct` | $0.05 | $0.1 | `bf16` | 8,192 |
+| `Qwen/Qwen3.5-27B` | $0.1 | $0.3 | `fp8` | 8,192 |
+| `hexgrad/Kokoro-82M` | $0.62 | Free | `fp32` | 4,096 |
+| `openai/gpt-oss-20b` | $0.75 | $4 | `mxfp4` | 131,072 |
+
+Pricing is the same whether requests stream or not. Failed requests (5xx, 429) are not billed.
+
+## How billing works
+
+- **Input tokens** are counted from the rendered prompt after applying the model's chat template.
+- **Output tokens** include generated text. For [reasoning models](/concepts/reasoning), `reasoning_content` tokens count toward output.
+- **TTS** ([Kokoro](/models/kokoro-82m)) bills on input characters, surfaced as `prompt` token cost.
+
+## Volume discounts
+
+Reach out at [tom@hashbranch.com](mailto:tom@hashbranch.com) for committed-use pricing.

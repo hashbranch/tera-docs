@@ -1,0 +1,92 @@
+---
+title: Streaming
+description: "Token-by-token output over Server-Sent Events."
+---
+
+Set `"stream": true` to receive tokens incrementally. Tera streams responses as Server-Sent Events on the same `/v1/chat/completions` endpoint.
+
+## Wire format
+
+Each event is a single line prefixed with `data:` carrying a JSON delta. The stream terminates with `data: [DONE]`.
+
+```text
+data: {"id":"...","object":"chat.completion.chunk","created":1700000000,"model":"Qwen/Qwen2.5-7B-Instruct","choices":[{"index":0,"delta":{"role":"assistant","content":""},"finish_reason":null}]}
+
+data: {"id":"...","object":"chat.completion.chunk","created":1700000000,"model":"Qwen/Qwen2.5-7B-Instruct","choices":[{"index":0,"delta":{"content":"Hello"},"finish_reason":null}]}
+
+data: {"id":"...","object":"chat.completion.chunk","created":1700000000,"model":"Qwen/Qwen2.5-7B-Instruct","choices":[{"index":0,"delta":{"content":" there"},"finish_reason":null}]}
+
+data: {"id":"...","object":"chat.completion.chunk","created":1700000000,"model":"Qwen/Qwen2.5-7B-Instruct","choices":[{"index":0,"delta":{},"finish_reason":"stop"}]}
+
+data: [DONE]
+```
+
+## Reading the stream
+
+<CodeGroup>
+
+```python python
+from openai import OpenAI
+
+client = OpenAI(base_url="https://api.tera.gw/v1", api_key="sk-tera-...")
+
+stream = client.chat.completions.create(
+    model="Qwen/Qwen2.5-7B-Instruct",
+    messages=[{"role": "user", "content": "Count to five."}],
+    stream=True,
+)
+
+for chunk in stream:
+    delta = chunk.choices[0].delta.content or ""
+    print(delta, end="", flush=True)
+```
+
+```javascript node
+import OpenAI from "openai";
+
+const client = new OpenAI({
+  baseURL: "https://api.tera.gw/v1",
+  apiKey: process.env.TERA_API_KEY,
+});
+
+const stream = await client.chat.completions.create({
+  model: "Qwen/Qwen2.5-7B-Instruct",
+  messages: [{ role: "user", content: "Count to five." }],
+  stream: true,
+});
+
+for await (const chunk of stream) {
+  process.stdout.write(chunk.choices[0]?.delta?.content ?? "");
+}
+```
+
+```bash curl
+curl -N https://api.tera.gw/v1/chat/completions \
+  -H "Authorization: Bearer $TERA_API_KEY" \
+  -H "Content-Type: application/json" \
+  -d '{
+    "model": "Qwen/Qwen2.5-7B-Instruct",
+    "messages": [{"role": "user", "content": "Count to five."}],
+    "stream": true
+  }'
+```
+
+</CodeGroup>
+
+## Finish reasons
+
+The final non-`[DONE]` event has a non-null `finish_reason`:
+
+- `stop` — natural end of generation
+- `length` — hit `max_tokens` or the model's max context
+- `tool_calls` — the model emitted a tool call (see [Tool calling](/concepts/tool-calling))
+
+## Streaming with reasoning models
+
+Reasoning models (e.g. `Qwen/Qwen3.5-27B`) stream `reasoning_content` deltas before the visible content. See [Reasoning](/concepts/reasoning).
+
+## Operational notes
+
+- **Heartbeats** — we do not currently send keep-alive comments. Configure client read timeouts above your expected longest generation (default vLLM timeouts: 120s).
+- **Disconnects** — if the client disconnects mid-stream, generation is cancelled on the backend.
+- **HTTP/2** — Tera supports HTTP/2; SDK defaults are fine.

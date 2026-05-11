@@ -1,0 +1,92 @@
+---
+title: Quickstart
+description: "Make your first inference request in under a minute."
+---
+
+## 1. Get an API key
+
+Tera is currently in private access. Email [tom@hashbranch.com](mailto:tom@hashbranch.com?subject=Tera%20API%20access) to request a key. Keys are formatted as `sk-tera-...`.
+
+## 2. Send your first request
+
+<CodeGroup>
+
+```bash curl
+curl https://api.tera.gw/v1/chat/completions \
+  -H "Content-Type: application/json" \
+  -H "Authorization: Bearer $TERA_API_KEY" \
+  -d '{
+    "model": "Qwen/Qwen2.5-7B-Instruct",
+    "messages": [
+      {"role": "user", "content": "Say hello in one short sentence."}
+    ],
+    "max_tokens": 64
+  }'
+```
+
+```python python
+from openai import OpenAI
+
+client = OpenAI(
+    base_url="https://api.tera.gw/v1",
+    api_key="sk-tera-...",
+)
+
+resp = client.chat.completions.create(
+    model="Qwen/Qwen2.5-7B-Instruct",
+    messages=[{"role": "user", "content": "Say hello in one short sentence."}],
+    max_tokens=64,
+)
+print(resp.choices[0].message.content)
+```
+
+```javascript node
+import OpenAI from "openai";
+
+const client = new OpenAI({
+  baseURL: "https://api.tera.gw/v1",
+  apiKey: process.env.TERA_API_KEY,
+});
+
+const resp = await client.chat.completions.create({
+  model: "Qwen/Qwen2.5-7B-Instruct",
+  messages: [{ role: "user", content: "Say hello in one short sentence." }],
+  max_tokens: 64,
+});
+
+console.log(resp.choices[0].message.content);
+```
+
+</CodeGroup>
+
+## 3. Stream the response
+
+Add `"stream": true` to get token-by-token output over Server-Sent Events. See [Streaming](/concepts/streaming) for the full event format.
+
+```bash
+curl https://api.tera.gw/v1/chat/completions \
+  -H "Authorization: Bearer $TERA_API_KEY" \
+  -H "Content-Type: application/json" \
+  -d '{
+    "model": "Qwen/Qwen2.5-7B-Instruct",
+    "messages": [{"role": "user", "content": "Count to five."}],
+    "stream": true
+  }'
+```
+
+## What next?
+
+<CardGroup cols={2}>
+  <Card title="Browse models" icon="microchip" href="/models/overview">
+    Pick the right model for your workload.
+  </Card>
+  <Card title="OpenAI compatibility" icon="arrow-right-arrow-left" href="/concepts/openai-compat">
+    Migrating from OpenAI? Read this first.
+  </Card>
+  <Card title="Reasoning models" icon="brain" href="/concepts/reasoning">
+    How to use `<think>` traces with Qwen3.5.
+  </Card>
+  <Card title="Tool calling" icon="wrench" href="/concepts/tool-calling">
+    Function calling with OpenAI-compatible schemas.
+  </Card>
+</CardGroup>

@@ -1,0 +1,48 @@
+---
+title: "Kokoro-82M"
+description: "hexgrad/Kokoro-82M on Tera"
+---
+
+<Info>
+  Model id: `hexgrad/Kokoro-82M` — pass this as the `model` field in API requests.
+</Info>
+
+## Spec
+
+| | |
+|---|---|
+| **Provider** | hexgrad |
+| **HuggingFace** | [`hexgrad/Kokoro-82M`](https://huggingface.co/hexgrad/Kokoro-82M) |
+| **Context length** | 4,096 tokens |
+| **Max output** | 0 tokens |
+| **Quantization** | `fp32` |
+| **Input modalities** | text |
+| **Output modalities** | audio |
+
+## Pricing
+
+| | per million tokens |
+|---|---|
+| Input  | $0.62 |
+| Output | Free |
+
+## Supported features
+
+—
+
+## Sampling parameters
+
+`voice`, `response_format`, `speed`, `lang_code`
+
+## Example
+
+```bash
+curl https://api.tera.gw/v1/chat/completions \
+  -H "Content-Type: application/json" \
+  -H "Authorization: Bearer $TERA_API_KEY" \
+  -d '{
+    "model": "hexgrad/Kokoro-82M",
+    "messages": [{"role": "user", "content": "Hello"}],
+    "max_tokens": 64
+  }'
+```

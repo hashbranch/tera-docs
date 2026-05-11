@@ -1,0 +1,41 @@
+name: Sync model catalog
+
+on:
+  schedule:
+    - cron: "17 6 * * *"
+  workflow_dispatch:
+    inputs:
+      source:
+        description: "Override source (gs:// path, https:// URL, or local path)"
+        required: false
+        default: "https://api.tera.gw/v1/models"
+
+permissions:
+  contents: write
+  pull-requests: write
+
+jobs:
+  sync:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Run sync
+        run: |
+          SOURCE="${{ github.event.inputs.source }}"
+          if [ -z "$SOURCE" ]; then
+            SOURCE="https://api.tera.gw/v1/models"
+          fi
+          python3 scripts/sync_catalog.py --source "$SOURCE"
+
+      - name: Open PR if catalog changed
+        uses: peter-evans/create-pull-request@v6
+        with:
+          commit-message: "chore: sync model catalog"
+          title: "Sync model catalog"
+          body: |
+            Automated regeneration of `models/*.mdx`, `pricing.mdx`, and
+            `mint.json` navigation from the live Tera catalog.
+          branch: chore/sync-catalog
+          delete-branch: true
+          labels: automated

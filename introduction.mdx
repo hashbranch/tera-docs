@@ -1,0 +1,37 @@
+---
+title: Introduction
+description: "Tera is an OpenAI-compatible inference API serving high-quality open-weight models."
+---
+
+## What is Tera?
+
+Tera is a hosted inference provider for open-weight language models. The API surface is OpenAI-compatible, so existing OpenAI SDKs and tools work without modification — point them at `https://api.tera.gw` with your Tera API key.
+
+We run vLLM on dedicated GPUs in Google Cloud (L4 and A100 80GB), with models loaded from a hot regional cache. We're focused on competitive **time-to-first-token** and **uptime**.
+
+## What's available today
+
+- **Chat completions** — `POST /v1/chat/completions`
+- **Text completions** — `POST /v1/completions`
+- **Model catalog** — `GET /v1/models`
+- **Text-to-speech** — `POST /v1/audio/speech` (Kokoro)
+- **Streaming** via Server-Sent Events
+- **Reasoning models** — Qwen3.5 surfaces `<think>` traces as a separate `reasoning_content` field
+- **Tool calling** — OpenAI-compatible `tools` and `tool_choice`
+
+## Where to start
+
+<CardGroup cols={2}>
+  <Card title="Quickstart" icon="bolt" href="/quickstart">
+    Make your first request in 60 seconds with curl, Python, or Node.
+  </Card>
+  <Card title="Authentication" icon="key" href="/authentication">
+    How API keys work and how to request one.
+  </Card>
+  <Card title="Models" icon="microchip" href="/models/overview">
+    What's deployed, context lengths, pricing.
+  </Card>
+  <Card title="OpenAI compatibility" icon="arrow-right-arrow-left" href="/concepts/openai-compat">
+    What carries over from OpenAI clients, what's different.
+  </Card>
+</CardGroup>

@@ -1,0 +1,8 @@
+.DS_Store
+node_modules/
+.mintlify/
+*.log
+.env
+.env.local
+__pycache__/
+*.pyc

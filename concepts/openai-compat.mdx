@@ -1,0 +1,65 @@
+---
+title: OpenAI compatibility
+description: "What carries over from OpenAI clients, and what's different."
+---
+
+Tera implements the OpenAI Chat Completions API surface. Existing OpenAI SDKs work by changing two settings:
+
+```python
+from openai import OpenAI
+
+client = OpenAI(
+    base_url="https://api.tera.gw/v1",
+    api_key="sk-tera-...",
+)
+```
+
+## What's the same
+
+- **Endpoints** — `/v1/chat/completions`, `/v1/completions`, `/v1/models`, `/v1/audio/speech`
+- **Streaming** — Server-Sent Events with `data: {...}` frames terminated by `data: [DONE]`
+- **Request shape** — `messages`, `temperature`, `top_p`, `max_tokens`, `stop`, `seed`, `frequency_penalty`, `presence_penalty`, `stream`, `tools`, `tool_choice`, `response_format`
+- **Response shape** — `id`, `object`, `created`, `model`, `choices[].message`, `choices[].finish_reason`, `usage`
+- **Tool calling** — OpenAI-compatible `tools` array and `tool_calls` in responses
+
+## What's different
+
+### Model IDs
+
+Tera uses HuggingFace IDs as the canonical model name — no provider prefix.
+
+```json
+{ "model": "Qwen/Qwen2.5-7B-Instruct" }
+```
+
+See [Models](/models/overview) for the catalog.
+
+### Extra sampling parameters
+
+vLLM supports a few parameters beyond OpenAI's surface. They're optional and ignored if you don't pass them.
+
+- `top_k` — top-k sampling
+- `repetition_penalty` — vLLM's penalty term (distinct from OpenAI's frequency/presence penalties)
+- `min_p` — minimum probability threshold
+
+### Reasoning models
+
+Models like `Qwen/Qwen3.5-27B` emit `<think>` reasoning traces. Tera splits these into a separate `reasoning_content` field rather than mixing them with the user-facing answer. See [Reasoning](/concepts/reasoning).
+
+### No org / project headers
+
+We don't require or accept `OpenAI-Organization` or `OpenAI-Project` headers. Drop them if your client sends them — they're ignored.
+
+### No moderation endpoint
+
+We don't offer `/v1/moderations`. Use OpenAI's moderation endpoint if you need it, or run a separate guard model.
+
+### No embeddings, no images, no fine-tuning
+
+Today: text generation and TTS only. No `/v1/embeddings`, no `/v1/images/*`, no `/v1/fine_tuning/*`. Let us know if you need these.
+
+## Behavioral notes
+
+- **First request after cold start is slower** (~2–12s TTFT) due to CUDA graph compilation. Subsequent requests are fast.
+- **5xx errors trigger automatic retry** within the gateway across healthy backend replicas before being returned to you.
+- **Health-aware routing** — if a backend fails health checks, traffic is steered to healthy replicas with no client changes.

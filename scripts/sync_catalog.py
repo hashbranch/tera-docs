@@ -165,7 +165,7 @@ Pricing is the same whether requests stream or not. Failed requests (5xx, 429) a
 
 ## Volume discounts
 
-Reach out at [tom@hashbranch.com](mailto:tom@hashbranch.com) for committed-use pricing.
+Reach out at [hello@tera.gw](mailto:hello@tera.gw) for committed-use pricing.
 """
 
 

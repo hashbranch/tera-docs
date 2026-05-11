@@ -3,9 +3,19 @@
   "theme": "mint",
   "name": "Tera",
   "colors": {
-    "primary": "#0F766E",
-    "light": "#2DD4BF",
-    "dark": "#0F766E"
+    "primary": "#111111",
+    "light": "#333333",
+    "dark": "#000000"
+  },
+  "background": {
+    "color": {
+      "light": "#faf9f7",
+      "dark": "#0a0a0a"
+    }
+  },
+  "banner": {
+    "content": "Llama, Qwen, DeepSeek, Mistral — drop-in OpenAI-compatible.",
+    "dismissible": true
   },
   "favicon": "/favicon.png",
   "navigation": {
@@ -19,7 +29,8 @@
             "pages": [
               "introduction",
               "quickstart",
-              "authentication"
+              "authentication",
+              "privacy"
             ]
           },
           {

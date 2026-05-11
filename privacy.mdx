@@ -1,0 +1,38 @@
+---
+title: Privacy
+description: "Zero retention. Zero training. Zero human review."
+---
+
+## What Tera does with your data
+
+<Note>
+  **Zero retention. Zero training. Zero human review.**
+  Prompts and completions are processed and discarded.
+</Note>
+
+We do not retain prompt or completion content beyond the request lifecycle. We do not train models on your traffic. No human reviews your prompts or completions in the normal course of operating the service.
+
+## What we do log
+
+For operational reliability we record a minimal request envelope:
+
+- Timestamp
+- API key name (not the secret)
+- Model and backend used
+- HTTP status and duration
+- Token counts (prompt + completion)
+- Truncated prompt/response **only when debugging an explicit error you've reported to us**, and only with the affected key holder's awareness
+
+This is what makes `/admin/logs` (internal) and per-request observability work. It's not used to build profiles of you or your users, and it's not shared.
+
+## Where data lives
+
+US team. US-owned GPUs. US data centers. Inference is served from our own infrastructure — your traffic does not pass through third-party model providers.
+
+## Long-form policy
+
+For the full legal text, see [tera.gw/privacy](https://tera.gw/privacy).
+
+## Questions
+
+Email [tom@hashbranch.com](mailto:tom@hashbranch.com) with any privacy question or data-subject request.

@@ -30,6 +30,7 @@ DEFAULT_SOURCE = "gs://tera-vllm-models/gateway-config.json"
 # never overwrites the page body.
 SKIP_PAGE_REGEN = {
     "openai/gpt-oss-20b",
+    "openai/gpt-oss-120b",
 }
 
 
@@ -102,7 +103,9 @@ def parse_model_page(path: Path) -> dict | None:
     except ValueError:
         context_length = None
 
-    quant = spec.get("Quantization", "—").strip("` ")
+    quant_raw = spec.get("Quantization", "—")
+    quant_match = re.search(r"`([^`]+)`", quant_raw)
+    quant = quant_match.group(1) if quant_match else quant_raw.strip("` ")
     return {
         "id": id_match.group(1),
         "context_length": context_length,

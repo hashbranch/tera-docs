@@ -19,7 +19,7 @@ Pricing is the same whether requests stream or not. Failed requests (5xx, 429) a
 ## How billing works
 
 - **Input tokens** are counted from the rendered prompt after applying the model's chat template.
-- **Output tokens** include generated text. For [reasoning models](/concepts/reasoning), chain-of-thought tokens count toward output.
+- **Output tokens** include generated text. For [reasoning models](/concepts/reasoning), `reasoning_content` tokens count toward output.
 - **TTS** ([Kokoro](/models/kokoro-82m)) bills on input characters, surfaced as `prompt` token cost.
 
 ## Volume discounts

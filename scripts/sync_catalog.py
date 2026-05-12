@@ -25,6 +25,13 @@ DOCS_JSON = ROOT / "docs.json"
 
 DEFAULT_SOURCE = "gs://tera-vllm-models/gateway-config.json"
 
+# Model ids whose .mdx is hand-maintained for partner/showcase content.
+# Sync keeps them in pricing.mdx and docs.json (via parse_model_page) but
+# never overwrites the page body.
+SKIP_PAGE_REGEN = {
+    "openai/gpt-oss-20b",
+}
+
 
 def slugify(model_id: str) -> str:
     base = model_id.split("/", 1)[1] if "/" in model_id else model_id
@@ -278,9 +285,13 @@ def main() -> int:
     MODELS_DIR.mkdir(parents=True, exist_ok=True)
 
     written = []
+    skipped = []
     for entry in catalog:
         slug = slugify(entry["id"])
         path = MODELS_DIR / f"{slug}.mdx"
+        if entry["id"] in SKIP_PAGE_REGEN and path.exists():
+            skipped.append((entry["id"], slug, path))
+            continue
         path.write_text(render_model_page(entry))
         written.append((entry["id"], slug, path))
 
@@ -290,6 +301,10 @@ def main() -> int:
     print(f"wrote {len(written)} catalog model pages and pricing.mdx")
     for model_id, slug, path in written:
         print(f"  {model_id} -> {path.relative_to(ROOT)}")
+    if skipped:
+        print(f"skipped {len(skipped)} catalog pages (hand-maintained per SKIP_PAGE_REGEN):")
+        for model_id, _, path in skipped:
+            print(f"  {model_id} -> {path.relative_to(ROOT)}")
     disk_only = [e for e in all_models if e.get("_source") == "disk"]
     if disk_only:
         print(f"preserved {len(disk_only)} hand-maintained model pages in pricing.mdx:")

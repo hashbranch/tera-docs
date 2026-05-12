@@ -19,7 +19,6 @@ description: "OpenAI's open-weight 20B reasoning model on Tera. OpenAI-compatibl
 | **Quantization** | `mxfp4` (native), prefix caching enabled |
 | **Reasoning** | Emits `reasoning_content` (OpenAI gpt-oss parser) |
 | **Tool calling** | OpenAI-format, auto tool choice enabled |
-| **Status** | Private beta — capacity is spun up on demand per integration partner |
 
 ## Pricing
 
@@ -248,7 +247,7 @@ For gateways that route across multiple providers (Respan, OpenRouter, in-house 
 - **Cold start**: The first request after a backend cold-boot is slow (~2–12s TTFT) because vLLM compiles CUDA graphs on first traffic. Subsequent requests are warm. Schedule a warmup probe before routing real traffic if you can.
 - **Gateway-side retry**: 5xx errors trigger automatic retry across healthy replicas within the Tera gateway before being returned to you. You'll see a single response.
 - **Health-aware routing**: Unhealthy backends are taken out of rotation automatically; clients don't need to manage this.
-- **Concurrency**: Current deployment caps `max_num_seqs=12` per replica. Capacity scales horizontally via additional replicas — coordinate with us before driving sustained high concurrency.
+- **Concurrency**: Per-key concurrency and throughput are sized to your workload. Reach out for higher provisioned envelopes.
 - **Idempotency**: Requests are not deduplicated server-side. If you retry a request that may have succeeded, you may be billed for both.
 - **Streaming cancellation**: If the client disconnects mid-stream, generation is cancelled on the backend.
 
@@ -295,7 +294,7 @@ All errors return a JSON body of the shape:
 
 ## Rate limits
 
-No preset per-key limit during private beta. Sustained concurrency is coordinated per integration partner; we provision additional replicas before turning up traffic. If you need a specific concurrency or token-per-second guarantee, tell us the shape and we'll size to it.
+Per-key concurrency and tokens-per-second are provisioned to your expected workload. Tell us the shape — peak QPS, sustained concurrency, rough token volumes — and we'll size accordingly. Bursts beyond your provisioned envelope return `429` with `Retry-After`.
 
 ## Cost example
 
@@ -310,17 +309,11 @@ Typical agentic turn with a tool call:
 
 At 10,000 turns/day this runs ~$36/day. Volume committed-use pricing available — email [hello@tera.gw](mailto:hello@tera.gw).
 
-## Caveats
-
-- **Validation status.** gpt-oss-20b is a validation candidate. Capacity is spun up on demand for the first integration partner; benchmarked TTFT and throughput will be published after first production routing. For comparison, our Qwen3.5-27B on a comparable Tera deployment measures ~280ms TTFT and ~45 tok/s sustained.
-- **Cold start.** First request after VM start: 2–12s TTFT (CUDA graph compile). Warm thereafter.
-- **MXFP4 runtime.** Native MXFP4 weights via the experimental vLLM image. We pin the runtime image by digest so model behavior doesn't drift on tag rebuilds.
-
 ## Onboard
 
 1. Email [hello@tera.gw](mailto:hello@tera.gw?subject=Tera%20API%20access%20%E2%80%94%20gpt-oss-20b) — tell us expected concurrency, peak QPS, and rough token volumes.
-2. We issue an `sk-tera-...` key and bring up capacity in the relevant region.
+2. We issue an `sk-tera-...` key.
 3. Smoke-test against `https://api.tera.gw/v1` from your gateway.
 4. Ramp.
 
-Bring the `X-Tera-Request-ID` of any failing request and we can grep the gateway logs end-to-end.
+Bring the `X-Tera-Request-ID` of any failing request and we can trace it end-to-end.

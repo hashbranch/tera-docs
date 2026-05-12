@@ -159,6 +159,33 @@ def render_model_page(entry: dict) -> str:
     title = model_id.split("/", 1)[-1]
     description = f"{model_id} on Tera"
 
+    is_tts = "audio" in outputs
+    if is_tts:
+        example = f"""```bash
+curl https://api.tera.gw/v1/audio/speech \\
+  -H "Content-Type: application/json" \\
+  -H "Authorization: Bearer $TERA_API_KEY" \\
+  -d '{{
+    "model": "{model_id}",
+    "input": "Hello from Tera.",
+    "voice": "af_heart",
+    "response_format": "wav",
+    "speed": 1.0
+  }}' \\
+  --output speech.wav
+```"""
+    else:
+        example = f"""```bash
+curl https://api.tera.gw/v1/chat/completions \\
+  -H "Content-Type: application/json" \\
+  -H "Authorization: Bearer $TERA_API_KEY" \\
+  -d '{{
+    "model": "{model_id}",
+    "messages": [{{"role": "user", "content": "Hello"}}],
+    "max_tokens": 256
+  }}'
+```"""
+
     return f"""---
 title: "{title}"
 description: "{description}"
@@ -196,16 +223,7 @@ description: "{description}"
 
 ## Example
 
-```bash
-curl https://api.tera.gw/v1/chat/completions \\
-  -H "Content-Type: application/json" \\
-  -H "Authorization: Bearer $TERA_API_KEY" \\
-  -d '{{
-    "model": "{model_id}",
-    "messages": [{{"role": "user", "content": "Hello"}}],
-    "max_tokens": 64
-  }}'
-```
+{example}
 """
 
 

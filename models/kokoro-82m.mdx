@@ -37,12 +37,15 @@ description: "hexgrad/Kokoro-82M on Tera"
 ## Example
 
 ```bash
-curl https://api.tera.gw/v1/chat/completions \
+curl https://api.tera.gw/v1/audio/speech \
   -H "Content-Type: application/json" \
   -H "Authorization: Bearer $TERA_API_KEY" \
   -d '{
     "model": "hexgrad/Kokoro-82M",
-    "messages": [{"role": "user", "content": "Hello"}],
-    "max_tokens": 64
-  }'
+    "input": "Hello from Tera.",
+    "voice": "af_heart",
+    "response_format": "wav",
+    "speed": 1.0
+  }' \
+  --output speech.wav
 ```

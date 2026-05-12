@@ -17,7 +17,7 @@ description: "OpenAI's open-weight 20B reasoning model on Tera. OpenAI-compatibl
 | **Context length** | 131,072 tokens |
 | **Max output** | 4,096 tokens |
 | **Quantization** | `mxfp4` (native), prefix caching enabled |
-| **Reasoning** | Emits `reasoning_content` (OpenAI gpt-oss parser) |
+| **Reasoning** | Emits `reasoning` (OpenAI gpt-oss parser) |
 | **Tool calling** | OpenAI-format, auto tool choice enabled |
 
 ## Pricing
@@ -83,7 +83,11 @@ curl https://api.tera.gw/v1/chat/completions \
 
 ## Reasoning
 
-gpt-oss-20b runs with the OpenAI gpt-oss reasoning parser. Chain-of-thought tokens are returned in a separate `reasoning_content` field so they don't pollute `content`. OpenAI SDKs that expect a plain `content` string continue to work.
+gpt-oss-20b runs with the OpenAI gpt-oss reasoning parser. Chain-of-thought tokens are returned in a separate `reasoning` field so they don't pollute `content`. OpenAI SDKs that expect a plain `content` string continue to work.
+
+<Note>
+  Some providers expose this as `reasoning_content`. We follow OpenAI's recommendation and use `reasoning`. If you're porting code that expects `reasoning_content`, treat the two as aliases.
+</Note>
 
 <CodeGroup>
 
@@ -92,7 +96,7 @@ gpt-oss-20b runs with the OpenAI gpt-oss reasoning parser. Chain-of-thought toke
   "choices": [{
     "message": {
       "role": "assistant",
-      "reasoning_content": "The user is asking about... I should think about...",
+      "reasoning": "The user is asking about... I should think about...",
       "content": "The final answer is X."
     },
     "finish_reason": "stop"
@@ -101,8 +105,8 @@ gpt-oss-20b runs with the OpenAI gpt-oss reasoning parser. Chain-of-thought toke
 ```
 
 ```text streaming
-data: {"choices":[{"delta":{"role":"assistant","reasoning_content":"The user is"}}]}
-data: {"choices":[{"delta":{"reasoning_content":" asking about"}}]}
+data: {"choices":[{"delta":{"role":"assistant","reasoning":"The user is"}}]}
+data: {"choices":[{"delta":{"reasoning":" asking about"}}]}
 ...
 data: {"choices":[{"delta":{"content":"The final answer is"}}]}
 data: {"choices":[{"delta":{"content":" X."}}]}
@@ -208,7 +212,7 @@ stream = client.chat.completions.create(
 
 for chunk in stream:
     delta = chunk.choices[0].delta
-    if reasoning := getattr(delta, "reasoning_content", None):
+    if reasoning := getattr(delta, "reasoning", None):
         print(f"[think] {reasoning}", end="", flush=True)
     if content := delta.content:
         print(content, end="", flush=True)
@@ -234,7 +238,7 @@ for chunk in stream:
 | `stream` (SSE) | ✅ | Terminated by `data: [DONE]` |
 | `seed` | ✅ | Deterministic |
 | `logprobs` / `top_logprobs` | ✅ | |
-| `reasoning_content` field | ✅ | Sibling of `content`; absent on non-reasoning models |
+| `reasoning` field | ✅ | Sibling of `content`; OpenAI-spec field for chain-of-thought. Some providers use `reasoning_content` as an alias. |
 | `OpenAI-Organization`, `OpenAI-Project` headers | ➖ | Accepted and ignored |
 | `/v1/moderations` | ❌ | Not offered |
 | `/v1/embeddings`, `/v1/images/*`, `/v1/fine_tuning/*` | ❌ | Not offered |

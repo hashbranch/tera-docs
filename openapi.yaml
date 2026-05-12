@@ -27,8 +27,11 @@ paths:
       summary: Create a chat completion
       description: |
         OpenAI-compatible chat completions endpoint. Set `stream: true` for
-        Server-Sent Events. Some models also return a `reasoning_content` field
-        with chain-of-thought traces — see [Reasoning models](/concepts/reasoning).
+        Server-Sent Events. Reasoning models return chain-of-thought traces in
+        a separate field — `reasoning` for models using the OpenAI gpt-oss
+        parser (e.g. `openai/gpt-oss-20b`), `reasoning_content` for models
+        using the qwen3 parser (e.g. `Qwen/Qwen3.5-27B`). Treat the two as
+        aliases. See [Reasoning models](/concepts/reasoning).
       operationId: createChatCompletion
       requestBody:
         required: true
@@ -287,12 +290,20 @@ components:
                 properties:
                   role: { type: string }
                   content: { type: string }
+                  reasoning:
+                    type: string
+                    description: |
+                      Chain-of-thought trace from reasoning models that use
+                      the OpenAI gpt-oss parser (e.g. `openai/gpt-oss-20b`).
+                      OpenAI's recommended field name for raw CoT in Chat
+                      Completions. See [Reasoning models](/concepts/reasoning).
                   reasoning_content:
                     type: string
                     description: |
-                      Chain-of-thought trace from reasoning models like Qwen3.5.
-                      Absent on non-reasoning models. See
-                      [Reasoning models](/concepts/reasoning).
+                      Legacy alias for `reasoning` emitted by models that use
+                      the qwen3 reasoning parser (e.g. `Qwen/Qwen3.5-27B`).
+                      Treat as equivalent to `reasoning`. Absent on
+                      non-reasoning models.
                   tool_calls:
                     type: array
                     items: { $ref: "#/components/schemas/ToolCall" }

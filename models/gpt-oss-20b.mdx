@@ -16,8 +16,7 @@ description: "OpenAI's open-weight 20B reasoning model on Tera. OpenAI-compatibl
 | **HuggingFace** | [`openai/gpt-oss-20b`](https://huggingface.co/openai/gpt-oss-20b) |
 | **Context length** | 131,072 tokens |
 | **Max output** | 4,096 tokens |
-| **Quantization** | `mxfp4` (native) |
-| **Hardware** | 1× NVIDIA A100 80GB (SXM4), prefix caching enabled |
+| **Quantization** | `mxfp4` (native), prefix caching enabled |
 | **Reasoning** | Emits `reasoning_content` (OpenAI gpt-oss parser) |
 | **Tool calling** | OpenAI-format, auto tool choice enabled |
 | **Status** | Private beta — capacity is spun up on demand per integration partner |
@@ -249,7 +248,7 @@ For gateways that route across multiple providers (Respan, OpenRouter, in-house 
 - **Cold start**: The first request after a backend cold-boot is slow (~2–12s TTFT) because vLLM compiles CUDA graphs on first traffic. Subsequent requests are warm. Schedule a warmup probe before routing real traffic if you can.
 - **Gateway-side retry**: 5xx errors trigger automatic retry across healthy replicas within the Tera gateway before being returned to you. You'll see a single response.
 - **Health-aware routing**: Unhealthy backends are taken out of rotation automatically; clients don't need to manage this.
-- **Concurrency**: Current deployment caps `max_num_seqs=12` per A100. Capacity scales horizontally via additional replicas — coordinate with us before driving sustained high concurrency.
+- **Concurrency**: Current deployment caps `max_num_seqs=12` per replica. Capacity scales horizontally via additional replicas — coordinate with us before driving sustained high concurrency.
 - **Idempotency**: Requests are not deduplicated server-side. If you retry a request that may have succeeded, you may be billed for both.
 - **Streaming cancellation**: If the client disconnects mid-stream, generation is cancelled on the backend.
 
@@ -313,7 +312,7 @@ At 10,000 turns/day this runs ~$36/day. Volume committed-use pricing available �
 
 ## Caveats
 
-- **Validation status.** gpt-oss-20b is a validation candidate. Capacity is spun up on demand for the first integration partner; benchmarked TTFT and throughput will be published after first production routing. For comparison, our Qwen3.5-27B on the same A100 hardware measures ~280ms TTFT and ~45 tok/s sustained.
+- **Validation status.** gpt-oss-20b is a validation candidate. Capacity is spun up on demand for the first integration partner; benchmarked TTFT and throughput will be published after first production routing. For comparison, our Qwen3.5-27B on a comparable Tera deployment measures ~280ms TTFT and ~45 tok/s sustained.
 - **Cold start.** First request after VM start: 2–12s TTFT (CUDA graph compile). Warm thereafter.
 - **MXFP4 runtime.** Native MXFP4 weights via the experimental vLLM image. We pin the runtime image by digest so model behavior doesn't drift on tag rebuilds.
 

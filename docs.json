@@ -73,8 +73,10 @@
             "group": "Models",
             "pages": [
               "models/overview",
+              "models/glm-5-1",
               "models/gpt-oss-120b",
               "models/gpt-oss-20b",
+              "models/kimi-k2-6",
               "models/kokoro-82m",
               "models/qwen2-5-7b-instruct",
               "models/qwen3-5-27b",

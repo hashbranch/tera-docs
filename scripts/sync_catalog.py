@@ -31,6 +31,8 @@ DEFAULT_SOURCE = "gs://tera-vllm-models/gateway-config.json"
 SKIP_PAGE_REGEN = {
     "openai/gpt-oss-20b",
     "openai/gpt-oss-120b",
+    "zai-org/GLM-5.1",
+    "moonshotai/Kimi-K2.6",
 }
 
 

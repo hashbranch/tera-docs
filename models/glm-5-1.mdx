@@ -1,0 +1,323 @@
+---
+title: "GLM-5.1"
+description: "Zhipu's open-weight 754B MoE reasoning model on Tera. OpenAI-compatible. 200k context. US-owned GPUs, zero retention."
+---
+
+<Info>
+  Model id: `zai-org/GLM-5.1` — pass this as the `model` field. The API surface is the OpenAI Chat Completions API; existing OpenAI SDKs and any gateway that abstracts over OpenAI-compatible providers work without code changes.
+</Info>
+
+## At a glance
+
+| | |
+|---|---|
+| **Model id** | `zai-org/GLM-5.1` |
+| **Provider** | zai-org |
+| **HuggingFace** | [`zai-org/GLM-5.1`](https://huggingface.co/zai-org/GLM-5.1) |
+| **Context length** | 202,752 tokens |
+| **Max output** | 4,096 tokens |
+| **Quantization** | `fp8` (official `zai-org/GLM-5.1-FP8`), prefix caching enabled |
+| **Reasoning** | Emits `reasoning_content` (GLM reasoning parser) |
+| **Tool calling** | OpenAI-format, auto tool choice enabled |
+
+## Pricing
+
+| | per million tokens |
+|---|---|
+| Input  | $1.40 |
+| Output | $4.40 |
+
+Reasoning tokens count toward output. See [How billing works](/pricing#how-billing-works).
+
+## Quickstart
+
+Set `base_url` to `https://api.tera.gw/v1` and pass your `sk-tera-...` key. No other code change.
+
+<CodeGroup>
+
+```python python
+from openai import OpenAI
+
+client = OpenAI(
+    base_url="https://api.tera.gw/v1",
+    api_key="sk-tera-...",
+)
+
+resp = client.chat.completions.create(
+    model="zai-org/GLM-5.1",
+    messages=[{"role": "user", "content": "Explain the tradeoffs of MoE vs dense models in 3 sentences."}],
+    max_tokens=512,
+)
+print(resp.choices[0].message.content)
+```
+
+```javascript node
+import OpenAI from "openai";
+
+const client = new OpenAI({
+  baseURL: "https://api.tera.gw/v1",
+  apiKey: process.env.TERA_API_KEY,
+});
+
+const resp = await client.chat.completions.create({
+  model: "zai-org/GLM-5.1",
+  messages: [{ role: "user", content: "Explain the tradeoffs of MoE vs dense models in 3 sentences." }],
+  max_tokens: 512,
+});
+
+console.log(resp.choices[0].message.content);
+```
+
+```bash curl
+curl https://api.tera.gw/v1/chat/completions \
+  -H "Content-Type: application/json" \
+  -H "Authorization: Bearer $TERA_API_KEY" \
+  -d '{
+    "model": "zai-org/GLM-5.1",
+    "messages": [{"role": "user", "content": "Explain the tradeoffs of MoE vs dense models in 3 sentences."}],
+    "max_tokens": 512
+  }'
+```
+
+</CodeGroup>
+
+## Reasoning
+
+GLM-5.1 is a reasoning model. Its vLLM reasoning parser returns chain-of-thought tokens in a separate `reasoning_content` field so they don't pollute `content`. OpenAI SDKs that expect a plain `content` string continue to work.
+
+<Note>
+  OpenAI's spec calls this field `reasoning`. The GLM parser emits it as `reasoning_content`. Treat the two as aliases — if you're porting code that reads `reasoning`, read `reasoning_content` here.
+</Note>
+
+<CodeGroup>
+
+```json non-streaming
+{
+  "choices": [{
+    "message": {
+      "role": "assistant",
+      "reasoning_content": "The user is asking about... I should think about...",
+      "content": "The final answer is X."
+    },
+    "finish_reason": "stop"
+  }]
+}
+```
+
+```text streaming
+data: {"choices":[{"delta":{"role":"assistant","reasoning_content":"The user is"}}]}
+data: {"choices":[{"delta":{"reasoning_content":" asking about"}}]}
+...
+data: {"choices":[{"delta":{"content":"The final answer is"}}]}
+data: {"choices":[{"delta":{"content":" X."}}]}
+data: {"choices":[{"delta":{},"finish_reason":"stop"}]}
+data: [DONE]
+```
+
+</CodeGroup>
+
+See [Reasoning models](/concepts/reasoning) for the streaming Python loop and rendering patterns.
+
+## Tool calling
+
+GLM-5.1 runs with auto tool choice enabled. The request and response shapes match the OpenAI Chat Completions API 1:1.
+
+```python
+tools = [{
+    "type": "function",
+    "function": {
+        "name": "get_weather",
+        "description": "Get the current weather in a city.",
+        "parameters": {
+            "type": "object",
+            "properties": {
+                "city": {"type": "string"},
+                "unit": {"type": "string", "enum": ["celsius", "fahrenheit"]},
+            },
+            "required": ["city"],
+        },
+    },
+}]
+
+# Turn 1: model decides to call the tool
+first = client.chat.completions.create(
+    model="zai-org/GLM-5.1",
+    messages=[{"role": "user", "content": "What's the weather in Paris?"}],
+    tools=tools,
+)
+tool_call = first.choices[0].message.tool_calls[0]
+
+# Turn 2: provide tool output, get final answer
+final = client.chat.completions.create(
+    model="zai-org/GLM-5.1",
+    messages=[
+        {"role": "user", "content": "What's the weather in Paris?"},
+        first.choices[0].message,
+        {"role": "tool", "tool_call_id": tool_call.id, "content": "18C, partly cloudy"},
+    ],
+    tools=tools,
+)
+print(final.choices[0].message.content)
+```
+
+`tool_choice` accepts `"auto"` (default), `"none"`, `"required"`, or `{"type": "function", "function": {"name": "..."}}`. Parallel tool calls are supported — the response can contain multiple entries in `tool_calls`. Streaming tool calls arrive as `delta.tool_calls[i].function.arguments` JSON fragments that must be concatenated by call index.
+
+See [Tool calling](/concepts/tool-calling) for the full streaming reconstruction example.
+
+## Structured outputs / JSON mode
+
+Pass `response_format` to constrain the assistant's output.
+
+```python
+# JSON mode — guarantees valid JSON, schema not enforced
+resp = client.chat.completions.create(
+    model="zai-org/GLM-5.1",
+    messages=[{"role": "user", "content": "List 3 colors as JSON."}],
+    response_format={"type": "json_object"},
+)
+
+# Structured outputs — JSON Schema enforced
+resp = client.chat.completions.create(
+    model="zai-org/GLM-5.1",
+    messages=[{"role": "user", "content": "Extract: 'Alice is 30 years old.'"}],
+    response_format={
+        "type": "json_schema",
+        "json_schema": {
+            "name": "person",
+            "strict": True,
+            "schema": {
+                "type": "object",
+                "properties": {
+                    "name": {"type": "string"},
+                    "age": {"type": "integer"},
+                },
+                "required": ["name", "age"],
+                "additionalProperties": False,
+            },
+        },
+    },
+)
+```
+
+## Streaming
+
+Set `"stream": true` and consume Server-Sent Events on the same endpoint. See [Streaming](/concepts/streaming) for the wire format.
+
+```python
+stream = client.chat.completions.create(
+    model="zai-org/GLM-5.1",
+    messages=[{"role": "user", "content": "Count to five."}],
+    stream=True,
+)
+
+for chunk in stream:
+    delta = chunk.choices[0].delta
+    if reasoning := getattr(delta, "reasoning_content", None):
+        print(f"[think] {reasoning}", end="", flush=True)
+    if content := delta.content:
+        print(content, end="", flush=True)
+```
+
+## Sampling parameters
+
+`temperature`, `top_p`, `top_k`, `max_tokens`, `stop`, `seed`, `frequency_penalty`, `presence_penalty`, `repetition_penalty`, `logprobs`, `top_logprobs`
+
+`seed` is honored for deterministic sampling. `top_k`, `repetition_penalty`, and `min_p` are vLLM extensions beyond OpenAI's surface — ignored by clients that don't pass them.
+
+## Supported features
+
+`tools`, `json_mode`, `structured_outputs`, `reasoning`, `logprobs`
+
+## OpenAI compatibility matrix
+
+| Field / behavior | Status | Notes |
+|---|---|---|
+| `messages` (system / user / assistant / tool) | ✅ | Standard OpenAI shape |
+| `tools` / `tool_choice` / `tool_calls` | ✅ | Auto tool choice enabled |
+| `response_format` (`json_object`, `json_schema`) | ✅ | Strict schema enforcement supported |
+| `stream` (SSE) | ✅ | Terminated by `data: [DONE]` |
+| `seed` | ✅ | Deterministic |
+| `logprobs` / `top_logprobs` | ✅ | |
+| `reasoning_content` field | ✅ | Sibling of `content` for chain-of-thought. OpenAI-spec alias is `reasoning`. |
+| `OpenAI-Organization`, `OpenAI-Project` headers | ➖ | Accepted and ignored |
+| `/v1/moderations` | ❌ | Not offered |
+| `/v1/embeddings`, `/v1/images/*`, `/v1/fine_tuning/*` | ❌ | Not offered |
+| Image inputs | ❌ | Text-only on Tera today |
+
+## Reliability and routing
+
+For gateways that route across multiple providers (Respan, OpenRouter, in-house abstractions), the relevant behaviors:
+
+- **Cold start**: The first request after a backend cold-boot is slow (~2–12s TTFT) because vLLM compiles CUDA graphs on first traffic. Subsequent requests are warm. Schedule a warmup probe before routing real traffic if you can.
+- **Gateway-side retry**: 5xx errors trigger automatic retry across healthy replicas within the Tera gateway before being returned to you. You'll see a single response.
+- **Health-aware routing**: Unhealthy backends are taken out of rotation automatically; clients don't need to manage this.
+- **Concurrency**: Per-key concurrency and throughput are sized to your workload. Reach out for higher provisioned envelopes.
+- **Idempotency**: Requests are not deduplicated server-side. If you retry a request that may have succeeded, you may be billed for both.
+- **Streaming cancellation**: If the client disconnects mid-stream, generation is cancelled on the backend.
+
+## Observability
+
+Every response carries headers and a body useful for trace correlation.
+
+| Surface | Value |
+|---|---|
+| `X-Tera-Request-ID` response header | Unique per request. Quote this in support emails. |
+| `usage.prompt_tokens` | Input tokens billed |
+| `usage.completion_tokens` | Output tokens billed (includes reasoning) |
+| `usage.total_tokens` | Sum |
+| `choices[0].finish_reason` | `stop`, `length`, or `tool_calls` |
+
+Read the header with the OpenAI Python SDK via the `with_raw_response` accessor:
+
+```python
+raw = client.chat.completions.with_raw_response.create(
+    model="zai-org/GLM-5.1",
+    messages=[{"role": "user", "content": "hi"}],
+)
+request_id = raw.http_response.headers.get("X-Tera-Request-ID")
+resp = raw.parse()
+```
+
+## Errors
+
+All errors return a JSON body of the shape:
+
+```json
+{ "error": { "message": "...", "type": "...", "code": "..." } }
+```
+
+| HTTP | `error.type` | When | Retry? |
+|---|---|---|---|
+| `400` | `invalid_request_error` | Malformed body, unknown sampling parameter values | No — fix the request |
+| `401` | `authentication_error` | Missing or invalid API key | No — rotate the key |
+| `403` | `permission_error` | Key not scoped to this model | No — request scope |
+| `404` | `model_not_found` | `model` field not in the catalog | No — check `/v1/models` |
+| `429` | `rate_limit_error` | Per-key concurrency / token-rate limit hit | Yes — honor `Retry-After` header |
+| `500` | `server_error` | Gateway-side failure after backend retries exhausted | Yes — bounded retry with backoff |
+| `503` | `service_unavailable` | Backend cold or no healthy replica | Yes — first request after long idle may hit this |
+
+## Rate limits
+
+Per-key concurrency and tokens-per-second are provisioned to your expected workload. Tell us the shape — peak QPS, sustained concurrency, rough token volumes — and we'll size accordingly. Bursts beyond your provisioned envelope return `429` with `Retry-After`.
+
+## Cost example
+
+Typical agentic turn with a tool call:
+
+| Stage | Tokens | Cost |
+|---|---:|---:|
+| User prompt + system | 800 in | $0.0011 |
+| Reasoning + tool call | 400 out | $0.0018 |
+| Tool result + final answer | 200 in / 300 out | $0.0016 |
+| **Per turn** |  | **~$0.0045** |
+
+At 10,000 turns/day this runs ~$45/day. Volume committed-use pricing available — email [hello@tera.gw](mailto:hello@tera.gw).
+
+## Onboard
+
+1. Email [hello@tera.gw](mailto:hello@tera.gw?subject=Tera%20API%20access%20%E2%80%94%20GLM-5.1) — tell us expected concurrency, peak QPS, and rough token volumes.
+2. We issue an `sk-tera-...` key.
+3. Smoke-test against `https://api.tera.gw/v1` from your gateway.
+4. Ramp.
+
+Bring the `X-Tera-Request-ID` of any failing request and we can trace it end-to-end.

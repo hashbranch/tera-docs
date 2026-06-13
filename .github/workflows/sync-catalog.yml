@@ -2,40 +2,129 @@ name: Sync model catalog
 
 on:
   schedule:
-    - cron: "17 6 * * *"
+    # Daily at 08:00 UTC
+    - cron: "0 8 * * *"
   workflow_dispatch:
-    inputs:
-      source:
-        description: "Override source (gs:// path, https:// URL, or local path)"
-        required: false
-        default: "https://api.tera.gw/v1/models"
 
 permissions:
   contents: write
-  pull-requests: write
+  issues: write
 
 jobs:
   sync:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
-
-      - name: Run sync
-        run: |
-          SOURCE="${{ github.event.inputs.source }}"
-          if [ -z "$SOURCE" ]; then
-            SOURCE="https://api.tera.gw/v1/models"
-          fi
-          python3 scripts/sync_catalog.py --source "$SOURCE"
-
-      - name: Open PR if catalog changed
-        uses: peter-evans/create-pull-request@v6
         with:
-          commit-message: "chore: sync model catalog"
-          title: "Sync model catalog"
-          body: |
-            Automated regeneration of `models/*.mdx`, `pricing.mdx`, and
-            `mint.json` navigation from the live Tera catalog.
-          branch: chore/sync-catalog
-          delete-branch: true
-          labels: automated
+          # Use the default GITHUB_TOKEN with write permission (granted above).
+          # fetch-depth: 0 so we can detect diffs against HEAD after sync.
+          fetch-depth: 0
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+
+      # ------------------------------------------------------------------ sync
+      - name: Run sync_catalog
+        run: python3 scripts/sync_catalog.py --source https://api.tera.gw/v1/models
+
+      # ------------------------------------------------------- forbidden-phrase gates
+      # Gate 1: no specific GPU SKUs
+      - name: "Gate: no GPU SKUs"
+        run: |
+          if grep -rni -E "a100|h100|l4|sxm4|nvidia|80gb|24gb" \
+               --include="*.mdx" --include="*.yaml" --include="*.json" .; then
+            echo "::error::Forbidden GPU SKU phrase found in docs. Fix before committing."
+            exit 1
+          fi
+
+      # Gate 2: no internal-status language
+      - name: "Gate: no internal-status language"
+        run: |
+          if grep -rni -E \
+               "validation|candidate|spun up|spin up|on.demand|private beta|first integration|first partner|while we onboard|bring up capacity|provision additional|before turning up" \
+               --include="*.mdx" --include="*.yaml" .; then
+            echo "::error::Forbidden internal-status phrase found in docs. Fix before committing."
+            exit 1
+          fi
+
+      # ------------------------------------------------------------------ diff
+      - name: Detect changed catalog files
+        id: diff
+        run: |
+          # Only look at the files the sync script can touch
+          git diff --name-only -- models/ pricing.mdx docs.json > /tmp/changed_files.txt
+          cat /tmp/changed_files.txt
+          if [ -s /tmp/changed_files.txt ]; then
+            echo "changed=true" >> "$GITHUB_OUTPUT"
+            # Build a short human-readable summary of what changed
+            ADDED=$(git diff --diff-filter=A --name-only -- models/ | sed 's|models/||;s|\.mdx||')
+            REMOVED=$(git diff --diff-filter=D --name-only -- models/ | sed 's|models/||;s|\.mdx||')
+            MODIFIED=$(git diff --diff-filter=M --name-only -- models/ pricing.mdx docs.json)
+            {
+              echo "added<<EOF"
+              echo "$ADDED"
+              echo "EOF"
+              echo "removed<<EOF"
+              echo "$REMOVED"
+              echo "EOF"
+              echo "modified<<EOF"
+              echo "$MODIFIED"
+              echo "EOF"
+            } >> "$GITHUB_OUTPUT"
+          else
+            echo "changed=false" >> "$GITHUB_OUTPUT"
+          fi
+
+      # ------------------------------------------- auto-commit to main (land mode)
+      - name: Commit and push to main
+        if: steps.diff.outputs.changed == 'true'
+        run: |
+          git config user.name  "tera-sync-bot"
+          git config user.email "bot@tera.gw"
+          git add models/ pricing.mdx docs.json
+          git commit -m "chore: auto-sync catalog from live API [skip ci]"
+          git push origin HEAD:main
+
+      # ---------------------------------------------------------------- notify
+      - name: Open tracking issue
+        if: steps.diff.outputs.changed == 'true'
+        uses: actions/github-script@v7
+        with:
+          script: |
+            const added    = `${{ steps.diff.outputs.added }}`.trim();
+            const removed  = `${{ steps.diff.outputs.removed }}`.trim();
+            const modified = `${{ steps.diff.outputs.modified }}`.trim();
+
+            const lines = ["Catalog auto-sync committed to `main` — here is what changed:\n"];
+            if (added)    lines.push(`**Added models:**\n${added.split("\n").map(l => `- \`${l}\``).join("\n")}`);
+            if (removed)  lines.push(`**Removed models:**\n${removed.split("\n").map(l => `- \`${l}\``).join("\n")}`);
+            if (modified) lines.push(`**Updated files:**\n${modified.split("\n").map(l => `- \`${l}\``).join("\n")}`);
+            lines.push(`\nRun: ${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}`);
+
+            await github.rest.issues.create({
+              owner: context.repo.owner,
+              repo:  context.repo.repo,
+              title: `Catalog sync — ${new Date().toISOString().slice(0,10)}`,
+              body:  lines.join("\n\n"),
+              labels: ["automated", "catalog-sync"],
+            });
+
+      # --------------------------------------------------------------- summary
+      - name: Write job summary
+        if: always()
+        run: |
+          {
+            echo "## Catalog sync — $(date -u +%Y-%m-%d)"
+            echo ""
+            if [ "${{ steps.diff.outputs.changed }}" = "true" ]; then
+              echo "**Status:** committed to \`main\`"
+              echo ""
+              echo "### Changed files"
+              echo "\`\`\`"
+              cat /tmp/changed_files.txt
+              echo "\`\`\`"
+            else
+              echo "**Status:** no catalog changes — nothing committed."
+            fi
+          } >> "$GITHUB_STEP_SUMMARY"

@@ -3,15 +3,12 @@ title: Pricing
 description: "Per-token pricing for models on Tera."
 ---
 
-All prices are in USD per **million tokens**. Updated 2026-06-12.
+All prices are in USD per **million tokens**. Updated 2026-06-13.
 
 | Model | Input | Output | Quant | Context |
 |---|---:|---:|---|---:|
-| `Qwen/Qwen3.5-4B` | $0.04 | $0.08 | `bf16` | 262,144 |
-| `Qwen/Qwen2.5-7B-Instruct` | $0.05 | $0.10 | `bf16` | 8,192 |
 | `openai/gpt-oss-20b` | $0.07 | $0.25 | `mxfp4` | 131,072 |
 | `openai/gpt-oss-120b` | $0.09 | $0.36 | `mxfp4` | 131,072 |
-| `Qwen/Qwen3.5-27B` | $0.10 | $0.30 | `fp8` | 8,192 |
 | `google/gemma-4-26B-A4B-it` | $0.15 | $0.60 | `managed` | 262,144 |
 | `Qwen/Qwen3-Next-80B-A3B-Instruct` | $0.15 | $1.20 | `managed` | 262,144 |
 | `Qwen/Qwen3-Next-80B-A3B-Thinking` | $0.15 | $1.20 | `managed` | 262,144 |
@@ -22,12 +19,9 @@ All prices are in USD per **million tokens**. Updated 2026-06-12.
 | `deepseek-ai/DeepSeek-V3.1` | $0.60 | $1.70 | `managed` | 163,840 |
 | `moonshotai/kimi-k2-thinking` | $0.60 | $2.50 | `managed-int4` | 262,144 |
 | `zai-org/GLM-4.7` | $0.60 | $2.20 | `managed` | 200,000 |
-| `hexgrad/Kokoro-82M` | $0.62 | Free | `fp32` | 4,096 |
 | `meta-llama/Llama-3.3-70B-Instruct` | $0.72 | $0.72 | `managed` | 128,000 |
 | `zai-org/GLM-5` | $1.00 | $3.20 | `managed` | 200,000 |
-| `moonshotai/Kimi-K2.6` | $1.20 | $4.50 | `int4` | 262,144 |
 | `deepseek-ai/DeepSeek-R1-0528` | $1.35 | $5.40 | `managed` | 163,840 |
-| `zai-org/GLM-5.1` | $1.40 | $4.40 | `fp8` | 202,752 |
 
 Pricing is the same whether requests stream or not. Failed requests (5xx, 429) are not billed.
 
@@ -35,7 +29,6 @@ Pricing is the same whether requests stream or not. Failed requests (5xx, 429) a
 
 - **Input tokens** are counted from the rendered prompt after applying the model's chat template.
 - **Output tokens** include generated text. For [reasoning models](/concepts/reasoning), `reasoning_content` tokens count toward output.
-- **TTS** ([Kokoro](/models/kokoro-82m)) bills on input characters, surfaced as `prompt` token cost.
 
 ## Volume discounts
 

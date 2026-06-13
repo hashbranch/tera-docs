@@ -1,0 +1,48 @@
+---
+title: "Llama-3.3-70B-Instruct"
+description: "meta-llama/Llama-3.3-70B-Instruct on Tera"
+---
+
+<Info>
+  Model id: `meta-llama/Llama-3.3-70B-Instruct` — pass this as the `model` field in API requests.
+</Info>
+
+## Spec
+
+| | |
+|---|---|
+| **Provider** | meta-llama |
+| **HuggingFace** | [`meta-llama/Llama-3.3-70B-Instruct`](https://huggingface.co/meta-llama/Llama-3.3-70B-Instruct) |
+| **Context length** | 128,000 tokens |
+| **Max output** | 4,096 tokens |
+| **Quantization** | `managed` |
+| **Input modalities** | text |
+| **Output modalities** | text |
+
+## Pricing
+
+| | per million tokens |
+|---|---|
+| Input  | $0.72 |
+| Output | $0.72 |
+
+## Supported features
+
+`tools`, `json_mode`, `structured_outputs`
+
+## Sampling parameters
+
+`temperature`, `top_p`, `top_k`, `max_tokens`, `stop`, `seed`, `frequency_penalty`, `presence_penalty`, `repetition_penalty`, `logprobs`, `top_logprobs`
+
+## Example
+
+```bash
+curl https://api.tera.gw/v1/chat/completions \
+  -H "Content-Type: application/json" \
+  -H "Authorization: Bearer $TERA_API_KEY" \
+  -d '{
+    "model": "meta-llama/Llama-3.3-70B-Instruct",
+    "messages": [{"role": "user", "content": "Hello"}],
+    "max_tokens": 256
+  }'
+```

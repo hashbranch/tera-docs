@@ -25,13 +25,29 @@ DOCS_JSON = ROOT / "docs.json"
 
 DEFAULT_SOURCE = "gs://tera-vllm-models/gateway-config.json"
 
-# Model ids whose .mdx is hand-maintained for partner/showcase content.
-# Sync keeps them in pricing.mdx and docs.json (via parse_model_page) but
-# never overwrites the page body.
+# Model ids whose .mdx body is hand-maintained for partner/showcase content.
+# Sync DOES NOT overwrite the full page. Instead it surgically patches the
+# content between sync marker comment pairs:
+#
+#   {/* sync:pricing:start */} … {/* sync:pricing:end */}
+#   {/* sync:cost-example:start */} … {/* sync:cost-example:end */}
+#
+# If a SKIP_PAGE_REGEN page lacks the markers, sync falls back to the old
+# behaviour (skip the page entirely) and prints a warning.
 SKIP_PAGE_REGEN = {
     "openai/gpt-oss-20b",
     "openai/gpt-oss-120b",
 }
+
+# Fixed cost-example scenario used in partner pages.
+# Row breakdown: 700 prompt in + 400 reasoning/tool out + 300 tool-result in + 200 final out
+# Total: 1,000 input tokens, 600 output tokens per turn.
+_CE_IN_PROMPT   = 700   # tokens
+_CE_OUT_REASON  = 400   # tokens
+_CE_IN_TOOL     = 300   # tokens
+_CE_OUT_FINAL   = 200   # tokens
+_CE_TURNS_DAY   = 50_000
+_CE_DAYS_MONTH  = 30
 
 
 def slugify(model_id: str) -> str:
@@ -81,6 +97,106 @@ SPEC_LINE_RE = re.compile(
     r"^\|\s*\*\*(?P<key>[^*]+)\*\*\s*\|\s*(?P<value>[^|]+?)\s*\|", re.MULTILINE
 )
 MODEL_ID_RE = re.compile(r"Model id:\s*`([^`]+)`")
+
+# Marker patterns for surgical patching of SKIP_PAGE_REGEN pages.
+_MARKER_RE = {
+    "pricing": re.compile(
+        r"(\{/\* sync:pricing:start \*/\}).*?(\{/\* sync:pricing:end \*/\})",
+        re.DOTALL,
+    ),
+    "cost-example": re.compile(
+        r"(\{/\* sync:cost-example:start \*/\}).*?(\{/\* sync:cost-example:end \*/\})",
+        re.DOTALL,
+    ),
+}
+
+
+def render_pricing_block(in_price: str, out_price: str) -> str:
+    """Return the MDX content to place between sync:pricing markers (no markers included)."""
+    return (
+        f"\n\n| | per million tokens |\n"
+        f"|---|---|\n"
+        f"| Input  | {in_price} |\n"
+        f"| Output | {out_price} |\n\n"
+    )
+
+
+def render_cost_example_block(prompt_rate: float, completion_rate: float) -> str:
+    """Return the MDX content to place between sync:cost-example markers.
+
+    Uses the fixed scenario: 700 in + 400 out + 300 in / 200 out per turn,
+    scaled to _CE_TURNS_DAY turns/day.
+    """
+    r1 = _CE_IN_PROMPT  * prompt_rate
+    r2 = _CE_OUT_REASON * completion_rate
+    r3 = _CE_IN_TOOL    * prompt_rate + _CE_OUT_FINAL * completion_rate
+    per_turn = r1 + r2 + r3
+    per_day  = per_turn * _CE_TURNS_DAY
+    per_month = per_day * _CE_DAYS_MONTH
+
+    total_in  = _CE_IN_PROMPT + _CE_IN_TOOL    # 1,000
+    total_out = _CE_OUT_REASON + _CE_OUT_FINAL # 600
+
+    return (
+        f"\n\nTypical agentic turn with a tool call ({total_in:,} input tokens, {total_out:,} output tokens):\n\n"
+        f"| Stage | Tokens | Cost |\n"
+        f"|---|---:|---:|\n"
+        f"| User prompt + system | {_CE_IN_PROMPT} in | ${r1:.7f} |\n"
+        f"| Reasoning + tool call | {_CE_OUT_REASON} out | ${r2:.7f} |\n"
+        f"| Tool result + final answer | {_CE_IN_TOOL} in / {_CE_OUT_FINAL} out | ${r3:.7f} |\n"
+        f"| **Per turn** |  | **~${per_turn:.6f}** |\n\n"
+        f"At {_CE_TURNS_DAY:,} turns/day this runs ~${per_day:.2f}/day "
+        f"(~${per_month:.0f}/month). Volume committed-use pricing available "
+        f"— email [hello@tera.gw](mailto:hello@tera.gw).\n\n"
+    )
+
+
+def patch_skip_page(path: Path, entry: dict) -> bool:
+    """Patch sync-managed sections of a SKIP_PAGE_REGEN page.
+
+    Returns True if the file was modified, False if unchanged or markers absent.
+    """
+    pricing = entry.get("pricing", {})
+    prompt_rate     = float(pricing.get("prompt", 0))
+    completion_rate = float(pricing.get("completion", 0))
+    in_price  = fmt_price(pricing.get("prompt", "0"))
+    out_price = fmt_price(pricing.get("completion", "0"))
+
+    text = path.read_text()
+    original = text
+
+    # Patch pricing block
+    if _MARKER_RE["pricing"].search(text):
+        new_block = render_pricing_block(in_price, out_price)
+        text = _MARKER_RE["pricing"].sub(
+            r"\g<1>" + new_block + r"\g<2>",
+            text,
+        )
+    else:
+        print(
+            f"  warning: {path.name} has no sync:pricing markers — "
+            "pricing section not patched",
+            file=sys.stderr,
+        )
+
+    # Patch cost-example block
+    if _MARKER_RE["cost-example"].search(text):
+        new_block = render_cost_example_block(prompt_rate, completion_rate)
+        text = _MARKER_RE["cost-example"].sub(
+            r"\g<1>" + new_block + r"\g<2>",
+            text,
+        )
+    else:
+        print(
+            f"  warning: {path.name} has no sync:cost-example markers — "
+            "cost example not patched",
+            file=sys.stderr,
+        )
+
+    if text != original:
+        path.write_text(text)
+        return True
+    return False
 
 
 def parse_model_page(path: Path) -> dict | None:
@@ -287,12 +403,17 @@ def main() -> int:
     MODELS_DIR.mkdir(parents=True, exist_ok=True)
 
     written = []
+    patched = []
     skipped = []
     for entry in catalog:
         slug = slugify(entry["id"])
         path = MODELS_DIR / f"{slug}.mdx"
         if entry["id"] in SKIP_PAGE_REGEN and path.exists():
-            skipped.append((entry["id"], slug, path))
+            changed = patch_skip_page(path, entry)
+            if changed:
+                patched.append((entry["id"], slug, path))
+            else:
+                skipped.append((entry["id"], slug, path))
             continue
         path.write_text(render_model_page(entry))
         written.append((entry["id"], slug, path))
@@ -303,8 +424,12 @@ def main() -> int:
     print(f"wrote {len(written)} catalog model pages and pricing.mdx")
     for model_id, slug, path in written:
         print(f"  {model_id} -> {path.relative_to(ROOT)}")
+    if patched:
+        print(f"patched {len(patched)} SKIP_PAGE_REGEN pages (pricing + cost example updated):")
+        for model_id, _, path in patched:
+            print(f"  {model_id} -> {path.relative_to(ROOT)}")
     if skipped:
-        print(f"skipped {len(skipped)} catalog pages (hand-maintained per SKIP_PAGE_REGEN):")
+        print(f"no-op {len(skipped)} SKIP_PAGE_REGEN pages (already current):")
         for model_id, _, path in skipped:
             print(f"  {model_id} -> {path.relative_to(ROOT)}")
     disk_only = [e for e in all_models if e.get("_source") == "disk"]

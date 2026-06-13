@@ -22,10 +22,14 @@ description: "OpenAI's open-weight 20B reasoning model on Tera. OpenAI-compatibl
 
 ## Pricing
 
+{/* sync:pricing:start */}
+
 | | per million tokens |
 |---|---|
 | Input  | $0.07 |
 | Output | $0.25 |
+
+{/* sync:pricing:end */}
 
 Reasoning tokens count toward output. See [How billing works](/pricing#how-billing-works).
 
@@ -302,6 +306,8 @@ Per-key concurrency and tokens-per-second are provisioned to your expected workl
 
 ## Cost example
 
+{/* sync:cost-example:start */}
+
 Typical agentic turn with a tool call (1,000 input tokens, 600 output tokens):
 
 | Stage | Tokens | Cost |
@@ -312,6 +318,8 @@ Typical agentic turn with a tool call (1,000 input tokens, 600 output tokens):
 | **Per turn** |  | **~$0.000220** |
 
 At 50,000 turns/day this runs ~$11.00/day (~$330/month). Volume committed-use pricing available — email [hello@tera.gw](mailto:hello@tera.gw).
+
+{/* sync:cost-example:end */}
 
 ## Onboard
 

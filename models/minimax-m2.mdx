@@ -1,0 +1,48 @@
+---
+title: "MiniMax-M2"
+description: "MiniMaxAI/MiniMax-M2 on Tera"
+---
+
+<Info>
+  Model id: `MiniMaxAI/MiniMax-M2` — pass this as the `model` field in API requests.
+</Info>
+
+## Spec
+
+| | |
+|---|---|
+| **Provider** | minimaxai |
+| **HuggingFace** | [`MiniMaxAI/MiniMax-M2`](https://huggingface.co/MiniMaxAI/MiniMax-M2) |
+| **Context length** | 196,608 tokens |
+| **Max output** | 4,096 tokens |
+| **Quantization** | `managed-fp8` |
+| **Input modalities** | text |
+| **Output modalities** | text |
+
+## Pricing
+
+| | per million tokens |
+|---|---|
+| Input  | $0.30 |
+| Output | $1.20 |
+
+## Supported features
+
+`tools`, `json_mode`, `structured_outputs`, `reasoning`
+
+## Sampling parameters
+
+`temperature`, `top_p`, `top_k`, `max_tokens`, `stop`, `seed`, `frequency_penalty`, `presence_penalty`, `repetition_penalty`, `logprobs`, `top_logprobs`
+
+## Example
+
+```bash
+curl https://api.tera.gw/v1/chat/completions \
+  -H "Content-Type: application/json" \
+  -H "Authorization: Bearer $TERA_API_KEY" \
+  -d '{
+    "model": "MiniMaxAI/MiniMax-M2",
+    "messages": [{"role": "user", "content": "Hello"}],
+    "max_tokens": 256
+  }'
+```

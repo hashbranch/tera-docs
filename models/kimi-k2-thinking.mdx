@@ -1,0 +1,48 @@
+---
+title: "kimi-k2-thinking"
+description: "moonshotai/kimi-k2-thinking on Tera"
+---
+
+<Info>
+  Model id: `moonshotai/kimi-k2-thinking` — pass this as the `model` field in API requests.
+</Info>
+
+## Spec
+
+| | |
+|---|---|
+| **Provider** | moonshotai |
+| **HuggingFace** | [`moonshotai/kimi-k2-thinking`](https://huggingface.co/moonshotai/kimi-k2-thinking) |
+| **Context length** | 262,144 tokens |
+| **Max output** | 4,096 tokens |
+| **Quantization** | `managed-int4` |
+| **Input modalities** | text |
+| **Output modalities** | text |
+
+## Pricing
+
+| | per million tokens |
+|---|---|
+| Input  | $0.60 |
+| Output | $2.50 |
+
+## Supported features
+
+`tools`, `json_mode`, `structured_outputs`, `reasoning`
+
+## Sampling parameters
+
+`temperature`, `top_p`, `top_k`, `max_tokens`, `stop`, `seed`, `frequency_penalty`, `presence_penalty`, `repetition_penalty`, `logprobs`, `top_logprobs`
+
+## Example
+
+```bash
+curl https://api.tera.gw/v1/chat/completions \
+  -H "Content-Type: application/json" \
+  -H "Authorization: Bearer $TERA_API_KEY" \
+  -d '{
+    "model": "moonshotai/kimi-k2-thinking",
+    "messages": [{"role": "user", "content": "Hello"}],
+    "max_tokens": 256
+  }'
+```

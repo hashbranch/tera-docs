@@ -63,7 +63,13 @@ def fetch(source: str) -> dict:
         out = subprocess.check_output(["gsutil", "cat", source])
         return json.loads(out)
     if source.startswith(("http://", "https://")):
-        with urllib.request.urlopen(source) as r:
+        # Cloudflare in front of api.tera.gw 403s the default Python-urllib
+        # user-agent, so send a normal one.
+        req = urllib.request.Request(
+            source,
+            headers={"User-Agent": "tera-docs-sync/1.0 (+https://github.com/hashbranch/tera-docs)"},
+        )
+        with urllib.request.urlopen(req) as r:
             data = json.loads(r.read())
             if "catalog" in data:
                 return data

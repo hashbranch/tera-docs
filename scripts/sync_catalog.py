@@ -31,8 +31,6 @@ DEFAULT_SOURCE = "gs://tera-vllm-models/gateway-config.json"
 SKIP_PAGE_REGEN = {
     "openai/gpt-oss-20b",
     "openai/gpt-oss-120b",
-    "zai-org/GLM-5.1",
-    "moonshotai/Kimi-K2.6",
 }
 
 
@@ -268,7 +266,6 @@ Pricing is the same whether requests stream or not. Failed requests (5xx, 429) a
 
 - **Input tokens** are counted from the rendered prompt after applying the model's chat template.
 - **Output tokens** include generated text. For [reasoning models](/concepts/reasoning), `reasoning_content` tokens count toward output.
-- **TTS** ([Kokoro](/models/kokoro-82m)) bills on input characters, surfaced as `prompt` token cost.
 
 ## Volume discounts
 

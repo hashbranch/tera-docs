@@ -1,0 +1,48 @@
+---
+title: "DeepSeek-V4-Pro"
+description: "deepseek-ai/DeepSeek-V4-Pro on Tera"
+---
+
+<Info>
+  Model id: `deepseek-ai/DeepSeek-V4-Pro` — pass this as the `model` field in API requests.
+</Info>
+
+## Spec
+
+| | |
+|---|---|
+| **Provider** | deepseek-ai |
+| **HuggingFace** | [`deepseek-ai/DeepSeek-V4-Pro`](https://huggingface.co/deepseek-ai/DeepSeek-V4-Pro) |
+| **Context length** | 1,048,576 tokens |
+| **Max output** | 32,768 tokens |
+| **Quantization** | `managed` |
+| **Input modalities** | text |
+| **Output modalities** | text |
+
+## Pricing
+
+| | per million tokens |
+|---|---|
+| Input  | $1.74 |
+| Output | $3.48 |
+
+## Supported features
+
+`tools`, `json_mode`, `structured_outputs`, `reasoning`
+
+## Sampling parameters
+
+`temperature`, `top_p`, `top_k`, `max_tokens`, `stop`, `seed`, `frequency_penalty`, `presence_penalty`, `repetition_penalty`, `logprobs`, `top_logprobs`
+
+## Example
+
+```bash
+curl https://api.tera.gw/v1/chat/completions \
+  -H "Content-Type: application/json" \
+  -H "Authorization: Bearer $TERA_API_KEY" \
+  -d '{
+    "model": "deepseek-ai/DeepSeek-V4-Pro",
+    "messages": [{"role": "user", "content": "Hello"}],
+    "max_tokens": 256
+  }'
+```

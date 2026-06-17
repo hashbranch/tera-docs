@@ -1,13 +1,15 @@
 ---
 title: Reasoning models
-description: "How to use chain-of-thought traces with Qwen3.5 and other thinking models."
+description: "How to use chain-of-thought traces with thinking models on Tera."
 ---
 
 Some models in Tera's catalog produce **explicit reasoning traces** — the chain-of-thought the model used before arriving at its answer. Tera surfaces these as a separate `reasoning_content` field so they don't pollute the visible response.
 
-Thinking models in the catalog today:
+Thinking models in the catalog today (partial list):
 
-- [Qwen/Qwen3.5-27B](/models/qwen3-5-27b)
+- [Qwen/Qwen3-Next-80B-A3B-Thinking](/models/qwen3-next-80b-a3b-thinking)
+- [moonshotai/kimi-k2-thinking](/models/kimi-k2-thinking)
+- [deepseek-ai/DeepSeek-R1-0528](/models/deepseek-r1-0528)
 
 ## Response shape
 
@@ -51,7 +53,7 @@ from openai import OpenAI
 client = OpenAI(base_url="https://api.tera.gw/v1", api_key="sk-tera-...")
 
 stream = client.chat.completions.create(
-    model="Qwen/Qwen3.5-27B",
+    model="Qwen/Qwen3-Next-80B-A3B-Thinking",
     messages=[{"role": "user", "content": "What's 6 times 7?"}],
     stream=True,
 )

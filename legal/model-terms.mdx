@@ -1,0 +1,37 @@
+---
+title: Model Terms
+description: "Upstream model licenses and provider terms that apply alongside Tera's Terms of Service."
+---
+
+When you accept Tera's [Terms of Service](https://tera.gw/legal/tos), you also agree to the terms of service of each model's underlying provider, for any model whose provider is not Tera.
+
+## How this works
+
+Tera serves models in two ways:
+
+- **Models on Tera's own infrastructure.** Tera holds the weights and serves inference directly. Your API interaction is governed by Tera's Terms of Service. The model's open-weight license still governs anything you do downstream with the outputs (redistribution, fine-tuning, derivative works).
+
+- **Models routed to an upstream provider.** For some models, Tera forwards requests to the originating provider's API. In that case, both Tera's Terms of Service and that provider's terms of service apply to your use.
+
+The table below lists the upstream provider for each model family, along with the applicable license or terms URL. Platform terms of service entries marked **TBD** will be linked once the provider URLs are confirmed.
+
+## Provider terms
+
+| Provider | Models | License / Terms |
+|---|---|---|
+| DeepSeek | DeepSeek-R1-0528, DeepSeek-V3.1, DeepSeek-V3.2, DeepSeek-V4-Flash, DeepSeek-V4-Pro | MIT (R1 series), DeepSeek License Agreement (V3 and V4 series). [Terms of Use](https://cdn.deepseek.com/policies/en-US/deepseek-terms-of-use.html) |
+| Google | gemma-4-26B-A4B-it | [Gemma Terms of Use](https://ai.google.dev/gemma/terms) |
+| Meta | Llama-3.3-70B-Instruct | [Llama 3.3 Community License](https://github.com/meta-llama/llama-models/blob/main/models/llama3_3/LICENSE), [Acceptable Use Policy](https://www.llama.com/llama3_3/use-policy) |
+| MiniMax | MiniMax-M2 | Modified MIT license. Platform ToS: TBD. |
+| Moonshot AI | Kimi-K2.5, Kimi-K2.6, Kimi-K2-thinking | Platform ToS: TBD. |
+| OpenAI | gpt-oss-20b, gpt-oss-120b | Platform ToS: TBD. |
+| Qwen (Alibaba) | Qwen3-235B-A22B-Instruct-2507, Qwen3-Coder-480B-A35B-Instruct, Qwen3-Next-80B-A3B-Instruct, Qwen3-Next-80B-A3B-Thinking | Apache 2.0. Platform ToS: TBD. |
+| ZAI-org (Zhipu AI) | GLM-4.7, GLM-5 | MIT. Platform ToS: TBD. |
+
+<Note>
+  Platform ToS links marked TBD are pending URL confirmation from each provider. This table will be updated once those URLs are verified.
+</Note>
+
+## Tera's commitments
+
+Regardless of which model you use, Tera's own data handling commitments apply to Tera's portion of the request lifecycle: no retention of prompt or completion content, no training on your traffic, no human review in the normal course of operations. For details on what Tera logs and where data lives, see [Privacy](/privacy).

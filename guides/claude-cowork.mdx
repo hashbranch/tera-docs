@@ -1,0 +1,74 @@
+---
+title: Claude Cowork
+description: "Use Tera's models inside Claude Cowork."
+---
+
+Claude Cowork (in the Claude desktop app) can run on Tera through its
+**third-party inference** setting — the same Tera endpoint and key you'd use for
+[Claude Code](/guides/claude-code), configured through a quick GUI dialog.
+
+## Before you start
+
+1. [Get an API key](/authentication) (`sk-tera-...`).
+2. Have credits on your account.
+
+## Connect Cowork to Tera
+
+<Steps>
+  <Step title="Enable Developer Mode">
+    In the Claude desktop app, open the **Help** menu → **Enable Developer Mode**,
+    then **restart** the app.
+  </Step>
+  <Step title="Open the third-party inference dialog">
+    Open the new **Developer** menu → **Configure Third-party inference…** and
+    choose backend **Gateway (Anthropic-compatible)**.
+  </Step>
+  <Step title="Enter your Tera details">
+    | Field | Value |
+    | --- | --- |
+    | Gateway base URL | `https://api.tera.gw` |
+    | Gateway API key | your `sk-tera-...` key |
+    | Auth scheme | `bearer` |
+    | Model discovery | On |
+  </Step>
+  <Step title="Save and restart">
+    Save, then restart Cowork. Open the model picker and choose a Tera model.
+  </Step>
+</Steps>
+
+<Note>
+  If the model picker is empty, add the models by hand in the same dialog using
+  their exact ids (see the table below).
+</Note>
+
+## Models
+
+Pick any of these from Cowork's model picker:
+
+| Tera model | Best for |
+| --- | --- |
+| [`deepseek-ai/DeepSeek-V4-Pro`](/models/deepseek-v4-pro) | Hardest coding & agentic work (1M context) |
+| [`moonshotai/Kimi-K2.6`](/models/kimi-k2-6) | Strong all-round agentic coding |
+| [`deepseek-ai/DeepSeek-V4-Flash`](/models/deepseek-v4-flash) | Quick edits & background tasks (1M context) |
+
+See the [full catalog](/models/overview) for everything Tera serves.
+
+<Info>
+  Cowork's third-party inference is an Anthropic Research Preview, so exact menu
+  labels may change.
+</Info>
+
+## Troubleshooting
+
+<AccordionGroup>
+  <Accordion title="Requests 404 or 'model not found'">
+    The Gateway base URL must be exactly `https://api.tera.gw` — no `/v1` suffix.
+    Cowork appends the path itself.
+  </Accordion>
+  <Accordion title="401 / authentication error">
+    Check the key and that Auth scheme is `bearer` (Tera also accepts `x-api-key`).
+  </Accordion>
+  <Accordion title="Empty model picker">
+    Add the model ids manually in the third-party inference dialog.
+  </Accordion>
+</AccordionGroup>

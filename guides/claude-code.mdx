@@ -1,0 +1,103 @@
+---
+title: Claude Code
+description: "Use Tera's models inside Claude Code."
+---
+
+Tera exposes the Anthropic Messages API, so Claude Code can run on Tera models
+with a one-time config change — no local proxy, no extra software.
+
+## Before you start
+
+1. [Get an API key](/authentication) (`sk-tera-...`).
+2. Have credits on your account.
+
+## Set it up with one prompt
+
+Paste this into Claude Code (swap in your key):
+
+```text
+Set up this Claude Code installation to use the Tera inference gateway.
+
+1. Open ~/.claude/settings.json (create it if it doesn't exist) and keep any
+   existing settings intact.
+2. Merge in this "env" block:
+     ANTHROPIC_BASE_URL          = https://api.tera.gw
+     ANTHROPIC_AUTH_TOKEN        = sk-tera-REPLACE_WITH_YOUR_KEY
+     ANTHROPIC_DEFAULT_OPUS_MODEL   = deepseek-ai/DeepSeek-V4-Pro
+     ANTHROPIC_DEFAULT_SONNET_MODEL = moonshotai/Kimi-K2.6
+     ANTHROPIC_DEFAULT_HAIKU_MODEL  = deepseek-ai/DeepSeek-V4-Flash
+3. Show me the final settings.json, then tell me to fully quit and relaunch
+   Claude Code so the new endpoint takes effect.
+```
+
+Claude Code edits its own config, you relaunch, and you're on Tera.
+
+<Accordion title="Prefer to edit settings.json by hand?">
+
+Add this to `~/.claude/settings.json`, then relaunch Claude Code. The `_NAME`
+values are optional labels for the `/model` picker.
+
+```json
+{
+  "env": {
+    "ANTHROPIC_BASE_URL": "https://api.tera.gw",
+    "ANTHROPIC_AUTH_TOKEN": "sk-tera-REPLACE_WITH_YOUR_KEY",
+    "ANTHROPIC_DEFAULT_OPUS_MODEL": "deepseek-ai/DeepSeek-V4-Pro",
+    "ANTHROPIC_DEFAULT_OPUS_MODEL_NAME": "Tera · DeepSeek V4 Pro",
+    "ANTHROPIC_DEFAULT_SONNET_MODEL": "moonshotai/Kimi-K2.6",
+    "ANTHROPIC_DEFAULT_SONNET_MODEL_NAME": "Tera · Kimi K2.6",
+    "ANTHROPIC_DEFAULT_HAIKU_MODEL": "deepseek-ai/DeepSeek-V4-Flash",
+    "ANTHROPIC_DEFAULT_HAIKU_MODEL_NAME": "Tera · DeepSeek V4 Flash"
+  }
+}
+```
+
+</Accordion>
+
+## Choosing models
+
+All three Tera models show up in the **`/model`** picker, and you can switch
+between them anytime with `/model`. To add more Tera models, set
+`ANTHROPIC_CUSTOM_MODEL_OPTION` to the model id.
+
+| `/model` slot | Tera model | Best for |
+| --- | --- | --- |
+| Opus | [`deepseek-ai/DeepSeek-V4-Pro`](/models/deepseek-v4-pro) | Hardest coding & agentic work (1M context) |
+| Sonnet | [`moonshotai/Kimi-K2.6`](/models/kimi-k2-6) | Strong all-round agentic coding |
+| Haiku | [`deepseek-ai/DeepSeek-V4-Flash`](/models/deepseek-v4-flash) | Quick edits & background tasks (1M context) |
+
+<Note>
+  Don't enable gateway model *discovery* (`CLAUDE_CODE_ENABLE_GATEWAY_MODEL_DISCOVERY`).
+  Claude Code only auto-lists models whose id begins with `claude`/`anthropic`,
+  so Tera ids won't appear that way. The config above puts them in the picker
+  directly.
+</Note>
+
+## Troubleshooting
+
+<AccordionGroup>
+  <Accordion title="Requests 404 or 'model not found'">
+    Make sure the base URL is exactly `https://api.tera.gw` — no `/v1` suffix.
+    Claude Code appends the path itself.
+  </Accordion>
+  <Accordion title="401 / authentication error">
+    Confirm you're using your `sk-tera-...` key. Tera accepts either
+    `Authorization: Bearer` or `x-api-key`.
+  </Accordion>
+  <Accordion title="402 / out of credits">
+    Top up in your account, then retry.
+  </Accordion>
+  <Accordion title="Tera models aren't in the /model picker">
+    They come from the `ANTHROPIC_DEFAULT_*_MODEL` vars after a full relaunch —
+    not from auto-discovery. Add extras with `ANTHROPIC_CUSTOM_MODEL_OPTION`.
+  </Accordion>
+  <Accordion title="Claude Code is still hitting Anthropic">
+    Fully quit and relaunch after editing `settings.json` — env changes apply at
+    startup.
+  </Accordion>
+</AccordionGroup>
+
+## Using Claude Cowork too?
+
+See [Claude Cowork](/guides/claude-cowork) — same endpoint and key, configured
+through Cowork's developer settings.

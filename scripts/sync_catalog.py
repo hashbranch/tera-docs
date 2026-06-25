@@ -89,6 +89,12 @@ def fmt_price(price_per_token: str) -> str:
     per_mtok = v * 1_000_000
     if per_mtok < 0.01:
         s = f"{per_mtok:.4f}".rstrip("0").rstrip(".") or "0"
+    elif per_mtok < 1:
+        s = f"{per_mtok:.4f}".rstrip("0").rstrip(".")
+        if "." not in s:
+            s = f"{s}.00"
+        elif len(s.split(".", 1)[1]) == 1:
+            s = f"{s}0"
     elif per_mtok == int(per_mtok):
         s = f"{int(per_mtok)}.00"
     else:
@@ -97,7 +103,8 @@ def fmt_price(price_per_token: str) -> str:
 
 
 PRICING_LINE_RE = re.compile(
-    r"^\|\s*(?P<label>Input|Output)\s*\|\s*(?P<value>[^|]+?)\s*\|", re.MULTILINE
+    r"^\|\s*(?P<label>Input|Output|Cache Read)\s*\|\s*(?P<value>[^|]+?)\s*\|",
+    re.MULTILINE,
 )
 SPEC_LINE_RE = re.compile(
     r"^\|\s*\*\*(?P<key>[^*]+)\*\*\s*\|\s*(?P<value>[^|]+?)\s*\|", re.MULTILINE
@@ -117,13 +124,40 @@ _MARKER_RE = {
 }
 
 
-def render_pricing_block(in_price: str, out_price: str) -> str:
+def pricing_value(pricing: dict, key: str, legacy_key: str | None = None) -> str:
+    """Return a pricing value from the current contract, with legacy fallback."""
+    value = pricing.get(key)
+    if value is None and legacy_key is not None:
+        value = pricing.get(legacy_key)
+    return str(value if value is not None else "0")
+
+
+def is_nonzero_price(price_per_token: str) -> bool:
+    try:
+        return float(price_per_token) != 0
+    except (TypeError, ValueError):
+        return False
+
+
+def is_zero_display_price(display: str) -> bool:
+    value = display.strip()
+    if not value or value == "—" or value.lower() == "free":
+        return True
+    try:
+        return float(value.removeprefix("$").replace(",", "")) == 0
+    except ValueError:
+        return False
+
+
+def render_pricing_block(in_price: str, out_price: str, cache_read_price: str | None = None) -> str:
     """Return the MDX content to place between sync:pricing markers (no markers included)."""
+    cache_row = f"| Cache Read | {cache_read_price} |\n" if cache_read_price else ""
     return (
         f"\n\n| | per million tokens |\n"
         f"|---|---|\n"
         f"| Input  | {in_price} |\n"
-        f"| Output | {out_price} |\n\n"
+        f"| Output | {out_price} |\n"
+        f"{cache_row}\n"
     )
 
 
@@ -163,17 +197,21 @@ def patch_skip_page(path: Path, entry: dict) -> bool:
     Returns True if the file was modified, False if unchanged or markers absent.
     """
     pricing = entry.get("pricing", {})
-    prompt_rate     = float(pricing.get("prompt", 0))
-    completion_rate = float(pricing.get("completion", 0))
-    in_price  = fmt_price(pricing.get("prompt", "0"))
-    out_price = fmt_price(pricing.get("completion", "0"))
+    input_rate_raw = pricing_value(pricing, "input", "prompt")
+    output_rate_raw = pricing_value(pricing, "output", "completion")
+    cache_read_raw = pricing_value(pricing, "cache_read")
+    prompt_rate     = float(input_rate_raw)
+    completion_rate = float(output_rate_raw)
+    in_price  = fmt_price(input_rate_raw)
+    out_price = fmt_price(output_rate_raw)
+    cache_read_price = fmt_price(cache_read_raw) if is_nonzero_price(cache_read_raw) else None
 
     text = path.read_text()
     original = text
 
     # Patch pricing block
     if _MARKER_RE["pricing"].search(text):
-        new_block = render_pricing_block(in_price, out_price)
+        new_block = render_pricing_block(in_price, out_price, cache_read_price)
         text = _MARKER_RE["pricing"].sub(
             r"\g<1>" + new_block + r"\g<2>",
             text,
@@ -232,18 +270,29 @@ def parse_model_page(path: Path) -> dict | None:
         "id": id_match.group(1),
         "context_length": context_length,
         "quantization": quant,
-        "_display_prompt": prices.get("Input", "—").strip(),
-        "_display_completion": prices.get("Output", "—").strip(),
+        "_display_input": prices.get("Input", "—").strip(),
+        "_display_output": prices.get("Output", "—").strip(),
+        "_display_cache_read": prices.get("Cache Read", "—").strip(),
         "_source": "disk",
     }
 
 
-def display_pricing(entry: dict) -> tuple[str, str]:
-    """Return (input, output) display strings for an entry, from either source."""
+def display_pricing(entry: dict) -> dict[str, str]:
+    """Return display strings for public pricing fields, from either source."""
     if entry.get("_source") == "disk":
-        return entry["_display_prompt"], entry["_display_completion"]
+        cache_read = entry["_display_cache_read"]
+        return {
+            "input": entry["_display_input"],
+            "output": entry["_display_output"],
+            "cache_read": "—" if is_zero_display_price(cache_read) else cache_read,
+        }
     p = entry.get("pricing", {})
-    return fmt_price(p.get("prompt", "0")), fmt_price(p.get("completion", "0"))
+    cache_read_raw = pricing_value(p, "cache_read")
+    return {
+        "input": fmt_price(pricing_value(p, "input", "prompt")),
+        "output": fmt_price(pricing_value(p, "output", "completion")),
+        "cache_read": fmt_price(cache_read_raw) if is_nonzero_price(cache_read_raw) else "—",
+    }
 
 
 def price_sort_key(display: str) -> float:
@@ -266,7 +315,7 @@ def collect_all_models(catalog: list[dict], models_dir: Path) -> list[dict]:
             if parsed and parsed["id"] not in by_id:
                 by_id[parsed["id"]] = parsed
     entries = list(by_id.values())
-    entries.sort(key=lambda e: price_sort_key(display_pricing(e)[0]))
+    entries.sort(key=lambda e: price_sort_key(display_pricing(e)["input"]))
     return entries
 
 
@@ -283,9 +332,18 @@ def render_model_page(entry: dict) -> str:
     in_list = ", ".join(inputs) if inputs else "text"
     out_list = ", ".join(outputs) if outputs else "text"
 
+    input_price_raw = pricing_value(pricing, "input", "prompt")
+    output_price_raw = pricing_value(pricing, "output", "completion")
+    cache_read_raw = pricing_value(pricing, "cache_read")
+    cache_read_block = (
+        f"\n| Cache Read | {fmt_price(cache_read_raw)} |"
+        if is_nonzero_price(cache_read_raw)
+        else ""
+    )
     pricing_block = (
-        f"| Input  | {fmt_price(pricing.get('prompt', '0'))} |\n"
-        f"| Output | {fmt_price(pricing.get('completion', '0'))} |"
+        f"| Input  | {fmt_price(input_price_raw)} |\n"
+        f"| Output | {fmt_price(output_price_raw)} |"
+        f"{cache_read_block}"
     )
 
     title = model_id.split("/", 1)[-1]
@@ -361,16 +419,20 @@ description: "{description}"
 
 def render_pricing(models: list[dict]) -> str:
     rows = []
+    include_cache_read = any(display_pricing(e)["cache_read"] != "—" for e in models)
     for e in models:
-        in_p, out_p = display_pricing(e)
+        prices = display_pricing(e)
         ctx = e.get("context_length")
         ctx_display = f"{ctx:,}" if isinstance(ctx, int) else "—"
+        cache_col = f" | {prices['cache_read']}" if include_cache_read else ""
         rows.append(
-            f"| `{e['id']}` | {in_p} | {out_p} | "
+            f"| `{e['id']}` | {prices['input']} | {prices['output']}{cache_col} | "
             f"`{e.get('quantization', '—')}` | {ctx_display} |"
         )
     table = "\n".join(rows)
     today = dt.date.today().isoformat()
+    cache_heading = " | Cache Read" if include_cache_read else ""
+    cache_separator = "|---:" if include_cache_read else ""
     return f"""---
 title: Pricing
 description: "Per-token pricing for models on Tera."
@@ -378,8 +440,8 @@ description: "Per-token pricing for models on Tera."
 
 All prices are in USD per **million tokens**. Updated {today}.
 
-| Model | Input | Output | Quant | Context |
-|---|---:|---:|---|---:|
+| Model | Input | Output{cache_heading} | Quant | Context |
+|---|---:|---:{cache_separator}|---|---:|
 {table}
 
 Pricing is the same whether requests stream or not. Failed requests (5xx, 429) are not billed.
@@ -388,6 +450,7 @@ Pricing is the same whether requests stream or not. Failed requests (5xx, 429) a
 
 - **Input tokens** are counted from the rendered prompt after applying the model's chat template.
 - **Output tokens** include generated text. For [reasoning models](/concepts/reasoning), `reasoning_content` tokens count toward output.
+- **Cache read tokens** are cached input tokens reported by the backend. They appear in pricing only for models with non-zero cache-read rates.
 
 ## Volume discounts
 

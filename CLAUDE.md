@@ -83,3 +83,8 @@ Build status visible only to the Mintlify-app installer (`gh api repos/.../hooks
 | `pricing.mdx` | Fully auto-generated. Sorted by input price ascending. |
 | `introduction.mdx` `quickstart.mdx` `authentication.mdx` `privacy.mdx` | Hand-maintained narrative pages. |
 | `README.md` | Human-facing: Mintlify dev, sync script usage. |
+
+<!-- Tera shared context — auto-loaded from ../tera-context (the shared brain). Keep it pulled. -->
+@../tera-context/OVERVIEW.md
+@../tera-context/projects/docs.md
+@../tera-context/CHANGELOG.md

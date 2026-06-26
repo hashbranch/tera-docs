@@ -10,7 +10,7 @@ Mintlify docs for the Tera inference API. Lives at **docs.tera.gw**, auto-deploy
   - **`SKIP_PAGE_REGEN`** (set in `scripts/sync_catalog.py`): catalog models whose page body is hand-curated. Sync patches only the content between sync marker comments (see below) and leaves all prose, code, and narrative untouched. Currently: `openai/gpt-oss-20b`, `openai/gpt-oss-120b`.
   - **Disk-merge**: non-catalog model `.mdx` files (models not yet in `gateway/config.json`) are parsed for their pricing/spec rows by `parse_model_page` and folded into pricing.mdx and docs.json nav.
 - **`pricing.mdx`** is fully generated. Never hand-edit — change the catalog or the source `.mdx` and re-run sync.
-- **Pricing rows** are sorted by input price ascending. `fmt_price` always renders 2 decimal places (`$0.10`, never `$0.1`).
+- **Pricing rows** are sorted by input price ascending. `fmt_price` renders at least 2 decimal places and preserves sub-dollar precision up to 4 decimals (`$0.10`, never `$0.1`; `$0.286` when the provider rate needs it).
 
 ## Auto-sync workflow
 
@@ -40,7 +40,7 @@ Partner-grade pages in `SKIP_PAGE_REGEN` contain two pairs of MDX comment marker
 {/* sync:cost-example:end */}
 ```
 
-During sync, the script replaces content between each marker pair with values computed from the live catalog — the pricing table from `pricing.prompt`/`pricing.completion`, and the cost-example figures from those rates using the fixed scenario: **50,000 turns/day, 1,000 input tokens + 600 output tokens per turn** (staged as 700 in prompt + 400 out reasoning/tool call + 300 in tool result + 200 out final answer).
+During sync, the script replaces content between each marker pair with values computed from the live catalog — the pricing table from `pricing.input`/`pricing.output` plus a `pricing.cache_read` row when non-zero, and the cost-example figures from the input/output rates using the fixed scenario: **50,000 turns/day, 1,000 input tokens + 600 output tokens per turn** (staged as 700 in prompt + 400 out reasoning/tool call + 300 in tool result + 200 out final answer).
 
 Everything outside the markers is preserved byte-for-byte. If a SKIP_PAGE_REGEN page lacks the markers, sync falls back to the old behaviour (skip entirely) and prints a warning — it does not error.
 

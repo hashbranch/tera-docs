@@ -394,11 +394,25 @@ components:
           items: { type: string }
         pricing:
           type: object
+          description: |
+            Per-unit USD pricing, encoded as decimal strings. The updated
+            pricing contract uses `input`, `output`, and `cache_read`; older
+            `prompt` and `completion` aliases are deprecated and retained here
+            only for rollout compatibility.
           properties:
-            prompt: { type: string, description: USD per input token }
-            completion: { type: string, description: USD per output token }
-            image: { type: string }
-            request: { type: string }
+            input: { type: string, description: USD per input token }
+            output: { type: string, description: USD per output token }
+            cache_read: { type: string, description: USD per cached input token read }
+            image: { type: string, description: USD per image unit }
+            request: { type: string, description: USD per request }
+            prompt:
+              type: string
+              deprecated: true
+              description: Deprecated alias for `input`.
+            completion:
+              type: string
+              deprecated: true
+              description: Deprecated alias for `output`.
         quantization:
           type: string
           enum: [bf16, fp8, fp32, int4, mxfp4]

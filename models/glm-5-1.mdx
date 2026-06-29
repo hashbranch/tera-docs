@@ -1,0 +1,49 @@
+---
+title: "GLM-5.1"
+description: "zai-org/GLM-5.1 on Tera"
+---
+
+<Info>
+  Model id: `zai-org/GLM-5.1` — pass this as the `model` field in API requests.
+</Info>
+
+## Spec
+
+| | |
+|---|---|
+| **Provider** | Z.ai |
+| **HuggingFace** | [`zai-org/GLM-5.1`](https://huggingface.co/zai-org/GLM-5.1) |
+| **Context length** | 202,752 tokens |
+| **Max output** | 4,096 tokens |
+| **Quantization** | `fp8` |
+| **Input modalities** | text |
+| **Output modalities** | text |
+
+## Pricing
+
+| | per million tokens |
+|---|---|
+| Input  | $1.54 |
+| Output | $4.84 |
+| Cache Read | $0.286 |
+
+## Supported features
+
+`reasoning`, `tools`, `json_mode`, `structured_outputs`
+
+## Sampling parameters
+
+`temperature`, `top_p`, `top_k`, `max_tokens`, `stop`, `seed`, `frequency_penalty`, `presence_penalty`, `repetition_penalty`
+
+## Example
+
+```bash
+curl https://api.tera.gw/v1/chat/completions \
+  -H "Content-Type: application/json" \
+  -H "Authorization: Bearer $TERA_API_KEY" \
+  -d '{
+    "model": "zai-org/GLM-5.1",
+    "messages": [{"role": "user", "content": "Hello"}],
+    "max_tokens": 256
+  }'
+```

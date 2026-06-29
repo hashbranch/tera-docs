@@ -87,6 +87,7 @@
               "models/gemma-4-26b-a4b-it",
               "models/glm-4-7",
               "models/glm-5",
+              "models/glm-5-1",
               "models/glm-5-2",
               "models/gpt-oss-120b",
               "models/gpt-oss-20b",

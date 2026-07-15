@@ -49,6 +49,8 @@ _CE_OUT_FINAL   = 200   # tokens
 _CE_TURNS_DAY   = 50_000
 _CE_DAYS_MONTH  = 30
 
+HF_REPO_ID_RE = re.compile(r"^[A-Za-z0-9][A-Za-z0-9._-]*/[A-Za-z0-9][A-Za-z0-9._-]*$")
+
 
 def slugify(model_id: str) -> str:
     base = model_id.split("/", 1)[1] if "/" in model_id else model_id
@@ -304,15 +306,20 @@ def price_sort_key(display: str) -> float:
         return 0.0
 
 
+def is_huggingface_id(source: str) -> bool:
+    """Return True for namespace/model Hugging Face repo ids."""
+    return bool(HF_REPO_ID_RE.fullmatch(source))
+
+
 def model_source_row(entry: dict) -> str:
-    """Render the model source row without inventing web links for registry URIs."""
+    """Render a public source row only for web URLs or Hugging Face ids."""
     model_id = entry["id"]
     source = str(entry.get("hugging_face_id") or model_id)
     if source.startswith(("http://", "https://")):
-        return f"| **Source** | [`{source}`]({source}) |"
-    if "://" in source:
-        return f"| **Source** | `{source}` |"
-    return f"| **HuggingFace** | [`{source}`](https://huggingface.co/{source}) |"
+        return f"| **Source** | [`{source}`]({source}) |\n"
+    if is_huggingface_id(source):
+        return f"| **HuggingFace** | [`{source}`](https://huggingface.co/{source}) |\n"
+    return ""
 
 
 def collect_all_models(catalog: list[dict], models_dir: Path) -> list[dict]:
@@ -401,8 +408,7 @@ description: "{description}"
 | | |
 |---|---|
 | **Provider** | {entry.get('owned_by', '—')} |
-{model_source_row(entry)}
-| **Context length** | {entry.get('context_length', '—'):,} tokens |
+{model_source_row(entry)}| **Context length** | {entry.get('context_length', '—'):,} tokens |
 | **Max output** | {entry.get('max_output_length', '—'):,} tokens |
 | **Quantization** | `{entry.get('quantization', '—')}` |
 | **Input modalities** | {in_list} |

@@ -96,7 +96,7 @@ def test_model_page_links_huggingface_source_ids():
     assert "| **HuggingFace** | [`org/model`](https://huggingface.co/org/model) |" in page
 
 
-def test_model_page_renders_registry_uri_without_huggingface_link():
+def test_model_page_omits_registry_uri_source_rows():
     page = sync_catalog.render_model_page(
         {
             "id": "anthropic/claude-sonnet-5",
@@ -110,11 +110,29 @@ def test_model_page_renders_registry_uri_without_huggingface_link():
         }
     )
 
-    assert (
-        "| **Source** | `azureml://registries/azureml-anthropic/models/claude-sonnet-5/versions/2` |"
-        in page
-    )
+    assert "| **Source** |" not in page
+    assert "| **HuggingFace** |" not in page
+    assert "azureml://registries/azureml-anthropic/models/claude-sonnet-5/versions/2" not in page
     assert "https://huggingface.co/azureml://" not in page
+
+
+def test_model_page_omits_non_huggingface_source_ids():
+    page = sync_catalog.render_model_page(
+        {
+            "id": "anthropic/claude-fable-5",
+            "hugging_face_id": "claude-fable-5",
+            "context_length": 200000,
+            "max_output_length": 8192,
+            "pricing": {
+                "input": "0.000002",
+                "output": "0.000010",
+            },
+        }
+    )
+
+    assert "| **Source** |" not in page
+    assert "| **HuggingFace** |" not in page
+    assert "https://huggingface.co/claude-fable-5" not in page
 
 
 def test_model_page_links_web_source_urls_without_huggingface_prefix():

@@ -79,6 +79,9 @@
             "group": "Models",
             "pages": [
               "models/overview",
+              "models/claude-fable-5",
+              "models/claude-opus-4-8",
+              "models/claude-sonnet-5",
               "models/deepseek-r1-0528",
               "models/deepseek-v3-1",
               "models/deepseek-v3-2",

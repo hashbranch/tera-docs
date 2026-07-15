@@ -79,6 +79,83 @@ def test_model_page_includes_nonzero_cache_read_row():
     assert "| Cache Read | $0.286 |" in page
 
 
+def test_model_page_links_huggingface_source_ids():
+    page = sync_catalog.render_model_page(
+        {
+            "id": "test/model",
+            "hugging_face_id": "org/model",
+            "context_length": 1000,
+            "max_output_length": 100,
+            "pricing": {
+                "input": "0.000001",
+                "output": "0.000002",
+            },
+        }
+    )
+
+    assert "| **HuggingFace** | [`org/model`](https://huggingface.co/org/model) |" in page
+
+
+def test_model_page_omits_registry_uri_source_rows():
+    page = sync_catalog.render_model_page(
+        {
+            "id": "anthropic/claude-sonnet-5",
+            "hugging_face_id": "azureml://registries/azureml-anthropic/models/claude-sonnet-5/versions/2",
+            "context_length": 200000,
+            "max_output_length": 8192,
+            "pricing": {
+                "input": "0.000002",
+                "output": "0.000010",
+            },
+        }
+    )
+
+    assert "| **Source** |" not in page
+    assert "| **HuggingFace** |" not in page
+    assert "azureml://registries/azureml-anthropic/models/claude-sonnet-5/versions/2" not in page
+    assert "https://huggingface.co/azureml://" not in page
+
+
+def test_model_page_omits_non_huggingface_source_ids():
+    page = sync_catalog.render_model_page(
+        {
+            "id": "anthropic/claude-fable-5",
+            "hugging_face_id": "claude-fable-5",
+            "context_length": 200000,
+            "max_output_length": 8192,
+            "pricing": {
+                "input": "0.000002",
+                "output": "0.000010",
+            },
+        }
+    )
+
+    assert "| **Source** |" not in page
+    assert "| **HuggingFace** |" not in page
+    assert "https://huggingface.co/claude-fable-5" not in page
+
+
+def test_model_page_links_web_source_urls_without_huggingface_prefix():
+    page = sync_catalog.render_model_page(
+        {
+            "id": "vendor/web-source",
+            "hugging_face_id": "https://example.com/models/web-source",
+            "context_length": 1000,
+            "max_output_length": 100,
+            "pricing": {
+                "input": "0.000001",
+                "output": "0.000002",
+            },
+        }
+    )
+
+    assert (
+        "| **Source** | [`https://example.com/models/web-source`](https://example.com/models/web-source) |"
+        in page
+    )
+    assert "https://huggingface.co/https://" not in page
+
+
 def test_pricing_page_adds_cache_read_column_only_when_needed():
     without_cache = sync_catalog.render_pricing(
         [

@@ -314,6 +314,8 @@ def is_huggingface_id(source: str) -> bool:
 def model_source_row(entry: dict) -> str:
     """Render a public source row only for web URLs or Hugging Face ids."""
     model_id = entry["id"]
+    if "hugging_face_id" in entry and not entry["hugging_face_id"]:
+        return ""
     source = str(entry.get("hugging_face_id") or model_id)
     if source.startswith(("http://", "https://")):
         return f"| **Source** | [`{source}`]({source}) |\n"

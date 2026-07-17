@@ -1,0 +1,48 @@
+---
+title: "gpt-5.6-terra"
+description: "openai/gpt-5.6-terra on Tera"
+---
+
+<Info>
+  Model id: `openai/gpt-5.6-terra` — pass this as the `model` field in API requests.
+</Info>
+
+## Spec
+
+| | |
+|---|---|
+| **Provider** | openai |
+| **Context length** | 1,050,000 tokens |
+| **Max output** | 4,096 tokens |
+| **Quantization** | `managed` |
+| **Input modalities** | text, image |
+| **Output modalities** | text |
+
+## Pricing
+
+| | per million tokens |
+|---|---|
+| Input  | $2.50 |
+| Output | $15.00 |
+| Cache Read | $0.25 |
+
+## Supported features
+
+—
+
+## Sampling parameters
+
+`top_p`, `max_completion_tokens`, `stop`
+
+## Example
+
+```bash
+curl https://api.tera.gw/v1/chat/completions \
+  -H "Content-Type: application/json" \
+  -H "Authorization: Bearer $TERA_API_KEY" \
+  -d '{
+    "model": "openai/gpt-5.6-terra",
+    "messages": [{"role": "user", "content": "Hello"}],
+    "max_tokens": 256
+  }'
+```

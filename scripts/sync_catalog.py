@@ -339,6 +339,14 @@ def collect_all_models(catalog: list[dict], models_dir: Path) -> list[dict]:
     return entries
 
 
+def chat_token_limit_parameter(entry: dict) -> str:
+    """Return the token-limit request field to show in chat examples."""
+    params = set(entry.get("supported_sampling_parameters", []) or [])
+    if "max_completion_tokens" in params and "max_tokens" not in params:
+        return "max_completion_tokens"
+    return "max_tokens"
+
+
 def render_model_page(entry: dict) -> str:
     model_id = entry["id"]
     pricing = entry.get("pricing", {})
@@ -385,6 +393,7 @@ curl https://api.tera.gw/v1/audio/speech \\
   --output speech.wav
 ```"""
     else:
+        token_limit_param = chat_token_limit_parameter(entry)
         example = f"""```bash
 curl https://api.tera.gw/v1/chat/completions \\
   -H "Content-Type: application/json" \\
@@ -392,7 +401,7 @@ curl https://api.tera.gw/v1/chat/completions \\
   -d '{{
     "model": "{model_id}",
     "messages": [{{"role": "user", "content": "Hello"}}],
-    "max_tokens": 256
+    "{token_limit_param}": 256
   }}'
 ```"""
 

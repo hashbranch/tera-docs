@@ -79,6 +79,42 @@ def test_model_page_includes_nonzero_cache_read_row():
     assert "| Cache Read | $0.286 |" in page
 
 
+def test_model_page_uses_max_completion_tokens_when_only_completion_token_cap_is_supported():
+    page = sync_catalog.render_model_page(
+        {
+            "id": "openai/gpt-5.6-sol",
+            "context_length": 1000,
+            "max_output_length": 100,
+            "supported_sampling_parameters": ["top_p", "max_completion_tokens", "stop"],
+            "pricing": {
+                "input": "0.000001",
+                "output": "0.000002",
+            },
+        }
+    )
+
+    assert '"max_completion_tokens": 256' in page
+    assert '"max_tokens": 256' not in page
+
+
+def test_model_page_keeps_max_tokens_when_supported():
+    page = sync_catalog.render_model_page(
+        {
+            "id": "test/max-tokens",
+            "context_length": 1000,
+            "max_output_length": 100,
+            "supported_sampling_parameters": ["temperature", "max_tokens", "stop"],
+            "pricing": {
+                "input": "0.000001",
+                "output": "0.000002",
+            },
+        }
+    )
+
+    assert '"max_tokens": 256' in page
+    assert '"max_completion_tokens": 256' not in page
+
+
 def test_model_page_links_huggingface_source_ids():
     page = sync_catalog.render_model_page(
         {

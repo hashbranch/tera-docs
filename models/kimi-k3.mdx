@@ -1,0 +1,48 @@
+---
+title: "Kimi-K3"
+description: "moonshotai/Kimi-K3 on Tera"
+---
+
+<Info>
+  Model id: `moonshotai/Kimi-K3` — pass this as the `model` field in API requests.
+</Info>
+
+## Spec
+
+| | |
+|---|---|
+| **Provider** | Moonshot AI |
+| **Context length** | 1,048,576 tokens |
+| **Max output** | 4,096 tokens |
+| **Quantization** | `managed` |
+| **Input modalities** | text, image |
+| **Output modalities** | text |
+
+## Pricing
+
+| | per million tokens |
+|---|---|
+| Input  | $3.00 |
+| Output | $15.00 |
+| Cache Read | $0.30 |
+
+## Supported features
+
+—
+
+## Sampling parameters
+
+`temperature`, `top_p`, `top_k`, `max_completion_tokens`, `frequency_penalty`, `presence_penalty`
+
+## Example
+
+```bash
+curl https://api.tera.gw/v1/chat/completions \
+  -H "Content-Type: application/json" \
+  -H "Authorization: Bearer $TERA_API_KEY" \
+  -d '{
+    "model": "moonshotai/Kimi-K3",
+    "messages": [{"role": "user", "content": "Hello"}],
+    "max_completion_tokens": 256
+  }'
+```

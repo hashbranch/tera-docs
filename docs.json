@@ -101,6 +101,7 @@
               "models/kimi-k2-5",
               "models/kimi-k2-6",
               "models/kimi-k2-thinking",
+              "models/kimi-k3",
               "models/llama-3-3-70b-instruct",
               "models/minimax-m2",
               "models/qwen3-235b-a22b-instruct-2507",

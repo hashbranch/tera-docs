@@ -4,8 +4,8 @@ description: "Use Tera's models inside Claude Cowork."
 ---
 
 Claude Cowork (in the Claude desktop app) can run on Tera through its
-**third-party inference** setting — the same Tera endpoint and key you'd use for
-[Claude Code](/guides/claude-code), configured through a quick GUI dialog.
+**third-party inference** setting, using the same Tera endpoint and key you'd use
+for [Claude Code](/guides/claude-code), configured through a quick GUI dialog.
 
 ## Before you start
 
@@ -62,8 +62,8 @@ See the [full catalog](/models/overview) for everything Tera serves.
 
 <AccordionGroup>
   <Accordion title="Requests 404 or 'model not found'">
-    The Gateway base URL must be exactly `https://api.tera.gw` — no `/v1` suffix.
-    Cowork appends the path itself.
+    The Gateway base URL must be exactly `https://api.tera.gw`, with no `/v1`
+    suffix. Cowork appends the path itself.
   </Accordion>
   <Accordion title="401 / authentication error">
     Check the key and that Auth scheme is `bearer` (Tera also accepts `x-api-key`).

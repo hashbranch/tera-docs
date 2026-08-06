@@ -1,0 +1,245 @@
+---
+title: Claude Code
+description: "Run Claude Code on any Tera model."
+---
+
+Tera serves the Anthropic Messages API at `https://api.tera.gw`, which is the wire format Claude Code speaks natively. Point it at Tera with a one-time config change and it runs on Tera models. No local proxy, no sidecar, no extra software.
+
+## How it works
+
+```
+Claude Code  ──▶  https://api.tera.gw/v1/messages  ──▶  any Tera model
+```
+
+Tera translates each Anthropic request into its normal inference pipeline, so **every model in the [catalog](/models/overview) is reachable from Claude Code**, not just a fixed pair of coding models. Your key, rate limits, and billing behave exactly as they do on the OpenAI-compatible routes.
+
+## Before you start
+
+1. [Get an API key](/authentication) (`sk-tera-...`).
+2. Have credits on your account.
+3. Install Claude Code if you have not already:
+
+   ```bash
+   npm install -g @anthropic-ai/claude-code
+   ```
+
+## Set it up with one prompt
+
+Paste this into Claude Code (swap in your key):
+
+```text
+Set up this Claude Code installation to use the Tera inference gateway.
+
+1. Open ~/.claude/settings.json (create it if it doesn't exist) and keep any
+   existing settings intact.
+2. Merge in this "env" block:
+     ANTHROPIC_BASE_URL          = https://api.tera.gw
+     ANTHROPIC_AUTH_TOKEN        = sk-tera-REPLACE_WITH_YOUR_KEY
+     ANTHROPIC_DEFAULT_OPUS_MODEL   = deepseek-ai/DeepSeek-V4-Pro
+     ANTHROPIC_DEFAULT_SONNET_MODEL = moonshotai/Kimi-K2.6
+     ANTHROPIC_DEFAULT_HAIKU_MODEL  = deepseek-ai/DeepSeek-V4-Flash
+3. Show me the final settings.json, then tell me to fully quit and relaunch
+   Claude Code so the new endpoint takes effect.
+```
+
+Claude Code edits its own config, you relaunch, and you are on Tera.
+
+<Accordion title="Prefer to edit settings.json by hand?">
+
+Add this to `~/.claude/settings.json`, then relaunch Claude Code. The `_NAME` values are optional labels for the `/model` picker.
+
+```json
+{
+  "env": {
+    "ANTHROPIC_BASE_URL": "https://api.tera.gw",
+    "ANTHROPIC_AUTH_TOKEN": "sk-tera-REPLACE_WITH_YOUR_KEY",
+    "ANTHROPIC_DEFAULT_OPUS_MODEL": "deepseek-ai/DeepSeek-V4-Pro",
+    "ANTHROPIC_DEFAULT_OPUS_MODEL_NAME": "Tera · DeepSeek V4 Pro",
+    "ANTHROPIC_DEFAULT_SONNET_MODEL": "moonshotai/Kimi-K2.6",
+    "ANTHROPIC_DEFAULT_SONNET_MODEL_NAME": "Tera · Kimi K2.6",
+    "ANTHROPIC_DEFAULT_HAIKU_MODEL": "deepseek-ai/DeepSeek-V4-Flash",
+    "ANTHROPIC_DEFAULT_HAIKU_MODEL_NAME": "Tera · DeepSeek V4 Flash"
+  }
+}
+```
+
+</Accordion>
+
+<Accordion title="Prefer shell environment variables?">
+
+Useful for trying Tera out, or for switching backends per terminal session. These apply to the current shell only, so add them to `~/.zshrc` or `~/.bashrc` to persist.
+
+<CodeGroup>
+
+```bash macOS and Linux
+export ANTHROPIC_BASE_URL="https://api.tera.gw"
+export ANTHROPIC_AUTH_TOKEN="sk-tera-..."
+export ANTHROPIC_DEFAULT_OPUS_MODEL="deepseek-ai/DeepSeek-V4-Pro"
+export ANTHROPIC_DEFAULT_SONNET_MODEL="moonshotai/Kimi-K2.6"
+export ANTHROPIC_DEFAULT_HAIKU_MODEL="deepseek-ai/DeepSeek-V4-Flash"
+claude
+```
+
+```powershell Windows
+$env:ANTHROPIC_BASE_URL="https://api.tera.gw"
+$env:ANTHROPIC_AUTH_TOKEN="sk-tera-..."
+$env:ANTHROPIC_DEFAULT_OPUS_MODEL="deepseek-ai/DeepSeek-V4-Pro"
+$env:ANTHROPIC_DEFAULT_SONNET_MODEL="moonshotai/Kimi-K2.6"
+$env:ANTHROPIC_DEFAULT_HAIKU_MODEL="deepseek-ai/DeepSeek-V4-Flash"
+claude
+```
+
+</CodeGroup>
+
+Pick one method. Values in `settings.json` override shell variables, and mixing the two is hard to debug.
+
+</Accordion>
+
+<Warning>
+`~/.claude/settings.json` holds your API key in plaintext. Do not commit it. For per-project settings, use `.claude/settings.local.json`, which Claude Code gitignores by default.
+</Warning>
+
+## Choosing models
+
+Claude Code addresses models through three slots rather than one model name. It uses the Opus slot for hard reasoning, Sonnet for most turns, and Haiku for cheap background work such as file summaries and title generation.
+
+Any Tera model id works in any slot. All three show up in the **`/model`** picker, and you can switch between them anytime with `/model`.
+
+| `/model` slot | Suggested model | Best for |
+| --- | --- | --- |
+| Opus | [`deepseek-ai/DeepSeek-V4-Pro`](/models/deepseek-v4-pro) | Hardest coding and agentic work (1M context) |
+| Sonnet | [`moonshotai/Kimi-K2.6`](/models/kimi-k2-6) | Strong all-round agentic coding |
+| Haiku | [`deepseek-ai/DeepSeek-V4-Flash`](/models/deepseek-v4-flash) | Quick edits and background tasks (1M context) |
+
+These are starting points, not limits. Anything in the catalog can go in any slot, including [`moonshotai/Kimi-K3`](/models/kimi-k3), [`zai-org/GLM-5.2`](/models/glm-5-2), [`Qwen/Qwen3-Coder-480B-A35B-Instruct`](/models/qwen3-coder-480b-a35b-instruct), the `openai/gpt-5.6-*` family, and the `anthropic/claude-*` models. You can also set all three slots to the same model if you would rather have consistent behavior than tiered cost. Check the [pricing page](/pricing) first, since the Haiku slot absorbs a lot of traffic.
+
+To add more Tera models to the picker, set `ANTHROPIC_CUSTOM_MODEL_OPTION` to the model id.
+
+Use the exact id from the model's page, including vendor prefix and capitalization. `deepseek-ai/DeepSeek-V4-Pro` works; `deepseek-v4-pro` does not.
+
+<Note>
+  Don't enable gateway model *discovery* (`CLAUDE_CODE_ENABLE_GATEWAY_MODEL_DISCOVERY`).
+  Claude Code only auto-lists models whose id begins with `claude`/`anthropic`,
+  so most Tera ids won't appear that way. The config above puts them in the
+  picker directly.
+</Note>
+
+## Confirm it is working
+
+Start Claude Code and run `/status`. The base URL should read `https://api.tera.gw` and the model line should show the Tera model you configured. Send a short message such as `hi` to confirm the request completes end to end.
+
+## Configuration reference
+
+| Variable | Required | Purpose |
+| --- | --- | --- |
+| `ANTHROPIC_BASE_URL` | Yes | Routes Claude Code to Tera. Exactly `https://api.tera.gw`, with no `/v1` and no trailing slash. |
+| `ANTHROPIC_AUTH_TOKEN` | Yes | Your Tera API key. Sent as `Authorization: Bearer`. |
+| `ANTHROPIC_API_KEY` | Alternative | Also accepted, sent as `x-api-key`. Set one or the other, never both. |
+| `ANTHROPIC_DEFAULT_OPUS_MODEL` | No | Tera model id for the Opus slot. |
+| `ANTHROPIC_DEFAULT_SONNET_MODEL` | No | Tera model id for the Sonnet slot. |
+| `ANTHROPIC_DEFAULT_HAIKU_MODEL` | No | Tera model id for the Haiku slot. |
+| `ANTHROPIC_DEFAULT_*_MODEL_NAME` | No | Display label for that slot in the `/model` picker. |
+| `ANTHROPIC_CUSTOM_MODEL_OPTION` | No | Adds another Tera model to the `/model` picker. |
+| `CLAUDE_CODE_SUBAGENT_MODEL` | No | Tera model id used by subagents. |
+| `CLAUDE_CODE_AUTO_COMPACT_WINDOW` | No | Context size in tokens at which Claude Code compacts history. Match your model's context length, for example `1048576` for a 1M model or `262144` for a 256K model. |
+
+## What is supported
+
+| Feature | Status | Notes |
+| --- | --- | --- |
+| Streaming | ✅ | Full Anthropic SSE event sequence, including streamed tool calls. |
+| Tool calling | ✅ | `tools`, `tool_use`, `tool_result`, and `tool_choice` all map through. Tool errors are preserved. |
+| System prompts | ✅ | Accepts a plain string or a list of content blocks. |
+| Multi-turn tool loops | ✅ | Tool results are ordered to follow the assistant turn that requested them. |
+| Images | ✅ | Base64 and URL image blocks, on models that accept image input. |
+| `stop_sequences`, `temperature`, `top_p`, `top_k`, `max_tokens` | ✅ | Passed through. |
+| `POST /v1/messages/count_tokens` | ✅ | Returns an approximate count. See below. |
+
+### Thinking and prompt caching differ by model
+
+Two capabilities depend on which model you pick.
+
+| | `anthropic/claude-*` models | All other models |
+| --- | --- | --- |
+| Prompt caching (`cache_control`) | ✅ Works, with the usual cache discounts | ➖ Accepted and ignored. Requests succeed, without cache discounts. |
+| `thinking` parameter | ✅ Native Anthropic thinking parameters | ➖ Accepted and ignored |
+| Thinking content blocks | ✅ Returned as `thinking` blocks | ❌ Reasoning models still reason internally, but traces are not returned as `thinking` blocks |
+
+Everything else in the table above behaves the same across the catalog.
+
+### Token counting is approximate
+
+Claude Code calls `count_tokens` to draw the context meter and decide when to compact. Tera returns a heuristic estimate rather than a per-model tokenizer count, so the context gauge is indicative rather than exact.
+
+This does not affect billing. Usage is metered from the actual token counts reported by inference, exactly as on the OpenAI-compatible routes.
+
+## Troubleshooting
+
+<AccordionGroup>
+  <Accordion title="Requests 404 or 'model not found'">
+    Make sure the base URL is exactly `https://api.tera.gw`, with no `/v1` suffix.
+    Claude Code appends the path itself.
+
+    If the URL is right, check the model id. Ids are case-sensitive and include a
+    vendor prefix. Copy it verbatim from the model's page and check for stray
+    spaces or quotes.
+  </Accordion>
+  <Accordion title="401 / authentication error">
+    Confirm you're using your `sk-tera-...` key. Tera accepts either
+    `Authorization: Bearer` or `x-api-key`, but do not set both
+    `ANTHROPIC_AUTH_TOKEN` and `ANTHROPIC_API_KEY`.
+
+    If you previously ran `/login` with an Anthropic account, that saved
+    credential can conflict. Run `/status` to see which credential is active, and
+    `/logout` to clear the saved login.
+  </Accordion>
+  <Accordion title="402 / out of credits">
+    Top up in your account, then retry.
+  </Accordion>
+  <Accordion title="Tera models aren't in the /model picker">
+    They come from the `ANTHROPIC_DEFAULT_*_MODEL` vars after a full relaunch,
+    not from auto-discovery. Add extras with `ANTHROPIC_CUSTOM_MODEL_OPTION`.
+  </Accordion>
+  <Accordion title="Claude Code is still hitting Anthropic">
+    Fully quit and relaunch after editing `settings.json`, since env changes apply
+    at startup. If it persists, `ANTHROPIC_BASE_URL` is unset or misspelled. Run
+    `/status` to see the base URL actually in use.
+  </Accordion>
+  <Accordion title="Config changes aren't taking effect">
+    Work through these in order:
+
+    1. Values in `~/.claude/settings.json` override shell exports. Check the `env` block there for stale entries.
+    2. Shell exports apply only to the session that ran them, unless you added them to `~/.zshrc` or `~/.bashrc`.
+    3. Fully quit and relaunch Claude Code.
+    4. Run `/status` and read the base URL and model actually in use.
+  </Accordion>
+  <Accordion title="Subagents or background tasks fail">
+    Those run on the Haiku slot and on `CLAUDE_CODE_SUBAGENT_MODEL`. If you set
+    some slot variables but not others, fill in the rest.
+  </Accordion>
+</AccordionGroup>
+
+## Other Anthropic-compatible tools
+
+Anything that speaks the Anthropic Messages API configures the same way: point its base URL at `https://api.tera.gw` and pass a Tera key. The endpoint is not specific to Claude Code.
+
+Using [Claude Cowork](/guides/claude-cowork)? Same endpoint and key, configured through Cowork's developer settings.
+
+For everything else, use the [OpenAI-compatible routes](/concepts/openai-compat) at `https://api.tera.gw/v1`.
+
+## What next?
+
+<CardGroup cols={2}>
+  <Card title="Browse models" icon="microchip" href="/models/overview">
+    Full catalog with context lengths and capabilities.
+  </Card>
+  <Card title="Pricing" icon="tag" href="/pricing">
+    Per-token rates. Worth checking before you pick your slots.
+  </Card>
+  <Card title="Tool calling" icon="wrench" href="/concepts/tool-calling">
+    How function calling behaves across Tera models.
+  </Card>
+  <Card title="Authentication" icon="key" href="/authentication">
+    Key formats, headers, and scoping.
+  </Card>
+</CardGroup>

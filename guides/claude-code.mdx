@@ -35,7 +35,7 @@ Set up this Claude Code installation to use the Tera inference gateway.
 2. Merge in this "env" block:
      ANTHROPIC_BASE_URL          = https://api.tera.gw
      ANTHROPIC_AUTH_TOKEN        = sk-tera-REPLACE_WITH_YOUR_KEY
-     ANTHROPIC_DEFAULT_OPUS_MODEL   = deepseek-ai/DeepSeek-V4-Pro
+     ANTHROPIC_DEFAULT_OPUS_MODEL   = moonshotai/Kimi-K3
      ANTHROPIC_DEFAULT_SONNET_MODEL = moonshotai/Kimi-K2.6
      ANTHROPIC_DEFAULT_HAIKU_MODEL  = deepseek-ai/DeepSeek-V4-Flash
 3. Show me the final settings.json, then tell me to fully quit and relaunch
@@ -53,8 +53,8 @@ Add this to `~/.claude/settings.json`, then relaunch Claude Code. The `_NAME` va
   "env": {
     "ANTHROPIC_BASE_URL": "https://api.tera.gw",
     "ANTHROPIC_AUTH_TOKEN": "sk-tera-REPLACE_WITH_YOUR_KEY",
-    "ANTHROPIC_DEFAULT_OPUS_MODEL": "deepseek-ai/DeepSeek-V4-Pro",
-    "ANTHROPIC_DEFAULT_OPUS_MODEL_NAME": "Tera · DeepSeek V4 Pro",
+    "ANTHROPIC_DEFAULT_OPUS_MODEL": "moonshotai/Kimi-K3",
+    "ANTHROPIC_DEFAULT_OPUS_MODEL_NAME": "Tera · Kimi K3",
     "ANTHROPIC_DEFAULT_SONNET_MODEL": "moonshotai/Kimi-K2.6",
     "ANTHROPIC_DEFAULT_SONNET_MODEL_NAME": "Tera · Kimi K2.6",
     "ANTHROPIC_DEFAULT_HAIKU_MODEL": "deepseek-ai/DeepSeek-V4-Flash",
@@ -74,7 +74,7 @@ Useful for trying Tera out, or for switching backends per terminal session. Thes
 ```bash macOS and Linux
 export ANTHROPIC_BASE_URL="https://api.tera.gw"
 export ANTHROPIC_AUTH_TOKEN="sk-tera-..."
-export ANTHROPIC_DEFAULT_OPUS_MODEL="deepseek-ai/DeepSeek-V4-Pro"
+export ANTHROPIC_DEFAULT_OPUS_MODEL="moonshotai/Kimi-K3"
 export ANTHROPIC_DEFAULT_SONNET_MODEL="moonshotai/Kimi-K2.6"
 export ANTHROPIC_DEFAULT_HAIKU_MODEL="deepseek-ai/DeepSeek-V4-Flash"
 claude
@@ -83,7 +83,7 @@ claude
 ```powershell Windows
 $env:ANTHROPIC_BASE_URL="https://api.tera.gw"
 $env:ANTHROPIC_AUTH_TOKEN="sk-tera-..."
-$env:ANTHROPIC_DEFAULT_OPUS_MODEL="deepseek-ai/DeepSeek-V4-Pro"
+$env:ANTHROPIC_DEFAULT_OPUS_MODEL="moonshotai/Kimi-K3"
 $env:ANTHROPIC_DEFAULT_SONNET_MODEL="moonshotai/Kimi-K2.6"
 $env:ANTHROPIC_DEFAULT_HAIKU_MODEL="deepseek-ai/DeepSeek-V4-Flash"
 claude
@@ -107,11 +107,11 @@ Any Tera model id works in any slot. All three show up in the **`/model`** picke
 
 | `/model` slot | Suggested model | Best for |
 | --- | --- | --- |
-| Opus | [`deepseek-ai/DeepSeek-V4-Pro`](/models/deepseek-v4-pro) | Hardest coding and agentic work (1M context) |
+| Opus | [`moonshotai/Kimi-K3`](/models/kimi-k3) | Hardest coding and agentic work (1M context) |
 | Sonnet | [`moonshotai/Kimi-K2.6`](/models/kimi-k2-6) | Strong all-round agentic coding |
 | Haiku | [`deepseek-ai/DeepSeek-V4-Flash`](/models/deepseek-v4-flash) | Quick edits and background tasks (1M context) |
 
-These are starting points, not limits. Anything in the catalog can go in any slot, including [`moonshotai/Kimi-K3`](/models/kimi-k3), [`zai-org/GLM-5.2`](/models/glm-5-2), [`Qwen/Qwen3-Coder-480B-A35B-Instruct`](/models/qwen3-coder-480b-a35b-instruct), the `openai/gpt-5.6-*` family, and the `anthropic/claude-*` models. You can also set all three slots to the same model if you would rather have consistent behavior than tiered cost. Check the [pricing page](/pricing) first, since the Haiku slot absorbs a lot of traffic.
+These are starting points, not limits. Anything in the catalog can go in any slot, including [`deepseek-ai/DeepSeek-V4-Pro`](/models/deepseek-v4-pro), [`zai-org/GLM-5.2`](/models/glm-5-2), [`Qwen/Qwen3-Coder-480B-A35B-Instruct`](/models/qwen3-coder-480b-a35b-instruct), the `openai/gpt-5.6-*` family, and the `anthropic/claude-*` models. You can also set all three slots to the same model if you would rather have consistent behavior than tiered cost. Check the [pricing page](/pricing) first, since the Haiku slot absorbs a lot of traffic.
 
 To add more Tera models to the picker, set `ANTHROPIC_CUSTOM_MODEL_OPTION` to the model id.
 

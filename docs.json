@@ -45,8 +45,7 @@
           {
             "group": "Use with Claude",
             "pages": [
-              "guides/claude-code",
-              "guides/claude-cowork"
+              "guides/claude-code"
             ]
           },
           {

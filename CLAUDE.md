@@ -120,3 +120,8 @@ Build status visible only to the Mintlify-app installer (`gh api repos/.../hooks
 | `.github/workflows/sync-catalog.yml` | Daily auto-sync at 08:00 UTC. Grep gates guard the commit; issues notify on change. |
 | `introduction.mdx` `quickstart.mdx` `authentication.mdx` `privacy.mdx` | Hand-maintained narrative pages. |
 | `README.md` | Human-facing: Mintlify dev, sync script usage. |
+
+<!-- Tera shared context — auto-loaded from ../tera-context (the shared brain). Keep it pulled. -->
+@../tera-context/OVERVIEW.md
+@../tera-context/projects/docs.md
+@../tera-context/CHANGELOG.md

@@ -1,5 +1,9 @@
 # CLAUDE.md — tera-docs
 
+## Current positioning (2026-11-18)
+
+Tera Compute primarily focuses on dedicated GPU node rentals and colocation for AI startups. The OpenAI-compatible inference API remains available. `introduction.mdx` is the current company overview. Run `python3 scripts/public_docs.py` after content edits to regenerate public agent exports; catalog sync runs it too. The API-specific guidance below describes the inference service. Keep inference token pricing distinct from GPU rental pricing.
+
 Mintlify docs for the Tera inference API. Lives at **docs.tera.gw**, auto-deployed on push to `main` via the Mintlify GitHub App.
 
 ## Architecture

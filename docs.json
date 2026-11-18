@@ -1,7 +1,7 @@
 {
   "$schema": "https://mintlify.com/docs.json",
   "theme": "mint",
-  "name": "Tera",
+  "name": "Tera Compute",
   "colors": {
     "primary": "#111111",
     "light": "#333333",
@@ -14,20 +14,25 @@
     }
   },
   "banner": {
-    "content": "Llama, Qwen, DeepSeek, Mistral \u2014 drop-in OpenAI-compatible.",
-    "dismissible": true
+    "content": "GPU rental and colocation are our primary focus. The inference API remains available. [Visit Tera Compute](https://www.tera.gw/).",
+    "dismissible": false
   },
   "favicon": "/favicon.png",
   "navigation": {
     "anchors": [
       {
-        "anchor": "Documentation",
+        "anchor": "Overview & guides",
         "icon": "book-open",
         "groups": [
           {
-            "group": "Get Started",
+            "group": "Tera Compute",
             "pages": [
-              "introduction",
+              "introduction"
+            ]
+          },
+          {
+            "group": "Inference API",
+            "pages": [
               "quickstart",
               "authentication",
               "privacy"
@@ -63,7 +68,7 @@
         ]
       },
       {
-        "anchor": "API Reference",
+        "anchor": "API reference",
         "icon": "code",
         "groups": [
           {
@@ -141,8 +146,8 @@
     ],
     "primary": {
       "type": "button",
-      "label": "Get API Key",
-      "href": "mailto:hello@tera.gw?subject=Tera%20API%20access"
+      "label": "GPU rental & colocation",
+      "href": "https://www.tera.gw/"
     }
   },
   "footer": {

@@ -1,0 +1,58 @@
+[
+  {
+    "route": "/introduction",
+    "size": "mobile",
+    "legacy": true,
+    "scroll": 378,
+    "width": 390
+  },
+  {
+    "route": "/pricing",
+    "size": "mobile",
+    "legacy": true,
+    "scroll": 378,
+    "width": 390
+  },
+  {
+    "route": "/api-reference/chat-completions",
+    "size": "mobile",
+    "legacy": true,
+    "scroll": 378,
+    "width": 390
+  },
+  {
+    "route": "/models/gpt-oss-20b",
+    "size": "mobile",
+    "legacy": true,
+    "scroll": 378,
+    "width": 390
+  },
+  {
+    "route": "/introduction",
+    "size": "desktop",
+    "legacy": true,
+    "scroll": 1428,
+    "width": 1440
+  },
+  {
+    "route": "/pricing",
+    "size": "desktop",
+    "legacy": true,
+    "scroll": 1428,
+    "width": 1440
+  },
+  {
+    "route": "/api-reference/chat-completions",
+    "size": "desktop",
+    "legacy": true,
+    "scroll": 1428,
+    "width": 1440
+  },
+  {
+    "route": "/models/gpt-oss-20b",
+    "size": "desktop",
+    "legacy": true,
+    "scroll": 1428,
+    "width": 1440
+  }
+]

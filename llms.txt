@@ -21,65 +21,63 @@ A request starts a conversation. It does not reserve capacity, authorize payment
   </Card>
 </CardGroup>
 
-## Deprecated: Inference API
+## Inference API
 
-<Warning>
-The Tera inference API is being deprecated. These reference pages remain for existing customers. No sunset date has been announced here. Contact your Tera representative about migration timing.
-</Warning>
+The inference API remains available. GPU rental and colocation are Tera’s primary focus; these docs cover the OpenAI-compatible inference API.
 
-The legacy API uses OpenAI-compatible request formats. Its token prices and model catalog do not describe GPU rental or colocation pricing.
+The API uses OpenAI-compatible request formats. Its token prices and model catalog do not describe GPU rental or colocation pricing.
 
-- [Legacy API quickstart](/quickstart)
-- [Legacy API authentication](/authentication)
-- [Legacy token pricing](/pricing)
+- [API quickstart](/quickstart)
+- [API authentication](/authentication)
+- [Inference token pricing](/pricing)
 - [Inference dashboard](https://www.tera.gw/dashboard)
 
-For current services, use [Tera Compute](https://www.tera.gw/). For GPU rental and colocation enquiries, email [gpubroker@tera.gw](mailto:gpubroker@tera.gw).
+For GPU rental and colocation, use [Tera Compute](https://www.tera.gw/). For GPU rental and colocation enquiries, email [gpubroker@tera.gw](mailto:gpubroker@tera.gw).
 
 
-## Deprecated: Inference API reference pages
+## Inference API reference pages
 
-- [Quickstart](https://docs.tera.gw/quickstart.md): Deprecated inference API reference. Make your first inference request in under a minute.
-- [Authentication](https://docs.tera.gw/authentication.md): Deprecated inference API reference. How Tera API keys work.
-- [Privacy](https://docs.tera.gw/privacy.md): Deprecated inference API reference. Zero retention. Zero training. Zero human review.
-- [OpenAI compatibility](https://docs.tera.gw/concepts/openai-compat.md): Deprecated inference API reference. What carries over from OpenAI clients, and what's different.
-- [Streaming](https://docs.tera.gw/concepts/streaming.md): Deprecated inference API reference. Token-by-token output over Server-Sent Events.
-- [Reasoning models](https://docs.tera.gw/concepts/reasoning.md): Deprecated inference API reference. How to use chain-of-thought traces with thinking models on Tera.
-- [Tool calling](https://docs.tera.gw/concepts/tool-calling.md): Deprecated inference API reference. OpenAI-compatible function calling.
-- [Claude Code](https://docs.tera.gw/guides/claude-code.md): Deprecated inference API reference. Run Claude Code on any Tera model.
-- [Pricing](https://docs.tera.gw/pricing.md): Deprecated inference API reference. Per-token pricing for models on Tera.
-- [Model Terms](https://docs.tera.gw/legal/model-terms.md): Deprecated inference API reference. Upstream model licenses and provider terms that apply alongside Tera's Terms of Service.
-- [Chat completions](https://docs.tera.gw/api-reference/chat-completions.md): Deprecated inference API reference for existing customers.
-- [Text completions](https://docs.tera.gw/api-reference/completions.md): Deprecated inference API reference for existing customers.
-- [List models](https://docs.tera.gw/api-reference/models.md): Deprecated inference API reference for existing customers.
-- [Text to speech](https://docs.tera.gw/api-reference/audio-speech.md): Deprecated inference API reference for existing customers.
-- [Models overview](https://docs.tera.gw/models/overview.md): Deprecated inference API reference. What's available on Tera today.
-- [claude-fable-5](https://docs.tera.gw/models/claude-fable-5.md): Deprecated inference API reference. anthropic/claude-fable-5 on Tera
-- [claude-opus-4-8](https://docs.tera.gw/models/claude-opus-4-8.md): Deprecated inference API reference. anthropic/claude-opus-4-8 on Tera
-- [claude-sonnet-5](https://docs.tera.gw/models/claude-sonnet-5.md): Deprecated inference API reference. anthropic/claude-sonnet-5 on Tera
-- [DeepSeek-R1-0528](https://docs.tera.gw/models/deepseek-r1-0528.md): Deprecated inference API reference. deepseek-ai/DeepSeek-R1-0528 on Tera
-- [DeepSeek-V3.1](https://docs.tera.gw/models/deepseek-v3-1.md): Deprecated inference API reference. deepseek-ai/DeepSeek-V3.1 on Tera
-- [DeepSeek-V3.2](https://docs.tera.gw/models/deepseek-v3-2.md): Deprecated inference API reference. deepseek-ai/DeepSeek-V3.2 on Tera
-- [DeepSeek-V4-Flash](https://docs.tera.gw/models/deepseek-v4-flash.md): Deprecated inference API reference. deepseek-ai/DeepSeek-V4-Flash on Tera
-- [DeepSeek-V4-Pro](https://docs.tera.gw/models/deepseek-v4-pro.md): Deprecated inference API reference. deepseek-ai/DeepSeek-V4-Pro on Tera
-- [gemma-4-26B-A4B-it](https://docs.tera.gw/models/gemma-4-26b-a4b-it.md): Deprecated inference API reference. google/gemma-4-26B-A4B-it on Tera
-- [GLM-4.7](https://docs.tera.gw/models/glm-4-7.md): Deprecated inference API reference. zai-org/GLM-4.7 on Tera
-- [GLM-5](https://docs.tera.gw/models/glm-5.md): Deprecated inference API reference. zai-org/GLM-5 on Tera
-- [GLM-5.1](https://docs.tera.gw/models/glm-5-1.md): Deprecated inference API reference. zai-org/GLM-5.1 on Tera
-- [GLM-5.2](https://docs.tera.gw/models/glm-5-2.md): Deprecated inference API reference. zai-org/GLM-5.2 on Tera
-- [gpt-5.5](https://docs.tera.gw/models/gpt-5-5.md): Deprecated inference API reference. openai/gpt-5.5 on Tera
-- [gpt-5.6-luna](https://docs.tera.gw/models/gpt-5-6-luna.md): Deprecated inference API reference. openai/gpt-5.6-luna on Tera
-- [gpt-5.6-sol](https://docs.tera.gw/models/gpt-5-6-sol.md): Deprecated inference API reference. openai/gpt-5.6-sol on Tera
-- [gpt-5.6-terra](https://docs.tera.gw/models/gpt-5-6-terra.md): Deprecated inference API reference. openai/gpt-5.6-terra on Tera
-- [gpt-oss-120b](https://docs.tera.gw/models/gpt-oss-120b.md): Deprecated inference API reference. OpenAI's open-weight 120B reasoning model on Tera. OpenAI-compatible. 131k context. US-only, zero retention.
-- [gpt-oss-20b](https://docs.tera.gw/models/gpt-oss-20b.md): Deprecated inference API reference. OpenAI's open-weight 20B reasoning model on Tera. OpenAI-compatible. 131k context. US-only, zero retention.
-- [Kimi-K2.5](https://docs.tera.gw/models/kimi-k2-5.md): Deprecated inference API reference. moonshotai/Kimi-K2.5 on Tera
-- [Kimi-K2.6](https://docs.tera.gw/models/kimi-k2-6.md): Deprecated inference API reference. moonshotai/Kimi-K2.6 on Tera
-- [kimi-k2-thinking](https://docs.tera.gw/models/kimi-k2-thinking.md): Deprecated inference API reference. moonshotai/kimi-k2-thinking on Tera
-- [Kimi-K3](https://docs.tera.gw/models/kimi-k3.md): Deprecated inference API reference. moonshotai/Kimi-K3 on Tera
-- [Llama-3.3-70B-Instruct](https://docs.tera.gw/models/llama-3-3-70b-instruct.md): Deprecated inference API reference. meta-llama/Llama-3.3-70B-Instruct on Tera
-- [MiniMax-M2](https://docs.tera.gw/models/minimax-m2.md): Deprecated inference API reference. MiniMaxAI/MiniMax-M2 on Tera
-- [Qwen3-235B-A22B-Instruct-2507](https://docs.tera.gw/models/qwen3-235b-a22b-instruct-2507.md): Deprecated inference API reference. Qwen/Qwen3-235B-A22B-Instruct-2507 on Tera
-- [Qwen3-Coder-480B-A35B-Instruct](https://docs.tera.gw/models/qwen3-coder-480b-a35b-instruct.md): Deprecated inference API reference. Qwen/Qwen3-Coder-480B-A35B-Instruct on Tera
-- [Qwen3-Next-80B-A3B-Instruct](https://docs.tera.gw/models/qwen3-next-80b-a3b-instruct.md): Deprecated inference API reference. Qwen/Qwen3-Next-80B-A3B-Instruct on Tera
-- [Qwen3-Next-80B-A3B-Thinking](https://docs.tera.gw/models/qwen3-next-80b-a3b-thinking.md): Deprecated inference API reference. Qwen/Qwen3-Next-80B-A3B-Thinking on Tera
+- [Quickstart](https://docs.tera.gw/quickstart.md): Make your first inference request in under a minute.
+- [Authentication](https://docs.tera.gw/authentication.md): How Tera API keys work.
+- [Privacy](https://docs.tera.gw/privacy.md): Zero retention. Zero training. Zero human review.
+- [OpenAI compatibility](https://docs.tera.gw/concepts/openai-compat.md): What carries over from OpenAI clients, and what's different.
+- [Streaming](https://docs.tera.gw/concepts/streaming.md): Token-by-token output over Server-Sent Events.
+- [Reasoning models](https://docs.tera.gw/concepts/reasoning.md): How to use chain-of-thought traces with thinking models on Tera.
+- [Tool calling](https://docs.tera.gw/concepts/tool-calling.md): OpenAI-compatible function calling.
+- [Claude Code](https://docs.tera.gw/guides/claude-code.md): Run Claude Code on any Tera model.
+- [Pricing](https://docs.tera.gw/pricing.md): Per-token pricing for models on Tera.
+- [Model Terms](https://docs.tera.gw/legal/model-terms.md): Upstream model licenses and provider terms that apply alongside Tera's Terms of Service.
+- [Chat completions](https://docs.tera.gw/api-reference/chat-completions.md): Inference API reference.
+- [Text completions](https://docs.tera.gw/api-reference/completions.md): Inference API reference.
+- [List models](https://docs.tera.gw/api-reference/models.md): Inference API reference.
+- [Text to speech](https://docs.tera.gw/api-reference/audio-speech.md): Inference API reference.
+- [Models overview](https://docs.tera.gw/models/overview.md): What's available on Tera today.
+- [claude-fable-5](https://docs.tera.gw/models/claude-fable-5.md): anthropic/claude-fable-5 on Tera
+- [claude-opus-4-8](https://docs.tera.gw/models/claude-opus-4-8.md): anthropic/claude-opus-4-8 on Tera
+- [claude-sonnet-5](https://docs.tera.gw/models/claude-sonnet-5.md): anthropic/claude-sonnet-5 on Tera
+- [DeepSeek-R1-0528](https://docs.tera.gw/models/deepseek-r1-0528.md): deepseek-ai/DeepSeek-R1-0528 on Tera
+- [DeepSeek-V3.1](https://docs.tera.gw/models/deepseek-v3-1.md): deepseek-ai/DeepSeek-V3.1 on Tera
+- [DeepSeek-V3.2](https://docs.tera.gw/models/deepseek-v3-2.md): deepseek-ai/DeepSeek-V3.2 on Tera
+- [DeepSeek-V4-Flash](https://docs.tera.gw/models/deepseek-v4-flash.md): deepseek-ai/DeepSeek-V4-Flash on Tera
+- [DeepSeek-V4-Pro](https://docs.tera.gw/models/deepseek-v4-pro.md): deepseek-ai/DeepSeek-V4-Pro on Tera
+- [gemma-4-26B-A4B-it](https://docs.tera.gw/models/gemma-4-26b-a4b-it.md): google/gemma-4-26B-A4B-it on Tera
+- [GLM-4.7](https://docs.tera.gw/models/glm-4-7.md): zai-org/GLM-4.7 on Tera
+- [GLM-5](https://docs.tera.gw/models/glm-5.md): zai-org/GLM-5 on Tera
+- [GLM-5.1](https://docs.tera.gw/models/glm-5-1.md): zai-org/GLM-5.1 on Tera
+- [GLM-5.2](https://docs.tera.gw/models/glm-5-2.md): zai-org/GLM-5.2 on Tera
+- [gpt-5.5](https://docs.tera.gw/models/gpt-5-5.md): openai/gpt-5.5 on Tera
+- [gpt-5.6-luna](https://docs.tera.gw/models/gpt-5-6-luna.md): openai/gpt-5.6-luna on Tera
+- [gpt-5.6-sol](https://docs.tera.gw/models/gpt-5-6-sol.md): openai/gpt-5.6-sol on Tera
+- [gpt-5.6-terra](https://docs.tera.gw/models/gpt-5-6-terra.md): openai/gpt-5.6-terra on Tera
+- [gpt-oss-120b](https://docs.tera.gw/models/gpt-oss-120b.md): OpenAI's open-weight 120B reasoning model on Tera. OpenAI-compatible. 131k context. US-only, zero retention.
+- [gpt-oss-20b](https://docs.tera.gw/models/gpt-oss-20b.md): OpenAI's open-weight 20B reasoning model on Tera. OpenAI-compatible. 131k context. US-only, zero retention.
+- [Kimi-K2.5](https://docs.tera.gw/models/kimi-k2-5.md): moonshotai/Kimi-K2.5 on Tera
+- [Kimi-K2.6](https://docs.tera.gw/models/kimi-k2-6.md): moonshotai/Kimi-K2.6 on Tera
+- [kimi-k2-thinking](https://docs.tera.gw/models/kimi-k2-thinking.md): moonshotai/kimi-k2-thinking on Tera
+- [Kimi-K3](https://docs.tera.gw/models/kimi-k3.md): moonshotai/Kimi-K3 on Tera
+- [Llama-3.3-70B-Instruct](https://docs.tera.gw/models/llama-3-3-70b-instruct.md): meta-llama/Llama-3.3-70B-Instruct on Tera
+- [MiniMax-M2](https://docs.tera.gw/models/minimax-m2.md): MiniMaxAI/MiniMax-M2 on Tera
+- [Qwen3-235B-A22B-Instruct-2507](https://docs.tera.gw/models/qwen3-235b-a22b-instruct-2507.md): Qwen/Qwen3-235B-A22B-Instruct-2507 on Tera
+- [Qwen3-Coder-480B-A35B-Instruct](https://docs.tera.gw/models/qwen3-coder-480b-a35b-instruct.md): Qwen/Qwen3-Coder-480B-A35B-Instruct on Tera
+- [Qwen3-Next-80B-A3B-Instruct](https://docs.tera.gw/models/qwen3-next-80b-a3b-instruct.md): Qwen/Qwen3-Next-80B-A3B-Instruct on Tera
+- [Qwen3-Next-80B-A3B-Thinking](https://docs.tera.gw/models/qwen3-next-80b-a3b-thinking.md): Qwen/Qwen3-Next-80B-A3B-Thinking on Tera

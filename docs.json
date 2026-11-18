@@ -14,14 +14,14 @@
     }
   },
   "banner": {
-    "content": "Tera now focuses on GPU rental and colocation. The inference API is being deprecated. [Visit Tera Compute](https://www.tera.gw/).",
+    "content": "GPU rental and colocation are our primary focus. The inference API remains available. [Visit Tera Compute](https://www.tera.gw/).",
     "dismissible": false
   },
   "favicon": "/favicon.png",
   "navigation": {
     "anchors": [
       {
-        "anchor": "Overview & legacy docs",
+        "anchor": "Overview & guides",
         "icon": "book-open",
         "groups": [
           {
@@ -31,7 +31,7 @@
             ]
           },
           {
-            "group": "Deprecated: Inference API",
+            "group": "Inference API",
             "pages": [
               "quickstart",
               "authentication",
@@ -68,7 +68,7 @@
         ]
       },
       {
-        "anchor": "Deprecated API reference",
+        "anchor": "API reference",
         "icon": "code",
         "groups": [
           {
@@ -83,7 +83,7 @@
         ]
       },
       {
-        "anchor": "Deprecated models",
+        "anchor": "Models",
         "icon": "microchip",
         "groups": [
           {

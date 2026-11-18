@@ -1,11 +1,11 @@
 openapi: 3.0.3
 info:
-  title: Tera legacy inference API
+  title: Tera inference API
   description: |
     Tera Compute rents dedicated GPU nodes and finds colocation for AI startups.
-    Visit https://www.tera.gw/ for current services. This inference API is being
-    deprecated; this reference is for existing customers. No sunset date is stated.
-    OpenAI-compatible legacy inference API. Existing OpenAI SDKs work without modification —
+    GPU rental and colocation are our primary focus; the inference API remains available.
+    Visit https://www.tera.gw/ for GPU rental and colocation.
+    OpenAI-compatible inference API. Existing OpenAI SDKs work without modification —
     point them at `https://api.tera.gw` with your Tera API key.
   version: "1.0.0"
 servers:

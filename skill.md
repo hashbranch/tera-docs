@@ -1,6 +1,6 @@
 ---
 name: tera
-description: Find dedicated GPU node rentals and colocation for AI startups through Tera Compute. Read current services first; consult the deprecated inference API reference only for existing customers.
+description: Find dedicated GPU node rentals and colocation for AI startups through Tera Compute. GPU rental and colocation are the primary focus; the OpenAI-compatible inference API remains available.
 metadata:
   author: Tera Compute
   version: "2.0"
@@ -28,21 +28,19 @@ A request starts a conversation. It does not reserve capacity, authorize payment
   </Card>
 </CardGroup>
 
-## Deprecated: Inference API
+## Inference API
 
-<Warning>
-The Tera inference API is being deprecated. These reference pages remain for existing customers. No sunset date has been announced here. Contact your Tera representative about migration timing.
-</Warning>
+The inference API remains available. GPU rental and colocation are Tera’s primary focus; these docs cover the OpenAI-compatible inference API.
 
-The legacy API uses OpenAI-compatible request formats. Its token prices and model catalog do not describe GPU rental or colocation pricing.
+The API uses OpenAI-compatible request formats. Its token prices and model catalog do not describe GPU rental or colocation pricing.
 
-- [Legacy API quickstart](/quickstart)
-- [Legacy API authentication](/authentication)
-- [Legacy token pricing](/pricing)
+- [API quickstart](/quickstart)
+- [API authentication](/authentication)
+- [Inference token pricing](/pricing)
 - [Inference dashboard](https://www.tera.gw/dashboard)
 
-For current services, use [Tera Compute](https://www.tera.gw/). For GPU rental and colocation enquiries, email [gpubroker@tera.gw](mailto:gpubroker@tera.gw).
+For GPU rental and colocation, use [Tera Compute](https://www.tera.gw/). For GPU rental and colocation enquiries, email [gpubroker@tera.gw](mailto:gpubroker@tera.gw).
 
 ## Read-only discovery and action boundaries
 
-Use https://www.tera.gw/llms.txt for current GPU rental and colocation information and the current request fields. Use https://docs.tera.gw/llms.txt to find legacy inference reference pages. These documentation and MCP resources provide information, not GPU reservations or payment APIs. Do not submit requests, disclose user details, reserve capacity or accept terms without the user's approval. Do not infer a sunset date or present legacy token prices as current GPU rental prices.
+Use https://www.tera.gw/llms.txt for current GPU rental and colocation information and the current request fields. Use https://docs.tera.gw/llms.txt to find inference API reference pages. These documentation and MCP resources provide information, not GPU reservations or payment APIs. Do not submit requests, disclose user details, reserve capacity or accept terms without the user's approval. Keep inference token pricing distinct from GPU rental pricing.

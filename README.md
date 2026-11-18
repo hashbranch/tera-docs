@@ -1,6 +1,6 @@
 # tera-docs
 
-Public documentation for [Tera Compute](https://www.tera.gw): dedicated GPU node rentals and colocation for AI startups, with legacy references for the inference API being deprecated. Lives at **docs.tera.gw**, deployed via [Mintlify](https://mintlify.com).
+Public documentation for [Tera Compute](https://www.tera.gw): dedicated GPU node rentals and colocation for AI startups, with documentation for the inference API, which remains available. Lives at **docs.tera.gw**, deployed via [Mintlify](https://mintlify.com).
 
 ## Local preview
 
@@ -57,4 +57,4 @@ CNAME `docs.tera.gw` → Mintlify (proxied off through Cloudflare; Mintlify hand
 
 ## Current positioning and agent exports
 
-Run `python3 scripts/public_docs.py` after narrative edits. It adds legacy notices and builds `llms.txt`, `llms-full.txt`, and `skill.md` from navigation-approved public pages and the introduction. Catalog sync also runs this step; CI checks export drift. The custom skill feeds Mintlify agent-card and MCP skill discovery. Hosting-owned MCP descriptions and generated discovery endpoints must be checked on the preview and after release. No sunset date or customer migration completion is assumed.
+Run `python3 scripts/public_docs.py` after narrative edits. It builds `llms.txt`, `llms-full.txt`, and `skill.md` from navigation-approved public pages and the introduction. Catalog sync also runs this step; CI checks export drift. The custom skill feeds Mintlify agent-card and MCP skill discovery. Hosting-owned MCP descriptions and generated discovery endpoints must be checked on the preview and after release. GPU rental and colocation are the primary focus; the inference API remains available.

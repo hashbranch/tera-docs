@@ -21,32 +21,26 @@ A request starts a conversation. It does not reserve capacity, authorize payment
   </Card>
 </CardGroup>
 
-## Deprecated: Inference API
+## Inference API
 
-<Warning>
-The Tera inference API is being deprecated. These reference pages remain for existing customers. No sunset date has been announced here. Contact your Tera representative about migration timing.
-</Warning>
+The inference API remains available. GPU rental and colocation are Tera’s primary focus; these docs cover the OpenAI-compatible inference API.
 
-The legacy API uses OpenAI-compatible request formats. Its token prices and model catalog do not describe GPU rental or colocation pricing.
+The API uses OpenAI-compatible request formats. Its token prices and model catalog do not describe GPU rental or colocation pricing.
 
-- [Legacy API quickstart](/quickstart)
-- [Legacy API authentication](/authentication)
-- [Legacy token pricing](/pricing)
+- [API quickstart](/quickstart)
+- [API authentication](/authentication)
+- [Inference token pricing](/pricing)
 - [Inference dashboard](https://www.tera.gw/dashboard)
 
-For current services, use [Tera Compute](https://www.tera.gw/). For GPU rental and colocation enquiries, email [gpubroker@tera.gw](mailto:gpubroker@tera.gw).
+For GPU rental and colocation, use [Tera Compute](https://www.tera.gw/). For GPU rental and colocation enquiries, email [gpubroker@tera.gw](mailto:gpubroker@tera.gw).
 
 
-## Deprecated: Inference API reference pages
+## Inference API reference pages
 
 
-### Deprecated: Quickstart
+### Quickstart
 
 Source: https://docs.tera.gw/quickstart.md
-<Warning>
-The Tera inference API is being deprecated. This page is a legacy reference for existing customers, not a current GPU rental offer. Tera Compute now rents dedicated GPU nodes and finds colocation for AI startups. Visit [Tera Compute](https://www.tera.gw/). No sunset date is stated here; contact your Tera representative about migration timing.
-</Warning>
-
 ## 1. Get an API key
 
 Email [hello@tera.gw](mailto:hello@tera.gw?subject=Tera%20API%20access) to request a key. Keys are formatted as `sk-tera-...`.
@@ -136,13 +130,9 @@ curl https://api.tera.gw/v1/chat/completions \
 </CardGroup>
 
 
-### Deprecated: Authentication
+### Authentication
 
 Source: https://docs.tera.gw/authentication.md
-<Warning>
-The Tera inference API is being deprecated. This page is a legacy reference for existing customers, not a current GPU rental offer. Tera Compute now rents dedicated GPU nodes and finds colocation for AI startups. Visit [Tera Compute](https://www.tera.gw/). No sunset date is stated here; contact your Tera representative about migration timing.
-</Warning>
-
 ## API keys
 
 Every request to Tera authenticates with a bearer token. Keys look like `sk-tera-<random>` and are issued per-customer.
@@ -180,13 +170,9 @@ Keys are revocable at any time. If you suspect a key has leaked, email us — we
 For every request we record: timestamp, key name (not the secret), model, backend, status, duration, token counts, and a truncated copy of the prompt and response for debugging. See our [privacy policy](https://tera.gw/privacy) for retention details.
 
 
-### Deprecated: Privacy
+### Privacy
 
 Source: https://docs.tera.gw/privacy.md
-<Warning>
-The Tera inference API is being deprecated. This page is a legacy reference for existing customers, not a current GPU rental offer. Tera Compute now rents dedicated GPU nodes and finds colocation for AI startups. Visit [Tera Compute](https://www.tera.gw/). No sunset date is stated here; contact your Tera representative about migration timing.
-</Warning>
-
 ## What Tera does with your data
 
 <Note>
@@ -222,13 +208,9 @@ For the full legal text, see [tera.gw/privacy](https://tera.gw/privacy).
 Email [hello@tera.gw](mailto:hello@tera.gw) with any privacy question or data-subject request.
 
 
-### Deprecated: OpenAI compatibility
+### OpenAI compatibility
 
 Source: https://docs.tera.gw/concepts/openai-compat.md
-<Warning>
-The Tera inference API is being deprecated. This page is a legacy reference for existing customers, not a current GPU rental offer. Tera Compute now rents dedicated GPU nodes and finds colocation for AI startups. Visit [Tera Compute](https://www.tera.gw/). No sunset date is stated here; contact your Tera representative about migration timing.
-</Warning>
-
 Tera implements the OpenAI Chat Completions API surface. Existing OpenAI SDKs work by changing two settings:
 
 ```python
@@ -291,13 +273,9 @@ Today: text generation and TTS only. No `/v1/embeddings`, no `/v1/images/*`, no 
 - **Health-aware routing** — if a backend fails health checks, traffic is steered to healthy replicas with no client changes.
 
 
-### Deprecated: Streaming
+### Streaming
 
 Source: https://docs.tera.gw/concepts/streaming.md
-<Warning>
-The Tera inference API is being deprecated. This page is a legacy reference for existing customers, not a current GPU rental offer. Tera Compute now rents dedicated GPU nodes and finds colocation for AI startups. Visit [Tera Compute](https://www.tera.gw/). No sunset date is stated here; contact your Tera representative about migration timing.
-</Warning>
-
 Set `"stream": true` to receive tokens incrementally. Tera streams responses as Server-Sent Events on the same `/v1/chat/completions` endpoint.
 
 ## Wire format
@@ -387,13 +365,9 @@ Reasoning models (e.g. `Qwen/Qwen3.5-27B`) stream `reasoning_content` deltas bef
 - **HTTP/2** — Tera supports HTTP/2; SDK defaults are fine.
 
 
-### Deprecated: Reasoning models
+### Reasoning models
 
 Source: https://docs.tera.gw/concepts/reasoning.md
-<Warning>
-The Tera inference API is being deprecated. This page is a legacy reference for existing customers, not a current GPU rental offer. Tera Compute now rents dedicated GPU nodes and finds colocation for AI startups. Visit [Tera Compute](https://www.tera.gw/). No sunset date is stated here; contact your Tera representative about migration timing.
-</Warning>
-
 Some models in Tera's catalog produce **explicit reasoning traces** — the chain-of-thought the model used before arriving at its answer. Tera surfaces these as a separate `reasoning_content` field so they don't pollute the visible response.
 
 Thinking models in the catalog today (partial list):
@@ -472,13 +446,9 @@ Reasoning traces consume output tokens and contribute to your bill. Use `max_tok
 OpenAI clients expect `content` to be the user-facing answer. Mixing reasoning markers (the literal `think` tags emitted by the model) into `content` breaks downstream parsers. By separating the two, OpenAI SDKs work without modification and reasoning becomes an opt-in feature on the client side.
 
 
-### Deprecated: Tool calling
+### Tool calling
 
 Source: https://docs.tera.gw/concepts/tool-calling.md
-<Warning>
-The Tera inference API is being deprecated. This page is a legacy reference for existing customers, not a current GPU rental offer. Tera Compute now rents dedicated GPU nodes and finds colocation for AI startups. Visit [Tera Compute](https://www.tera.gw/). No sunset date is stated here; contact your Tera representative about migration timing.
-</Warning>
-
 Tera supports tool calling on models that advertise the `tools` feature in their [catalog entry](/api-reference/models). The request and response shapes match the OpenAI Chat Completions API.
 
 ## Defining tools
@@ -583,13 +553,9 @@ With `stream: true`, tool call arguments arrive as deltas. Concatenate `delta.to
 Not every model in our catalog supports tools. Check `supported_features` in `/v1/models` — only models that include `"tools"` will reliably call functions. See [Models](/models/overview).
 
 
-### Deprecated: Claude Code
+### Claude Code
 
 Source: https://docs.tera.gw/guides/claude-code.md
-<Warning>
-The Tera inference API is being deprecated. This page is a legacy reference for existing customers, not a current GPU rental offer. Tera Compute now rents dedicated GPU nodes and finds colocation for AI startups. Visit [Tera Compute](https://www.tera.gw/). No sunset date is stated here; contact your Tera representative about migration timing.
-</Warning>
-
 Tera serves the Anthropic Messages API at `https://api.tera.gw`, which is the wire format Claude Code speaks natively. Point it at Tera with a one-time config change and it runs on Tera models. No local proxy, no sidecar, no extra software.
 
 ## How it works
@@ -830,13 +796,9 @@ For everything else, use the [OpenAI-compatible routes](/concepts/openai-compat)
 </CardGroup>
 
 
-### Deprecated: Pricing
+### Pricing
 
 Source: https://docs.tera.gw/pricing.md
-<Warning>
-The Tera inference API is being deprecated. This page is a legacy reference for existing customers, not a current GPU rental offer. Tera Compute now rents dedicated GPU nodes and finds colocation for AI startups. Visit [Tera Compute](https://www.tera.gw/). No sunset date is stated here; contact your Tera representative about migration timing.
-</Warning>
-
 All prices are in USD per **million tokens**. Updated 2026-11-18.
 
 | Model | Input | Output | Cache Read | Quant | Context |
@@ -884,13 +846,9 @@ Pricing is the same whether requests stream or not. Failed requests (5xx, 429) a
 Reach out at [hello@tera.gw](mailto:hello@tera.gw) for committed-use pricing.
 
 
-### Deprecated: Model Terms
+### Model Terms
 
 Source: https://docs.tera.gw/legal/model-terms.md
-<Warning>
-The Tera inference API is being deprecated. This page is a legacy reference for existing customers, not a current GPU rental offer. Tera Compute now rents dedicated GPU nodes and finds colocation for AI startups. Visit [Tera Compute](https://www.tera.gw/). No sunset date is stated here; contact your Tera representative about migration timing.
-</Warning>
-
 When you accept Tera's [Terms of Service](https://tera.gw/legal/tos), you also agree to the terms of service of each model's underlying provider, for any model whose provider is not Tera.
 
 ## How this works
@@ -925,45 +883,33 @@ The table below lists the upstream provider for each model family, along with th
 Regardless of which model you use, Tera's own data handling commitments apply to Tera's portion of the request lifecycle: no retention of prompt or completion content, no training on your traffic, no human review in the normal course of operations. For details on what Tera logs and where data lives, see [Privacy](/privacy).
 
 
-### Deprecated: Chat completions
+### Chat completions
 
 Source: https://docs.tera.gw/api-reference/chat-completions.md
-<Warning>
-The Tera inference API is being deprecated. This page is a legacy reference for existing customers, not a current GPU rental offer. Tera Compute now rents dedicated GPU nodes and finds colocation for AI startups. Visit [Tera Compute](https://www.tera.gw/). No sunset date is stated here; contact your Tera representative about migration timing.
-</Warning>
 
 
-### Deprecated: Text completions
+
+### Text completions
 
 Source: https://docs.tera.gw/api-reference/completions.md
-<Warning>
-The Tera inference API is being deprecated. This page is a legacy reference for existing customers, not a current GPU rental offer. Tera Compute now rents dedicated GPU nodes and finds colocation for AI startups. Visit [Tera Compute](https://www.tera.gw/). No sunset date is stated here; contact your Tera representative about migration timing.
-</Warning>
 
 
-### Deprecated: List models
+
+### List models
 
 Source: https://docs.tera.gw/api-reference/models.md
-<Warning>
-The Tera inference API is being deprecated. This page is a legacy reference for existing customers, not a current GPU rental offer. Tera Compute now rents dedicated GPU nodes and finds colocation for AI startups. Visit [Tera Compute](https://www.tera.gw/). No sunset date is stated here; contact your Tera representative about migration timing.
-</Warning>
 
 
-### Deprecated: Text to speech
+
+### Text to speech
 
 Source: https://docs.tera.gw/api-reference/audio-speech.md
-<Warning>
-The Tera inference API is being deprecated. This page is a legacy reference for existing customers, not a current GPU rental offer. Tera Compute now rents dedicated GPU nodes and finds colocation for AI startups. Visit [Tera Compute](https://www.tera.gw/). No sunset date is stated here; contact your Tera representative about migration timing.
-</Warning>
 
 
-### Deprecated: Models overview
+
+### Models overview
 
 Source: https://docs.tera.gw/models/overview.md
-<Warning>
-The Tera inference API is being deprecated. This page is a legacy reference for existing customers, not a current GPU rental offer. Tera Compute now rents dedicated GPU nodes and finds colocation for AI startups. Visit [Tera Compute](https://www.tera.gw/). No sunset date is stated here; contact your Tera representative about migration timing.
-</Warning>
-
 Tera serves open-weight models through a single OpenAI-compatible API surface. Pick a model id and pass it as the `model` field.
 
 This page is regenerated from the live model catalog. The authoritative source is [`GET /v1/models`](/api-reference/models).
@@ -1012,13 +958,9 @@ See the [pricing table](/pricing) for per-million-token rates across all 19 mode
 We add models as customers ask for them. Email [hello@tera.gw](mailto:hello@tera.gw) with the HuggingFace id and we'll evaluate.
 
 
-### Deprecated: claude-fable-5
+### claude-fable-5
 
 Source: https://docs.tera.gw/models/claude-fable-5.md
-<Warning>
-The Tera inference API is being deprecated. This page is a legacy reference for existing customers, not a current GPU rental offer. Tera Compute now rents dedicated GPU nodes and finds colocation for AI startups. Visit [Tera Compute](https://www.tera.gw/). No sunset date is stated here; contact your Tera representative about migration timing.
-</Warning>
-
 <Info>
   Model id: `anthropic/claude-fable-5` — pass this as the `model` field in API requests.
 </Info>
@@ -1064,13 +1006,9 @@ curl https://api.tera.gw/v1/chat/completions \
 ```
 
 
-### Deprecated: claude-opus-4-8
+### claude-opus-4-8
 
 Source: https://docs.tera.gw/models/claude-opus-4-8.md
-<Warning>
-The Tera inference API is being deprecated. This page is a legacy reference for existing customers, not a current GPU rental offer. Tera Compute now rents dedicated GPU nodes and finds colocation for AI startups. Visit [Tera Compute](https://www.tera.gw/). No sunset date is stated here; contact your Tera representative about migration timing.
-</Warning>
-
 <Info>
   Model id: `anthropic/claude-opus-4-8` — pass this as the `model` field in API requests.
 </Info>
@@ -1116,13 +1054,9 @@ curl https://api.tera.gw/v1/chat/completions \
 ```
 
 
-### Deprecated: claude-sonnet-5
+### claude-sonnet-5
 
 Source: https://docs.tera.gw/models/claude-sonnet-5.md
-<Warning>
-The Tera inference API is being deprecated. This page is a legacy reference for existing customers, not a current GPU rental offer. Tera Compute now rents dedicated GPU nodes and finds colocation for AI startups. Visit [Tera Compute](https://www.tera.gw/). No sunset date is stated here; contact your Tera representative about migration timing.
-</Warning>
-
 <Info>
   Model id: `anthropic/claude-sonnet-5` — pass this as the `model` field in API requests.
 </Info>
@@ -1168,13 +1102,9 @@ curl https://api.tera.gw/v1/chat/completions \
 ```
 
 
-### Deprecated: DeepSeek-R1-0528
+### DeepSeek-R1-0528
 
 Source: https://docs.tera.gw/models/deepseek-r1-0528.md
-<Warning>
-The Tera inference API is being deprecated. This page is a legacy reference for existing customers, not a current GPU rental offer. Tera Compute now rents dedicated GPU nodes and finds colocation for AI startups. Visit [Tera Compute](https://www.tera.gw/). No sunset date is stated here; contact your Tera representative about migration timing.
-</Warning>
-
 <Info>
   Model id: `deepseek-ai/DeepSeek-R1-0528` — pass this as the `model` field in API requests.
 </Info>
@@ -1220,13 +1150,9 @@ curl https://api.tera.gw/v1/chat/completions \
 ```
 
 
-### Deprecated: DeepSeek-V3.1
+### DeepSeek-V3.1
 
 Source: https://docs.tera.gw/models/deepseek-v3-1.md
-<Warning>
-The Tera inference API is being deprecated. This page is a legacy reference for existing customers, not a current GPU rental offer. Tera Compute now rents dedicated GPU nodes and finds colocation for AI startups. Visit [Tera Compute](https://www.tera.gw/). No sunset date is stated here; contact your Tera representative about migration timing.
-</Warning>
-
 <Info>
   Model id: `deepseek-ai/DeepSeek-V3.1` — pass this as the `model` field in API requests.
 </Info>
@@ -1273,13 +1199,9 @@ curl https://api.tera.gw/v1/chat/completions \
 ```
 
 
-### Deprecated: DeepSeek-V3.2
+### DeepSeek-V3.2
 
 Source: https://docs.tera.gw/models/deepseek-v3-2.md
-<Warning>
-The Tera inference API is being deprecated. This page is a legacy reference for existing customers, not a current GPU rental offer. Tera Compute now rents dedicated GPU nodes and finds colocation for AI startups. Visit [Tera Compute](https://www.tera.gw/). No sunset date is stated here; contact your Tera representative about migration timing.
-</Warning>
-
 <Info>
   Model id: `deepseek-ai/DeepSeek-V3.2` — pass this as the `model` field in API requests.
 </Info>
@@ -1326,13 +1248,9 @@ curl https://api.tera.gw/v1/chat/completions \
 ```
 
 
-### Deprecated: DeepSeek-V4-Flash
+### DeepSeek-V4-Flash
 
 Source: https://docs.tera.gw/models/deepseek-v4-flash.md
-<Warning>
-The Tera inference API is being deprecated. This page is a legacy reference for existing customers, not a current GPU rental offer. Tera Compute now rents dedicated GPU nodes and finds colocation for AI startups. Visit [Tera Compute](https://www.tera.gw/). No sunset date is stated here; contact your Tera representative about migration timing.
-</Warning>
-
 <Info>
   Model id: `deepseek-ai/DeepSeek-V4-Flash` — pass this as the `model` field in API requests.
 </Info>
@@ -1379,13 +1297,9 @@ curl https://api.tera.gw/v1/chat/completions \
 ```
 
 
-### Deprecated: DeepSeek-V4-Pro
+### DeepSeek-V4-Pro
 
 Source: https://docs.tera.gw/models/deepseek-v4-pro.md
-<Warning>
-The Tera inference API is being deprecated. This page is a legacy reference for existing customers, not a current GPU rental offer. Tera Compute now rents dedicated GPU nodes and finds colocation for AI startups. Visit [Tera Compute](https://www.tera.gw/). No sunset date is stated here; contact your Tera representative about migration timing.
-</Warning>
-
 <Info>
   Model id: `deepseek-ai/DeepSeek-V4-Pro` — pass this as the `model` field in API requests.
 </Info>
@@ -1432,13 +1346,9 @@ curl https://api.tera.gw/v1/chat/completions \
 ```
 
 
-### Deprecated: gemma-4-26B-A4B-it
+### gemma-4-26B-A4B-it
 
 Source: https://docs.tera.gw/models/gemma-4-26b-a4b-it.md
-<Warning>
-The Tera inference API is being deprecated. This page is a legacy reference for existing customers, not a current GPU rental offer. Tera Compute now rents dedicated GPU nodes and finds colocation for AI startups. Visit [Tera Compute](https://www.tera.gw/). No sunset date is stated here; contact your Tera representative about migration timing.
-</Warning>
-
 <Info>
   Model id: `google/gemma-4-26B-A4B-it` — pass this as the `model` field in API requests.
 </Info>
@@ -1485,13 +1395,9 @@ curl https://api.tera.gw/v1/chat/completions \
 ```
 
 
-### Deprecated: GLM-4.7
+### GLM-4.7
 
 Source: https://docs.tera.gw/models/glm-4-7.md
-<Warning>
-The Tera inference API is being deprecated. This page is a legacy reference for existing customers, not a current GPU rental offer. Tera Compute now rents dedicated GPU nodes and finds colocation for AI startups. Visit [Tera Compute](https://www.tera.gw/). No sunset date is stated here; contact your Tera representative about migration timing.
-</Warning>
-
 <Info>
   Model id: `zai-org/GLM-4.7` — pass this as the `model` field in API requests.
 </Info>
@@ -1537,13 +1443,9 @@ curl https://api.tera.gw/v1/chat/completions \
 ```
 
 
-### Deprecated: GLM-5
+### GLM-5
 
 Source: https://docs.tera.gw/models/glm-5.md
-<Warning>
-The Tera inference API is being deprecated. This page is a legacy reference for existing customers, not a current GPU rental offer. Tera Compute now rents dedicated GPU nodes and finds colocation for AI startups. Visit [Tera Compute](https://www.tera.gw/). No sunset date is stated here; contact your Tera representative about migration timing.
-</Warning>
-
 <Info>
   Model id: `zai-org/GLM-5` — pass this as the `model` field in API requests.
 </Info>
@@ -1590,13 +1492,9 @@ curl https://api.tera.gw/v1/chat/completions \
 ```
 
 
-### Deprecated: GLM-5.1
+### GLM-5.1
 
 Source: https://docs.tera.gw/models/glm-5-1.md
-<Warning>
-The Tera inference API is being deprecated. This page is a legacy reference for existing customers, not a current GPU rental offer. Tera Compute now rents dedicated GPU nodes and finds colocation for AI startups. Visit [Tera Compute](https://www.tera.gw/). No sunset date is stated here; contact your Tera representative about migration timing.
-</Warning>
-
 <Info>
   Model id: `zai-org/GLM-5.1` — pass this as the `model` field in API requests.
 </Info>
@@ -1643,13 +1541,9 @@ curl https://api.tera.gw/v1/chat/completions \
 ```
 
 
-### Deprecated: GLM-5.2
+### GLM-5.2
 
 Source: https://docs.tera.gw/models/glm-5-2.md
-<Warning>
-The Tera inference API is being deprecated. This page is a legacy reference for existing customers, not a current GPU rental offer. Tera Compute now rents dedicated GPU nodes and finds colocation for AI startups. Visit [Tera Compute](https://www.tera.gw/). No sunset date is stated here; contact your Tera representative about migration timing.
-</Warning>
-
 <Info>
   Model id: `zai-org/GLM-5.2` — pass this as the `model` field in API requests.
 </Info>
@@ -1696,13 +1590,9 @@ curl https://api.tera.gw/v1/chat/completions \
 ```
 
 
-### Deprecated: gpt-5.5
+### gpt-5.5
 
 Source: https://docs.tera.gw/models/gpt-5-5.md
-<Warning>
-The Tera inference API is being deprecated. This page is a legacy reference for existing customers, not a current GPU rental offer. Tera Compute now rents dedicated GPU nodes and finds colocation for AI startups. Visit [Tera Compute](https://www.tera.gw/). No sunset date is stated here; contact your Tera representative about migration timing.
-</Warning>
-
 <Info>
   Model id: `openai/gpt-5.5` — pass this as the `model` field in API requests.
 </Info>
@@ -1748,13 +1638,9 @@ curl https://api.tera.gw/v1/chat/completions \
 ```
 
 
-### Deprecated: gpt-5.6-luna
+### gpt-5.6-luna
 
 Source: https://docs.tera.gw/models/gpt-5-6-luna.md
-<Warning>
-The Tera inference API is being deprecated. This page is a legacy reference for existing customers, not a current GPU rental offer. Tera Compute now rents dedicated GPU nodes and finds colocation for AI startups. Visit [Tera Compute](https://www.tera.gw/). No sunset date is stated here; contact your Tera representative about migration timing.
-</Warning>
-
 <Info>
   Model id: `openai/gpt-5.6-luna` — pass this as the `model` field in API requests.
 </Info>
@@ -1800,13 +1686,9 @@ curl https://api.tera.gw/v1/chat/completions \
 ```
 
 
-### Deprecated: gpt-5.6-sol
+### gpt-5.6-sol
 
 Source: https://docs.tera.gw/models/gpt-5-6-sol.md
-<Warning>
-The Tera inference API is being deprecated. This page is a legacy reference for existing customers, not a current GPU rental offer. Tera Compute now rents dedicated GPU nodes and finds colocation for AI startups. Visit [Tera Compute](https://www.tera.gw/). No sunset date is stated here; contact your Tera representative about migration timing.
-</Warning>
-
 <Info>
   Model id: `openai/gpt-5.6-sol` — pass this as the `model` field in API requests.
 </Info>
@@ -1852,13 +1734,9 @@ curl https://api.tera.gw/v1/chat/completions \
 ```
 
 
-### Deprecated: gpt-5.6-terra
+### gpt-5.6-terra
 
 Source: https://docs.tera.gw/models/gpt-5-6-terra.md
-<Warning>
-The Tera inference API is being deprecated. This page is a legacy reference for existing customers, not a current GPU rental offer. Tera Compute now rents dedicated GPU nodes and finds colocation for AI startups. Visit [Tera Compute](https://www.tera.gw/). No sunset date is stated here; contact your Tera representative about migration timing.
-</Warning>
-
 <Info>
   Model id: `openai/gpt-5.6-terra` — pass this as the `model` field in API requests.
 </Info>
@@ -1904,13 +1782,9 @@ curl https://api.tera.gw/v1/chat/completions \
 ```
 
 
-### Deprecated: gpt-oss-120b
+### gpt-oss-120b
 
 Source: https://docs.tera.gw/models/gpt-oss-120b.md
-<Warning>
-The Tera inference API is being deprecated. This page is a legacy reference for existing customers, not a current GPU rental offer. Tera Compute now rents dedicated GPU nodes and finds colocation for AI startups. Visit [Tera Compute](https://www.tera.gw/). No sunset date is stated here; contact your Tera representative about migration timing.
-</Warning>
-
 <Info>
   Model id: `openai/gpt-oss-120b` — pass this as the `model` field. The API surface is the OpenAI Chat Completions API; existing OpenAI SDKs and any gateway that abstracts over OpenAI-compatible providers work without code changes.
 </Info>
@@ -2239,13 +2113,9 @@ At 50,000 turns/day this runs ~$15.30/day (~$459/month). Volume committed-use pr
 Bring the `X-Tera-Request-ID` of any failing request and we can trace it end-to-end.
 
 
-### Deprecated: gpt-oss-20b
+### gpt-oss-20b
 
 Source: https://docs.tera.gw/models/gpt-oss-20b.md
-<Warning>
-The Tera inference API is being deprecated. This page is a legacy reference for existing customers, not a current GPU rental offer. Tera Compute now rents dedicated GPU nodes and finds colocation for AI startups. Visit [Tera Compute](https://www.tera.gw/). No sunset date is stated here; contact your Tera representative about migration timing.
-</Warning>
-
 <Info>
   Model id: `openai/gpt-oss-20b` — pass this as the `model` field. The API surface is the OpenAI Chat Completions API; existing OpenAI SDKs and any gateway that abstracts over OpenAI-compatible providers work without code changes.
 </Info>
@@ -2574,13 +2444,9 @@ At 50,000 turns/day this runs ~$11.00/day (~$330/month). Volume committed-use pr
 Bring the `X-Tera-Request-ID` of any failing request and we can trace it end-to-end.
 
 
-### Deprecated: Kimi-K2.5
+### Kimi-K2.5
 
 Source: https://docs.tera.gw/models/kimi-k2-5.md
-<Warning>
-The Tera inference API is being deprecated. This page is a legacy reference for existing customers, not a current GPU rental offer. Tera Compute now rents dedicated GPU nodes and finds colocation for AI startups. Visit [Tera Compute](https://www.tera.gw/). No sunset date is stated here; contact your Tera representative about migration timing.
-</Warning>
-
 <Info>
   Model id: `moonshotai/Kimi-K2.5` — pass this as the `model` field in API requests.
 </Info>
@@ -2627,13 +2493,9 @@ curl https://api.tera.gw/v1/chat/completions \
 ```
 
 
-### Deprecated: Kimi-K2.6
+### Kimi-K2.6
 
 Source: https://docs.tera.gw/models/kimi-k2-6.md
-<Warning>
-The Tera inference API is being deprecated. This page is a legacy reference for existing customers, not a current GPU rental offer. Tera Compute now rents dedicated GPU nodes and finds colocation for AI startups. Visit [Tera Compute](https://www.tera.gw/). No sunset date is stated here; contact your Tera representative about migration timing.
-</Warning>
-
 <Info>
   Model id: `moonshotai/Kimi-K2.6` — pass this as the `model` field in API requests.
 </Info>
@@ -2680,13 +2542,9 @@ curl https://api.tera.gw/v1/chat/completions \
 ```
 
 
-### Deprecated: kimi-k2-thinking
+### kimi-k2-thinking
 
 Source: https://docs.tera.gw/models/kimi-k2-thinking.md
-<Warning>
-The Tera inference API is being deprecated. This page is a legacy reference for existing customers, not a current GPU rental offer. Tera Compute now rents dedicated GPU nodes and finds colocation for AI startups. Visit [Tera Compute](https://www.tera.gw/). No sunset date is stated here; contact your Tera representative about migration timing.
-</Warning>
-
 <Info>
   Model id: `moonshotai/kimi-k2-thinking` — pass this as the `model` field in API requests.
 </Info>
@@ -2733,13 +2591,9 @@ curl https://api.tera.gw/v1/chat/completions \
 ```
 
 
-### Deprecated: Kimi-K3
+### Kimi-K3
 
 Source: https://docs.tera.gw/models/kimi-k3.md
-<Warning>
-The Tera inference API is being deprecated. This page is a legacy reference for existing customers, not a current GPU rental offer. Tera Compute now rents dedicated GPU nodes and finds colocation for AI startups. Visit [Tera Compute](https://www.tera.gw/). No sunset date is stated here; contact your Tera representative about migration timing.
-</Warning>
-
 <Info>
   Model id: `moonshotai/Kimi-K3` — pass this as the `model` field in API requests.
 </Info>
@@ -2785,13 +2639,9 @@ curl https://api.tera.gw/v1/chat/completions \
 ```
 
 
-### Deprecated: Llama-3.3-70B-Instruct
+### Llama-3.3-70B-Instruct
 
 Source: https://docs.tera.gw/models/llama-3-3-70b-instruct.md
-<Warning>
-The Tera inference API is being deprecated. This page is a legacy reference for existing customers, not a current GPU rental offer. Tera Compute now rents dedicated GPU nodes and finds colocation for AI startups. Visit [Tera Compute](https://www.tera.gw/). No sunset date is stated here; contact your Tera representative about migration timing.
-</Warning>
-
 <Info>
   Model id: `meta-llama/Llama-3.3-70B-Instruct` — pass this as the `model` field in API requests.
 </Info>
@@ -2837,13 +2687,9 @@ curl https://api.tera.gw/v1/chat/completions \
 ```
 
 
-### Deprecated: MiniMax-M2
+### MiniMax-M2
 
 Source: https://docs.tera.gw/models/minimax-m2.md
-<Warning>
-The Tera inference API is being deprecated. This page is a legacy reference for existing customers, not a current GPU rental offer. Tera Compute now rents dedicated GPU nodes and finds colocation for AI startups. Visit [Tera Compute](https://www.tera.gw/). No sunset date is stated here; contact your Tera representative about migration timing.
-</Warning>
-
 <Info>
   Model id: `MiniMaxAI/MiniMax-M2` — pass this as the `model` field in API requests.
 </Info>
@@ -2890,13 +2736,9 @@ curl https://api.tera.gw/v1/chat/completions \
 ```
 
 
-### Deprecated: Qwen3-235B-A22B-Instruct-2507
+### Qwen3-235B-A22B-Instruct-2507
 
 Source: https://docs.tera.gw/models/qwen3-235b-a22b-instruct-2507.md
-<Warning>
-The Tera inference API is being deprecated. This page is a legacy reference for existing customers, not a current GPU rental offer. Tera Compute now rents dedicated GPU nodes and finds colocation for AI startups. Visit [Tera Compute](https://www.tera.gw/). No sunset date is stated here; contact your Tera representative about migration timing.
-</Warning>
-
 <Info>
   Model id: `Qwen/Qwen3-235B-A22B-Instruct-2507` — pass this as the `model` field in API requests.
 </Info>
@@ -2942,13 +2784,9 @@ curl https://api.tera.gw/v1/chat/completions \
 ```
 
 
-### Deprecated: Qwen3-Coder-480B-A35B-Instruct
+### Qwen3-Coder-480B-A35B-Instruct
 
 Source: https://docs.tera.gw/models/qwen3-coder-480b-a35b-instruct.md
-<Warning>
-The Tera inference API is being deprecated. This page is a legacy reference for existing customers, not a current GPU rental offer. Tera Compute now rents dedicated GPU nodes and finds colocation for AI startups. Visit [Tera Compute](https://www.tera.gw/). No sunset date is stated here; contact your Tera representative about migration timing.
-</Warning>
-
 <Info>
   Model id: `Qwen/Qwen3-Coder-480B-A35B-Instruct` — pass this as the `model` field in API requests.
 </Info>
@@ -2995,13 +2833,9 @@ curl https://api.tera.gw/v1/chat/completions \
 ```
 
 
-### Deprecated: Qwen3-Next-80B-A3B-Instruct
+### Qwen3-Next-80B-A3B-Instruct
 
 Source: https://docs.tera.gw/models/qwen3-next-80b-a3b-instruct.md
-<Warning>
-The Tera inference API is being deprecated. This page is a legacy reference for existing customers, not a current GPU rental offer. Tera Compute now rents dedicated GPU nodes and finds colocation for AI startups. Visit [Tera Compute](https://www.tera.gw/). No sunset date is stated here; contact your Tera representative about migration timing.
-</Warning>
-
 <Info>
   Model id: `Qwen/Qwen3-Next-80B-A3B-Instruct` — pass this as the `model` field in API requests.
 </Info>
@@ -3047,13 +2881,9 @@ curl https://api.tera.gw/v1/chat/completions \
 ```
 
 
-### Deprecated: Qwen3-Next-80B-A3B-Thinking
+### Qwen3-Next-80B-A3B-Thinking
 
 Source: https://docs.tera.gw/models/qwen3-next-80b-a3b-thinking.md
-<Warning>
-The Tera inference API is being deprecated. This page is a legacy reference for existing customers, not a current GPU rental offer. Tera Compute now rents dedicated GPU nodes and finds colocation for AI startups. Visit [Tera Compute](https://www.tera.gw/). No sunset date is stated here; contact your Tera representative about migration timing.
-</Warning>
-
 <Info>
   Model id: `Qwen/Qwen3-Next-80B-A3B-Thinking` — pass this as the `model` field in API requests.
 </Info>

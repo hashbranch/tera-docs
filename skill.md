@@ -39,7 +39,7 @@ The API uses OpenAI-compatible request formats. Its token prices and model catal
 - [Inference token pricing](/pricing)
 - [Inference dashboard](https://www.tera.gw/dashboard)
 
-For GPU rental and colocation, use [Tera Compute](https://www.tera.gw/). For GPU rental and colocation enquiries, email [gpubroker@tera.gw](mailto:gpubroker@tera.gw).
+For GPU rental and colocation, use [Tera Compute](https://www.tera.gw/). For GPU rental and colocation enquiries, email [hello@tera.gw](mailto:hello@tera.gw).
 
 ## Read-only discovery and action boundaries
 

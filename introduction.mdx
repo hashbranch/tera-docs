@@ -1,37 +1,39 @@
 ---
-title: Introduction
-description: "Tera is an OpenAI-compatible inference API serving high-quality open-weight models."
+title: Tera Compute
+description: "Dedicated GPU node rentals and colocation for AI startups. The inference API is being deprecated."
 ---
 
-## What is Tera?
+Tera Compute rents dedicated GPU nodes to AI startups and finds colocation for the GPUs they own. Visit [www.tera.gw](https://www.tera.gw/) for GPU capacity, pricing and requests.
 
-Tera is a hosted inference provider for open-weight language models — Llama, Qwen, DeepSeek, Mistral, and more. The API is OpenAI-compatible, so existing OpenAI SDKs and tools work without modification — point them at `https://api.tera.gw` with your Tera API key.
+## What does Tera do today?
 
-We're a pure execution layer for the open ecosystem. **US team, US-owned GPUs, US data centers.** No proprietary model to upsell you to — we focus on per-token economics on the models developers actually ship. Prompts and completions are processed and discarded: **zero retention, zero training, zero human review.**
+- **GPU rental:** dedicated bare-metal nodes, with configuration, term, availability and price confirmed in a written offer.
+- **Colocation:** sourcing rack space and power for customer-owned GPUs. Tera does not operate its own data centers.
 
-## What's available today
+A request starts a conversation. It does not reserve capacity, authorize payment or create a commercial commitment.
 
-- **Chat completions** — `POST /v1/chat/completions`
-- **Text completions** — `POST /v1/completions`
-- **Model catalog** — `GET /v1/models`
-- **Text-to-speech** — `POST /v1/audio/speech` (Kokoro)
-- **Streaming** via Server-Sent Events
-- **Reasoning models** — Qwen3.5 surfaces chain-of-thought traces as a separate `reasoning_content` field
-- **Tool calling** — OpenAI-compatible `tools` and `tool_choice`
-
-## Where to start
+## Where should I start?
 
 <CardGroup cols={2}>
-  <Card title="Quickstart" icon="bolt" href="/quickstart">
-    Make your first request in 60 seconds with curl, Python, or Node.
+  <Card title="Rent GPU nodes" icon="microchip" href="https://www.tera.gw/">
+    Review dedicated GPU capacity and send your requirements.
   </Card>
-  <Card title="Authentication" icon="key" href="/authentication">
-    How API keys work and how to request one.
-  </Card>
-  <Card title="Models" icon="microchip" href="/models/overview">
-    What's deployed, context lengths, pricing.
-  </Card>
-  <Card title="OpenAI compatibility" icon="arrow-right-arrow-left" href="/concepts/openai-compat">
-    What carries over from OpenAI clients, what's different.
+  <Card title="Find colocation" icon="server" href="https://www.tera.gw/colocation">
+    Find rack space and power for the GPUs you own.
   </Card>
 </CardGroup>
+
+## Deprecated: Inference API
+
+<Warning>
+The Tera inference API is being deprecated. These reference pages remain for existing customers. No sunset date has been announced here. Contact your Tera representative about migration timing.
+</Warning>
+
+The legacy API uses OpenAI-compatible request formats. Its token prices and model catalog do not describe GPU rental or colocation pricing.
+
+- [Legacy API quickstart](/quickstart)
+- [Legacy API authentication](/authentication)
+- [Legacy token pricing](/pricing)
+- [Inference dashboard](https://www.tera.gw/dashboard)
+
+For current services, use [Tera Compute](https://www.tera.gw/). For GPU rental and colocation enquiries, email [gpubroker@tera.gw](mailto:gpubroker@tera.gw).

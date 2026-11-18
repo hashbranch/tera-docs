@@ -1,5 +1,9 @@
 # CLAUDE.md — tera-docs
 
+## Current positioning (2026-11-18)
+
+Tera Compute rents dedicated GPU nodes and finds colocation for AI startups. The inference API is being deprecated; no sunset date has been announced here. `introduction.mdx` is the current company overview. Run `python3 scripts/public_docs.py` after content edits to preserve legacy notices and regenerate public agent exports; catalog sync runs it too. Older inference-first positioning below describes the legacy API only. Do not remove deprecation notices or advertise token pricing as GPU rental pricing.
+
 Mintlify docs for the Tera inference API. Lives at **docs.tera.gw**, auto-deployed on push to `main` via the Mintlify GitHub App.
 
 ## Architecture

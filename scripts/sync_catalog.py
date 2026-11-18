@@ -557,6 +557,9 @@ def main() -> int:
         DOCS_JSON.write_text(json.dumps(docs, indent=2) + "\n")
         print("updated docs.json navigation")
 
+    from public_docs import refresh
+    refresh()
+
     return 0
 
 

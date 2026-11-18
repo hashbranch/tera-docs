@@ -53,14 +53,14 @@ jobs:
         id: diff
         run: |
           # Only look at the files the sync script can touch
-          git diff --name-only -- models/ pricing.mdx docs.json > /tmp/changed_files.txt
+          git diff --name-only -- models/ pricing.mdx docs.json llms.txt llms-full.txt skill.md > /tmp/changed_files.txt
           cat /tmp/changed_files.txt
           if [ -s /tmp/changed_files.txt ]; then
             echo "changed=true" >> "$GITHUB_OUTPUT"
             # Build a short human-readable summary of what changed
             ADDED=$(git diff --diff-filter=A --name-only -- models/ | sed 's|models/||;s|\.mdx||')
             REMOVED=$(git diff --diff-filter=D --name-only -- models/ | sed 's|models/||;s|\.mdx||')
-            MODIFIED=$(git diff --diff-filter=M --name-only -- models/ pricing.mdx docs.json)
+            MODIFIED=$(git diff --diff-filter=M --name-only -- models/ pricing.mdx docs.json llms.txt llms-full.txt skill.md)
             {
               echo "added<<EOF"
               echo "$ADDED"
@@ -82,7 +82,7 @@ jobs:
         run: |
           git config user.name  "tera-sync-bot"
           git config user.email "bot@tera.gw"
-          git add models/ pricing.mdx docs.json
+          git add models/ pricing.mdx docs.json llms.txt llms-full.txt skill.md
           git commit -m "chore: auto-sync catalog from live API [skip ci]"
           git push origin HEAD:main
 

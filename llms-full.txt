@@ -1,0 +1,3100 @@
+# Tera Compute
+
+
+Tera Compute rents dedicated GPU nodes to AI startups and finds colocation for the GPUs they own. Visit [www.tera.gw](https://www.tera.gw/) for GPU capacity, pricing and requests.
+
+## What does Tera do today?
+
+- **GPU rental:** dedicated bare-metal nodes, with configuration, term, availability and price confirmed in a written offer.
+- **Colocation:** sourcing rack space and power for customer-owned GPUs. Tera does not operate its own data centers.
+
+A request starts a conversation. It does not reserve capacity, authorize payment or create a commercial commitment.
+
+## Where should I start?
+
+<CardGroup cols={2}>
+  <Card title="Rent GPU nodes" icon="microchip" href="https://www.tera.gw/">
+    Review dedicated GPU capacity and send your requirements.
+  </Card>
+  <Card title="Find colocation" icon="server" href="https://www.tera.gw/colocation">
+    Find rack space and power for the GPUs you own.
+  </Card>
+</CardGroup>
+
+## Deprecated: Inference API
+
+<Warning>
+The Tera inference API is being deprecated. These reference pages remain for existing customers. No sunset date has been announced here. Contact your Tera representative about migration timing.
+</Warning>
+
+The legacy API uses OpenAI-compatible request formats. Its token prices and model catalog do not describe GPU rental or colocation pricing.
+
+- [Legacy API quickstart](/quickstart)
+- [Legacy API authentication](/authentication)
+- [Legacy token pricing](/pricing)
+- [Inference dashboard](https://www.tera.gw/dashboard)
+
+For current services, use [Tera Compute](https://www.tera.gw/). For GPU rental and colocation enquiries, email [gpubroker@tera.gw](mailto:gpubroker@tera.gw).
+
+
+## Deprecated: Inference API reference pages
+
+
+### Deprecated: Quickstart
+
+Source: https://docs.tera.gw/quickstart.md
+<Warning>
+The Tera inference API is being deprecated. This page is a legacy reference for existing customers, not a current GPU rental offer. Tera Compute now rents dedicated GPU nodes and finds colocation for AI startups. Visit [Tera Compute](https://www.tera.gw/). No sunset date is stated here; contact your Tera representative about migration timing.
+</Warning>
+
+## 1. Get an API key
+
+Email [hello@tera.gw](mailto:hello@tera.gw?subject=Tera%20API%20access) to request a key. Keys are formatted as `sk-tera-...`.
+
+## 2. Send your first request
+
+<CodeGroup>
+
+```bash curl
+curl https://api.tera.gw/v1/chat/completions \
+  -H "Content-Type: application/json" \
+  -H "Authorization: Bearer $TERA_API_KEY" \
+  -d '{
+    "model": "Qwen/Qwen2.5-7B-Instruct",
+    "messages": [
+      {"role": "user", "content": "Say hello in one short sentence."}
+    ],
+    "max_tokens": 64
+  }'
+```
+
+```python python
+from openai import OpenAI
+
+client = OpenAI(
+    base_url="https://api.tera.gw/v1",
+    api_key="sk-tera-...",
+)
+
+resp = client.chat.completions.create(
+    model="Qwen/Qwen2.5-7B-Instruct",
+    messages=[{"role": "user", "content": "Say hello in one short sentence."}],
+    max_tokens=64,
+)
+print(resp.choices[0].message.content)
+```
+
+```javascript node
+import OpenAI from "openai";
+
+const client = new OpenAI({
+  baseURL: "https://api.tera.gw/v1",
+  apiKey: process.env.TERA_API_KEY,
+});
+
+const resp = await client.chat.completions.create({
+  model: "Qwen/Qwen2.5-7B-Instruct",
+  messages: [{ role: "user", content: "Say hello in one short sentence." }],
+  max_tokens: 64,
+});
+
+console.log(resp.choices[0].message.content);
+```
+
+</CodeGroup>
+
+## 3. Stream the response
+
+Add `"stream": true` to get token-by-token output over Server-Sent Events. See [Streaming](/concepts/streaming) for the full event format.
+
+```bash
+curl https://api.tera.gw/v1/chat/completions \
+  -H "Authorization: Bearer $TERA_API_KEY" \
+  -H "Content-Type: application/json" \
+  -d '{
+    "model": "Qwen/Qwen2.5-7B-Instruct",
+    "messages": [{"role": "user", "content": "Count to five."}],
+    "stream": true
+  }'
+```
+
+## What next?
+
+<CardGroup cols={2}>
+  <Card title="Browse models" icon="microchip" href="/models/overview">
+    Pick the right model for your workload.
+  </Card>
+  <Card title="OpenAI compatibility" icon="arrow-right-arrow-left" href="/concepts/openai-compat">
+    Migrating from OpenAI? Read this first.
+  </Card>
+  <Card title="Reasoning models" icon="brain" href="/concepts/reasoning">
+    How to use chain-of-thought reasoning with Qwen3.5.
+  </Card>
+  <Card title="Tool calling" icon="wrench" href="/concepts/tool-calling">
+    Function calling with OpenAI-compatible schemas.
+  </Card>
+</CardGroup>
+
+
+### Deprecated: Authentication
+
+Source: https://docs.tera.gw/authentication.md
+<Warning>
+The Tera inference API is being deprecated. This page is a legacy reference for existing customers, not a current GPU rental offer. Tera Compute now rents dedicated GPU nodes and finds colocation for AI startups. Visit [Tera Compute](https://www.tera.gw/). No sunset date is stated here; contact your Tera representative about migration timing.
+</Warning>
+
+## API keys
+
+Every request to Tera authenticates with a bearer token. Keys look like `sk-tera-<random>` and are issued per-customer.
+
+```bash
+Authorization: Bearer sk-tera-...
+```
+
+Pass it in the `Authorization` header for every request. The OpenAI SDKs handle this via `api_key=...` / `apiKey: ...`.
+
+## Requesting access
+
+Request a key by emailing [hello@tera.gw](mailto:hello@tera.gw?subject=Tera%20API%20access) with a one-line description of what you're building.
+
+## Errors
+
+<ResponseField name="401 Unauthorized" type="missing or invalid key">
+  Returned when the `Authorization` header is missing or the key is unknown or revoked.
+
+  ```json
+  { "error": { "message": "missing or invalid API key", "type": "authentication_error" } }
+  ```
+</ResponseField>
+
+<ResponseField name="403 Forbidden" type="key lacks access to model">
+  Some keys are scoped to specific models. Requests to other models return 403.
+</ResponseField>
+
+## Key rotation
+
+Keys are revocable at any time. If you suspect a key has leaked, email us — we'll issue a new one and revoke the old. We don't currently rotate keys on a schedule.
+
+## What we log
+
+For every request we record: timestamp, key name (not the secret), model, backend, status, duration, token counts, and a truncated copy of the prompt and response for debugging. See our [privacy policy](https://tera.gw/privacy) for retention details.
+
+
+### Deprecated: Privacy
+
+Source: https://docs.tera.gw/privacy.md
+<Warning>
+The Tera inference API is being deprecated. This page is a legacy reference for existing customers, not a current GPU rental offer. Tera Compute now rents dedicated GPU nodes and finds colocation for AI startups. Visit [Tera Compute](https://www.tera.gw/). No sunset date is stated here; contact your Tera representative about migration timing.
+</Warning>
+
+## What Tera does with your data
+
+<Note>
+  **Zero retention. Zero training. Zero human review.**
+  Prompts and completions are processed and discarded.
+</Note>
+
+We do not retain prompt or completion content beyond the request lifecycle. We do not train models on your traffic. No human reviews your prompts or completions in the normal course of operating the service.
+
+## What we do log
+
+For operational reliability we record a minimal request envelope:
+
+- Timestamp
+- API key name (not the secret)
+- Model and backend used
+- HTTP status and duration
+- Token counts (prompt + completion)
+- Truncated prompt/response **only when debugging an explicit error you've reported to us**, and only with the affected key holder's awareness
+
+This is what makes `/admin/logs` (internal) and per-request observability work. It's not used to build profiles of you or your users, and it's not shared.
+
+## Where data lives
+
+US team. US-owned GPUs. US data centers. For models served on Tera's own infrastructure, inference stays within our network. For models that route requests to a third-party model provider, that provider's data handling terms apply as well. See [Model Terms](/legal/model-terms) for the full provider list.
+
+## Long-form policy
+
+For the full legal text, see [tera.gw/privacy](https://tera.gw/privacy).
+
+## Questions
+
+Email [hello@tera.gw](mailto:hello@tera.gw) with any privacy question or data-subject request.
+
+
+### Deprecated: OpenAI compatibility
+
+Source: https://docs.tera.gw/concepts/openai-compat.md
+<Warning>
+The Tera inference API is being deprecated. This page is a legacy reference for existing customers, not a current GPU rental offer. Tera Compute now rents dedicated GPU nodes and finds colocation for AI startups. Visit [Tera Compute](https://www.tera.gw/). No sunset date is stated here; contact your Tera representative about migration timing.
+</Warning>
+
+Tera implements the OpenAI Chat Completions API surface. Existing OpenAI SDKs work by changing two settings:
+
+```python
+from openai import OpenAI
+
+client = OpenAI(
+    base_url="https://api.tera.gw/v1",
+    api_key="sk-tera-...",
+)
+```
+
+## What's the same
+
+- **Endpoints** — `/v1/chat/completions`, `/v1/completions`, `/v1/models`, `/v1/audio/speech`
+- **Streaming** — Server-Sent Events with `data: {...}` frames terminated by `data: [DONE]`
+- **Request shape** — `messages`, `temperature`, `top_p`, `max_tokens`, `stop`, `seed`, `frequency_penalty`, `presence_penalty`, `stream`, `tools`, `tool_choice`, `response_format`
+- **Response shape** — `id`, `object`, `created`, `model`, `choices[].message`, `choices[].finish_reason`, `usage`
+- **Tool calling** — OpenAI-compatible `tools` array and `tool_calls` in responses
+
+## What's different
+
+### Model IDs
+
+Tera uses HuggingFace IDs as the canonical model name — no provider prefix.
+
+```json
+{ "model": "Qwen/Qwen2.5-7B-Instruct" }
+```
+
+See [Models](/models/overview) for the catalog.
+
+### Extra sampling parameters
+
+Tera supports a few sampling parameters beyond OpenAI's surface. They're optional and ignored if you don't pass them.
+
+- `top_k` — top-k sampling
+- `repetition_penalty` — additional penalty term (distinct from OpenAI's frequency/presence penalties)
+- `min_p` — minimum probability threshold
+
+### Reasoning models
+
+Models like `Qwen/Qwen3.5-27B` emit explicit reasoning traces. Tera splits these into a separate `reasoning_content` field rather than mixing them with the user-facing answer. See [Reasoning](/concepts/reasoning).
+
+### No org / project headers
+
+We don't require or accept `OpenAI-Organization` or `OpenAI-Project` headers. Drop them if your client sends them — they're ignored.
+
+### No moderation endpoint
+
+We don't offer `/v1/moderations`. Use OpenAI's moderation endpoint if you need it, or run a separate guard model.
+
+### No embeddings, no images, no fine-tuning
+
+Today: text generation and TTS only. No `/v1/embeddings`, no `/v1/images/*`, no `/v1/fine_tuning/*`. Let us know if you need these.
+
+## Behavioral notes
+
+- **First request after cold start is slower** (~2–12s TTFT) due to CUDA graph compilation. Subsequent requests are fast.
+- **5xx errors trigger automatic retry** within the gateway across healthy backend replicas before being returned to you.
+- **Health-aware routing** — if a backend fails health checks, traffic is steered to healthy replicas with no client changes.
+
+
+### Deprecated: Streaming
+
+Source: https://docs.tera.gw/concepts/streaming.md
+<Warning>
+The Tera inference API is being deprecated. This page is a legacy reference for existing customers, not a current GPU rental offer. Tera Compute now rents dedicated GPU nodes and finds colocation for AI startups. Visit [Tera Compute](https://www.tera.gw/). No sunset date is stated here; contact your Tera representative about migration timing.
+</Warning>
+
+Set `"stream": true` to receive tokens incrementally. Tera streams responses as Server-Sent Events on the same `/v1/chat/completions` endpoint.
+
+## Wire format
+
+Each event is a single line prefixed with `data:` carrying a JSON delta. The stream terminates with `data: [DONE]`.
+
+```text
+data: {"id":"...","object":"chat.completion.chunk","created":1700000000,"model":"Qwen/Qwen2.5-7B-Instruct","choices":[{"index":0,"delta":{"role":"assistant","content":""},"finish_reason":null}]}
+
+data: {"id":"...","object":"chat.completion.chunk","created":1700000000,"model":"Qwen/Qwen2.5-7B-Instruct","choices":[{"index":0,"delta":{"content":"Hello"},"finish_reason":null}]}
+
+data: {"id":"...","object":"chat.completion.chunk","created":1700000000,"model":"Qwen/Qwen2.5-7B-Instruct","choices":[{"index":0,"delta":{"content":" there"},"finish_reason":null}]}
+
+data: {"id":"...","object":"chat.completion.chunk","created":1700000000,"model":"Qwen/Qwen2.5-7B-Instruct","choices":[{"index":0,"delta":{},"finish_reason":"stop"}]}
+
+data: [DONE]
+```
+
+## Reading the stream
+
+<CodeGroup>
+
+```python python
+from openai import OpenAI
+
+client = OpenAI(base_url="https://api.tera.gw/v1", api_key="sk-tera-...")
+
+stream = client.chat.completions.create(
+    model="Qwen/Qwen2.5-7B-Instruct",
+    messages=[{"role": "user", "content": "Count to five."}],
+    stream=True,
+)
+
+for chunk in stream:
+    delta = chunk.choices[0].delta.content or ""
+    print(delta, end="", flush=True)
+```
+
+```javascript node
+import OpenAI from "openai";
+
+const client = new OpenAI({
+  baseURL: "https://api.tera.gw/v1",
+  apiKey: process.env.TERA_API_KEY,
+});
+
+const stream = await client.chat.completions.create({
+  model: "Qwen/Qwen2.5-7B-Instruct",
+  messages: [{ role: "user", content: "Count to five." }],
+  stream: true,
+});
+
+for await (const chunk of stream) {
+  process.stdout.write(chunk.choices[0]?.delta?.content ?? "");
+}
+```
+
+```bash curl
+curl -N https://api.tera.gw/v1/chat/completions \
+  -H "Authorization: Bearer $TERA_API_KEY" \
+  -H "Content-Type: application/json" \
+  -d '{
+    "model": "Qwen/Qwen2.5-7B-Instruct",
+    "messages": [{"role": "user", "content": "Count to five."}],
+    "stream": true
+  }'
+```
+
+</CodeGroup>
+
+## Finish reasons
+
+The final non-`[DONE]` event has a non-null `finish_reason`:
+
+- `stop` — natural end of generation
+- `length` — hit `max_tokens` or the model's max context
+- `tool_calls` — the model emitted a tool call (see [Tool calling](/concepts/tool-calling))
+
+## Streaming with reasoning models
+
+Reasoning models (e.g. `Qwen/Qwen3.5-27B`) stream `reasoning_content` deltas before the visible content. See [Reasoning](/concepts/reasoning).
+
+## Operational notes
+
+- **Heartbeats** — we do not currently send keep-alive comments. Configure client read timeouts above your expected longest generation (server-side default: 120s).
+- **Disconnects** — if the client disconnects mid-stream, generation is cancelled on the backend.
+- **HTTP/2** — Tera supports HTTP/2; SDK defaults are fine.
+
+
+### Deprecated: Reasoning models
+
+Source: https://docs.tera.gw/concepts/reasoning.md
+<Warning>
+The Tera inference API is being deprecated. This page is a legacy reference for existing customers, not a current GPU rental offer. Tera Compute now rents dedicated GPU nodes and finds colocation for AI startups. Visit [Tera Compute](https://www.tera.gw/). No sunset date is stated here; contact your Tera representative about migration timing.
+</Warning>
+
+Some models in Tera's catalog produce **explicit reasoning traces** — the chain-of-thought the model used before arriving at its answer. Tera surfaces these as a separate `reasoning_content` field so they don't pollute the visible response.
+
+Thinking models in the catalog today (partial list):
+
+- [Qwen/Qwen3-Next-80B-A3B-Thinking](/models/qwen3-next-80b-a3b-thinking)
+- [moonshotai/kimi-k2-thinking](/models/kimi-k2-thinking)
+- [deepseek-ai/DeepSeek-R1-0528](/models/deepseek-r1-0528)
+
+## Response shape
+
+Non-streaming responses get a `reasoning_content` sibling of `content`:
+
+```json
+{
+  "choices": [
+    {
+      "index": 0,
+      "message": {
+        "role": "assistant",
+        "reasoning_content": "The user is asking about... I should consider...",
+        "content": "The answer is 42."
+      },
+      "finish_reason": "stop"
+    }
+  ]
+}
+```
+
+`reasoning_content` is the model's internal trace; `content` is the user-facing answer.
+
+## Streaming
+
+When `stream: true`, reasoning deltas arrive first, then content deltas:
+
+```text
+data: {"choices":[{"delta":{"role":"assistant","reasoning_content":"The user is"}}]}
+data: {"choices":[{"delta":{"reasoning_content":" asking about"}}]}
+...
+data: {"choices":[{"delta":{"content":"The answer is"}}]}
+data: {"choices":[{"delta":{"content":" 42."}}]}
+data: {"choices":[{"delta":{},"finish_reason":"stop"}]}
+data: [DONE]
+```
+
+```python
+from openai import OpenAI
+
+client = OpenAI(base_url="https://api.tera.gw/v1", api_key="sk-tera-...")
+
+stream = client.chat.completions.create(
+    model="Qwen/Qwen3-Next-80B-A3B-Thinking",
+    messages=[{"role": "user", "content": "What's 6 times 7?"}],
+    stream=True,
+)
+
+for chunk in stream:
+    delta = chunk.choices[0].delta
+    if reasoning := getattr(delta, "reasoning_content", None):
+        print(f"\033[2m{reasoning}\033[0m", end="", flush=True)
+    if content := delta.content:
+        print(content, end="", flush=True)
+```
+
+## Should you show reasoning to end users?
+
+Up to you. Common patterns:
+
+- **Hide entirely** — drop `reasoning_content`, display only `content`.
+- **Show collapsible** — UI affordance like "Show reasoning" that reveals the trace.
+- **Use for logging only** — keep traces server-side for debugging and feedback loops.
+
+Reasoning traces consume output tokens and contribute to your bill. Use `max_tokens` to bound total generation length.
+
+## Why a separate field?
+
+OpenAI clients expect `content` to be the user-facing answer. Mixing reasoning markers (the literal `think` tags emitted by the model) into `content` breaks downstream parsers. By separating the two, OpenAI SDKs work without modification and reasoning becomes an opt-in feature on the client side.
+
+
+### Deprecated: Tool calling
+
+Source: https://docs.tera.gw/concepts/tool-calling.md
+<Warning>
+The Tera inference API is being deprecated. This page is a legacy reference for existing customers, not a current GPU rental offer. Tera Compute now rents dedicated GPU nodes and finds colocation for AI startups. Visit [Tera Compute](https://www.tera.gw/). No sunset date is stated here; contact your Tera representative about migration timing.
+</Warning>
+
+Tera supports tool calling on models that advertise the `tools` feature in their [catalog entry](/api-reference/models). The request and response shapes match the OpenAI Chat Completions API.
+
+## Defining tools
+
+```python
+from openai import OpenAI
+
+client = OpenAI(base_url="https://api.tera.gw/v1", api_key="sk-tera-...")
+
+tools = [
+    {
+        "type": "function",
+        "function": {
+            "name": "get_weather",
+            "description": "Get current weather in a city",
+            "parameters": {
+                "type": "object",
+                "properties": {
+                    "city": {"type": "string", "description": "City name"},
+                    "unit": {"type": "string", "enum": ["celsius", "fahrenheit"]}
+                },
+                "required": ["city"]
+            }
+        }
+    }
+]
+
+resp = client.chat.completions.create(
+    model="Qwen/Qwen2.5-7B-Instruct",
+    messages=[{"role": "user", "content": "What's the weather in Paris?"}],
+    tools=tools,
+)
+
+print(resp.choices[0].message.tool_calls)
+```
+
+## Response
+
+When the model decides to call a tool, the response carries `tool_calls` and `finish_reason: "tool_calls"`:
+
+```json
+{
+  "choices": [
+    {
+      "message": {
+        "role": "assistant",
+        "content": null,
+        "tool_calls": [
+          {
+            "id": "call_abc123",
+            "type": "function",
+            "function": {
+              "name": "get_weather",
+              "arguments": "{\"city\":\"Paris\",\"unit\":\"celsius\"}"
+            }
+          }
+        ]
+      },
+      "finish_reason": "tool_calls"
+    }
+  ]
+}
+```
+
+## Returning tool results
+
+Append the assistant's tool call and your tool's output to `messages`, then call the API again:
+
+```python
+messages = [
+    {"role": "user", "content": "What's the weather in Paris?"},
+    resp.choices[0].message,  # the assistant tool call
+    {
+        "role": "tool",
+        "tool_call_id": "call_abc123",
+        "content": "18C, partly cloudy"
+    }
+]
+
+final = client.chat.completions.create(
+    model="Qwen/Qwen2.5-7B-Instruct",
+    messages=messages,
+    tools=tools,
+)
+print(final.choices[0].message.content)
+```
+
+## `tool_choice`
+
+Default is `"auto"` — the model decides whether to call a tool. Other modes:
+
+- `"none"` — disable tool calling for this request
+- `"required"` — force a tool call
+- `{"type": "function", "function": {"name": "..."}}` — force a specific tool
+
+## Streaming tool calls
+
+With `stream: true`, tool call arguments arrive as deltas. Concatenate `delta.tool_calls[i].function.arguments` strings across chunks to reconstruct the full JSON.
+
+## Model support
+
+Not every model in our catalog supports tools. Check `supported_features` in `/v1/models` — only models that include `"tools"` will reliably call functions. See [Models](/models/overview).
+
+
+### Deprecated: Claude Code
+
+Source: https://docs.tera.gw/guides/claude-code.md
+<Warning>
+The Tera inference API is being deprecated. This page is a legacy reference for existing customers, not a current GPU rental offer. Tera Compute now rents dedicated GPU nodes and finds colocation for AI startups. Visit [Tera Compute](https://www.tera.gw/). No sunset date is stated here; contact your Tera representative about migration timing.
+</Warning>
+
+Tera serves the Anthropic Messages API at `https://api.tera.gw`, which is the wire format Claude Code speaks natively. Point it at Tera with a one-time config change and it runs on Tera models. No local proxy, no sidecar, no extra software.
+
+## How it works
+
+```
+Claude Code  ──▶  https://api.tera.gw/v1/messages  ──▶  any Tera model
+```
+
+Tera translates each Anthropic request into its normal inference pipeline, so **every model in the [catalog](/models/overview) is reachable from Claude Code**, not just a fixed pair of coding models. Your key, rate limits, and billing behave exactly as they do on the OpenAI-compatible routes.
+
+## Before you start
+
+1. [Get an API key](/authentication) (`sk-tera-...`).
+2. Have credits on your account.
+3. Install Claude Code if you have not already:
+
+   ```bash
+   npm install -g @anthropic-ai/claude-code
+   ```
+
+## Set it up with one prompt
+
+Paste this into Claude Code (swap in your key):
+
+```text
+Set up this Claude Code installation to use the Tera inference gateway.
+
+1. Open ~/.claude/settings.json (create it if it doesn't exist) and keep any
+   existing settings intact.
+2. Merge in this "env" block:
+     ANTHROPIC_BASE_URL          = https://api.tera.gw
+     ANTHROPIC_AUTH_TOKEN        = sk-tera-REPLACE_WITH_YOUR_KEY
+     ANTHROPIC_DEFAULT_OPUS_MODEL   = moonshotai/Kimi-K3
+     ANTHROPIC_DEFAULT_SONNET_MODEL = moonshotai/Kimi-K2.6
+     ANTHROPIC_DEFAULT_HAIKU_MODEL  = deepseek-ai/DeepSeek-V4-Flash
+3. Show me the final settings.json, then tell me to fully quit and relaunch
+   Claude Code so the new endpoint takes effect.
+```
+
+Claude Code edits its own config, you relaunch, and you are on Tera.
+
+<Accordion title="Prefer to edit settings.json by hand?">
+
+Add this to `~/.claude/settings.json`, then relaunch Claude Code. The `_NAME` values are optional labels for the `/model` picker.
+
+```json
+{
+  "env": {
+    "ANTHROPIC_BASE_URL": "https://api.tera.gw",
+    "ANTHROPIC_AUTH_TOKEN": "sk-tera-REPLACE_WITH_YOUR_KEY",
+    "ANTHROPIC_DEFAULT_OPUS_MODEL": "moonshotai/Kimi-K3",
+    "ANTHROPIC_DEFAULT_OPUS_MODEL_NAME": "Tera · Kimi K3",
+    "ANTHROPIC_DEFAULT_SONNET_MODEL": "moonshotai/Kimi-K2.6",
+    "ANTHROPIC_DEFAULT_SONNET_MODEL_NAME": "Tera · Kimi K2.6",
+    "ANTHROPIC_DEFAULT_HAIKU_MODEL": "deepseek-ai/DeepSeek-V4-Flash",
+    "ANTHROPIC_DEFAULT_HAIKU_MODEL_NAME": "Tera · DeepSeek V4 Flash"
+  }
+}
+```
+
+</Accordion>
+
+<Accordion title="Prefer shell environment variables?">
+
+Useful for trying Tera out, or for switching backends per terminal session. These apply to the current shell only, so add them to `~/.zshrc` or `~/.bashrc` to persist.
+
+<CodeGroup>
+
+```bash macOS and Linux
+export ANTHROPIC_BASE_URL="https://api.tera.gw"
+export ANTHROPIC_AUTH_TOKEN="sk-tera-..."
+export ANTHROPIC_DEFAULT_OPUS_MODEL="moonshotai/Kimi-K3"
+export ANTHROPIC_DEFAULT_SONNET_MODEL="moonshotai/Kimi-K2.6"
+export ANTHROPIC_DEFAULT_HAIKU_MODEL="deepseek-ai/DeepSeek-V4-Flash"
+claude
+```
+
+```powershell Windows
+$env:ANTHROPIC_BASE_URL="https://api.tera.gw"
+$env:ANTHROPIC_AUTH_TOKEN="sk-tera-..."
+$env:ANTHROPIC_DEFAULT_OPUS_MODEL="moonshotai/Kimi-K3"
+$env:ANTHROPIC_DEFAULT_SONNET_MODEL="moonshotai/Kimi-K2.6"
+$env:ANTHROPIC_DEFAULT_HAIKU_MODEL="deepseek-ai/DeepSeek-V4-Flash"
+claude
+```
+
+</CodeGroup>
+
+Pick one method. Values in `settings.json` override shell variables, and mixing the two is hard to debug.
+
+</Accordion>
+
+<Warning>
+`~/.claude/settings.json` holds your API key in plaintext. Do not commit it. For per-project settings, use `.claude/settings.local.json`, which Claude Code gitignores by default.
+</Warning>
+
+## Choosing models
+
+Claude Code addresses models through three slots rather than one model name. It uses the Opus slot for hard reasoning, Sonnet for most turns, and Haiku for cheap background work such as file summaries and title generation.
+
+Any Tera model id works in any slot. All three show up in the **`/model`** picker, and you can switch between them anytime with `/model`.
+
+| `/model` slot | Suggested model | Best for |
+| --- | --- | --- |
+| Opus | [`moonshotai/Kimi-K3`](/models/kimi-k3) | Hardest coding and agentic work (1M context) |
+| Sonnet | [`moonshotai/Kimi-K2.6`](/models/kimi-k2-6) | Strong all-round agentic coding |
+| Haiku | [`deepseek-ai/DeepSeek-V4-Flash`](/models/deepseek-v4-flash) | Quick edits and background tasks (1M context) |
+
+These are starting points, not limits. Anything in the catalog can go in any slot, including [`deepseek-ai/DeepSeek-V4-Pro`](/models/deepseek-v4-pro), [`zai-org/GLM-5.2`](/models/glm-5-2), [`Qwen/Qwen3-Coder-480B-A35B-Instruct`](/models/qwen3-coder-480b-a35b-instruct), the `openai/gpt-5.6-*` family, and the `anthropic/claude-*` models. You can also set all three slots to the same model if you would rather have consistent behavior than tiered cost. Check the [pricing page](/pricing) first, since the Haiku slot absorbs a lot of traffic.
+
+To add more Tera models to the picker, set `ANTHROPIC_CUSTOM_MODEL_OPTION` to the model id.
+
+Use the exact id from the model's page, including vendor prefix and capitalization. `deepseek-ai/DeepSeek-V4-Pro` works; `deepseek-v4-pro` does not.
+
+<Note>
+  Don't enable gateway model *discovery* (`CLAUDE_CODE_ENABLE_GATEWAY_MODEL_DISCOVERY`).
+  Claude Code only auto-lists models whose id begins with `claude`/`anthropic`,
+  so most Tera ids won't appear that way. The config above puts them in the
+  picker directly.
+</Note>
+
+## Confirm it is working
+
+Start Claude Code and run `/status`. The base URL should read `https://api.tera.gw` and the model line should show the Tera model you configured. Send a short message such as `hi` to confirm the request completes end to end.
+
+## Configuration reference
+
+| Variable | Required | Purpose |
+| --- | --- | --- |
+| `ANTHROPIC_BASE_URL` | Yes | Routes Claude Code to Tera. Exactly `https://api.tera.gw`, with no `/v1` and no trailing slash. |
+| `ANTHROPIC_AUTH_TOKEN` | Yes | Your Tera API key. Sent as `Authorization: Bearer`. |
+| `ANTHROPIC_API_KEY` | Alternative | Also accepted, sent as `x-api-key`. Set one or the other, never both. |
+| `ANTHROPIC_DEFAULT_OPUS_MODEL` | No | Tera model id for the Opus slot. |
+| `ANTHROPIC_DEFAULT_SONNET_MODEL` | No | Tera model id for the Sonnet slot. |
+| `ANTHROPIC_DEFAULT_HAIKU_MODEL` | No | Tera model id for the Haiku slot. |
+| `ANTHROPIC_DEFAULT_*_MODEL_NAME` | No | Display label for that slot in the `/model` picker. |
+| `ANTHROPIC_CUSTOM_MODEL_OPTION` | No | Adds another Tera model to the `/model` picker. |
+| `CLAUDE_CODE_SUBAGENT_MODEL` | No | Tera model id used by subagents. |
+| `CLAUDE_CODE_AUTO_COMPACT_WINDOW` | No | Context size in tokens at which Claude Code compacts history. Match your model's context length, for example `1048576` for a 1M model or `262144` for a 256K model. |
+
+## What is supported
+
+| Feature | Status | Notes |
+| --- | --- | --- |
+| Streaming | ✅ | Full Anthropic SSE event sequence, including streamed tool calls. |
+| Tool calling | ✅ | `tools`, `tool_use`, `tool_result`, and `tool_choice` all map through. Tool errors are preserved. |
+| System prompts | ✅ | Accepts a plain string or a list of content blocks. |
+| Multi-turn tool loops | ✅ | Tool results are ordered to follow the assistant turn that requested them. |
+| Images | ✅ | Base64 and URL image blocks, on models that accept image input. |
+| `stop_sequences`, `temperature`, `top_p`, `top_k`, `max_tokens` | ✅ | Passed through. |
+| `POST /v1/messages/count_tokens` | ✅ | Returns an approximate count. See below. |
+
+### Thinking and prompt caching differ by model
+
+Two capabilities depend on which model you pick.
+
+| | `anthropic/claude-*` models | All other models |
+| --- | --- | --- |
+| Prompt caching (`cache_control`) | ✅ Works, with the usual cache discounts | ➖ Accepted and ignored. Requests succeed, without cache discounts. |
+| `thinking` parameter | ✅ Native Anthropic thinking parameters | ➖ Accepted and ignored |
+| Thinking content blocks | ✅ Returned as `thinking` blocks | ❌ Reasoning models still reason internally, but traces are not returned as `thinking` blocks |
+
+Everything else in the table above behaves the same across the catalog.
+
+### Token counting is approximate
+
+Claude Code calls `count_tokens` to draw the context meter and decide when to compact. Tera returns a heuristic estimate rather than a per-model tokenizer count, so the context gauge is indicative rather than exact.
+
+This does not affect billing. Usage is metered from the actual token counts reported by inference, exactly as on the OpenAI-compatible routes.
+
+## Troubleshooting
+
+<AccordionGroup>
+  <Accordion title="Requests 404 or 'model not found'">
+    Make sure the base URL is exactly `https://api.tera.gw`, with no `/v1` suffix.
+    Claude Code appends the path itself.
+
+    If the URL is right, check the model id. Ids are case-sensitive and include a
+    vendor prefix. Copy it verbatim from the model's page and check for stray
+    spaces or quotes.
+  </Accordion>
+  <Accordion title="401 / authentication error">
+    Confirm you're using your `sk-tera-...` key. Tera accepts either
+    `Authorization: Bearer` or `x-api-key`, but do not set both
+    `ANTHROPIC_AUTH_TOKEN` and `ANTHROPIC_API_KEY`.
+
+    If you previously ran `/login` with an Anthropic account, that saved
+    credential can conflict. Run `/status` to see which credential is active, and
+    `/logout` to clear the saved login.
+  </Accordion>
+  <Accordion title="402 / out of credits">
+    Top up in your account, then retry.
+  </Accordion>
+  <Accordion title="Tera models aren't in the /model picker">
+    They come from the `ANTHROPIC_DEFAULT_*_MODEL` vars after a full relaunch,
+    not from auto-discovery. Add extras with `ANTHROPIC_CUSTOM_MODEL_OPTION`.
+  </Accordion>
+  <Accordion title="Claude Code is still hitting Anthropic">
+    Fully quit and relaunch after editing `settings.json`, since env changes apply
+    at startup. If it persists, `ANTHROPIC_BASE_URL` is unset or misspelled. Run
+    `/status` to see the base URL actually in use.
+  </Accordion>
+  <Accordion title="Config changes aren't taking effect">
+    Work through these in order:
+
+    1. Values in `~/.claude/settings.json` override shell exports. Check the `env` block there for stale entries.
+    2. Shell exports apply only to the session that ran them, unless you added them to `~/.zshrc` or `~/.bashrc`.
+    3. Fully quit and relaunch Claude Code.
+    4. Run `/status` and read the base URL and model actually in use.
+  </Accordion>
+  <Accordion title="Subagents or background tasks fail">
+    Those run on the Haiku slot and on `CLAUDE_CODE_SUBAGENT_MODEL`. If you set
+    some slot variables but not others, fill in the rest.
+  </Accordion>
+</AccordionGroup>
+
+## Other Anthropic-compatible tools
+
+Anything that speaks the Anthropic Messages API configures the same way: point its base URL at `https://api.tera.gw` and pass a Tera key. The endpoint is not specific to Claude Code.
+
+For everything else, use the [OpenAI-compatible routes](/concepts/openai-compat) at `https://api.tera.gw/v1`.
+
+## What next?
+
+<CardGroup cols={2}>
+  <Card title="Browse models" icon="microchip" href="/models/overview">
+    Full catalog with context lengths and capabilities.
+  </Card>
+  <Card title="Pricing" icon="tag" href="/pricing">
+    Per-token rates. Worth checking before you pick your slots.
+  </Card>
+  <Card title="Tool calling" icon="wrench" href="/concepts/tool-calling">
+    How function calling behaves across Tera models.
+  </Card>
+  <Card title="Authentication" icon="key" href="/authentication">
+    Key formats, headers, and scoping.
+  </Card>
+</CardGroup>
+
+
+### Deprecated: Pricing
+
+Source: https://docs.tera.gw/pricing.md
+<Warning>
+The Tera inference API is being deprecated. This page is a legacy reference for existing customers, not a current GPU rental offer. Tera Compute now rents dedicated GPU nodes and finds colocation for AI startups. Visit [Tera Compute](https://www.tera.gw/). No sunset date is stated here; contact your Tera representative about migration timing.
+</Warning>
+
+All prices are in USD per **million tokens**. Updated 2026-11-18.
+
+| Model | Input | Output | Cache Read | Quant | Context |
+|---|---:|---:|---:|---|---:|
+| `openai/gpt-oss-20b` | $0.07 | $0.25 | — | `mxfp4` | 131,072 |
+| `openai/gpt-oss-120b` | $0.09 | $0.36 | — | `managed-mxfp4` | 131,072 |
+| `google/gemma-4-26B-A4B-it` | $0.15 | $0.60 | $0.015 | `managed` | 262,144 |
+| `Qwen/Qwen3-Next-80B-A3B-Instruct` | $0.15 | $1.20 | — | `managed` | 262,144 |
+| `Qwen/Qwen3-Next-80B-A3B-Thinking` | $0.15 | $1.20 | — | `managed` | 262,144 |
+| `deepseek-ai/DeepSeek-V4-Flash` | $0.19 | $0.51 | $0.028 | `managed` | 1,048,576 |
+| `openai/gpt-5.6-luna` | $0.20 | $1.20 | $0.02 | `managed` | 1,050,000 |
+| `Qwen/Qwen3-235B-A22B-Instruct-2507` | $0.22 | $0.88 | — | `managed` | 262,144 |
+| `Qwen/Qwen3-Coder-480B-A35B-Instruct` | $0.22 | $1.80 | $0.022 | `managed` | 262,144 |
+| `MiniMaxAI/MiniMax-M2` | $0.30 | $1.20 | $0.03 | `managed-fp8` | 196,608 |
+| `deepseek-ai/DeepSeek-V3.2` | $0.56 | $1.68 | $0.056 | `managed` | 163,840 |
+| `moonshotai/Kimi-K2.5` | $0.60 | $3.00 | $0.10 | `managed` | 262,144 |
+| `deepseek-ai/DeepSeek-V3.1` | $0.60 | $1.70 | $0.06 | `managed` | 163,840 |
+| `zai-org/GLM-4.7` | $0.60 | $2.20 | — | `managed` | 200,000 |
+| `moonshotai/kimi-k2-thinking` | $0.60 | $2.50 | $0.06 | `managed-int4` | 262,144 |
+| `meta-llama/Llama-3.3-70B-Instruct` | $0.72 | $0.72 | — | `managed` | 128,000 |
+| `moonshotai/Kimi-K2.6` | $0.95 | $4.00 | $0.16 | `managed` | 262,144 |
+| `zai-org/GLM-5` | $1.00 | $3.20 | $0.10 | `managed` | 200,000 |
+| `deepseek-ai/DeepSeek-R1-0528` | $1.35 | $5.40 | — | `managed` | 163,840 |
+| `zai-org/GLM-5.2` | $1.49 | $4.62 | $0.27 | `managed` | 262,144 |
+| `zai-org/GLM-5.1` | $1.54 | $4.84 | $0.286 | `managed` | 202,752 |
+| `deepseek-ai/DeepSeek-V4-Pro` | $1.74 | $3.48 | $0.145 | `managed` | 1,048,576 |
+| `anthropic/claude-sonnet-5` | $2.00 | $10.00 | $0.20 | `managed` | 200,000 |
+| `openai/gpt-5.6-terra` | $2.00 | $12.00 | $0.20 | `managed` | 1,050,000 |
+| `moonshotai/Kimi-K3` | $3.00 | $15.00 | $0.30 | `managed` | 1,048,576 |
+| `anthropic/claude-opus-4-8` | $5.00 | $25.00 | $0.50 | `managed` | 200,000 |
+| `openai/gpt-5.5` | $5.00 | $30.00 | $0.50 | `managed` | 1,050,000 |
+| `openai/gpt-5.6-sol` | $5.00 | $30.00 | $0.50 | `managed` | 1,050,000 |
+| `anthropic/claude-fable-5` | $10.00 | $50.00 | $1.00 | `managed` | 200,000 |
+
+Pricing is the same whether requests stream or not. Failed requests (5xx, 429) are not billed.
+
+## How billing works
+
+- **Input tokens** are counted from the rendered prompt after applying the model's chat template.
+- **Output tokens** include generated text. For [reasoning models](/concepts/reasoning), `reasoning_content` tokens count toward output.
+- **Cache read tokens** are cached input tokens reported by the backend. They appear in pricing only for models with non-zero cache-read rates.
+
+## Volume discounts
+
+Reach out at [hello@tera.gw](mailto:hello@tera.gw) for committed-use pricing.
+
+
+### Deprecated: Model Terms
+
+Source: https://docs.tera.gw/legal/model-terms.md
+<Warning>
+The Tera inference API is being deprecated. This page is a legacy reference for existing customers, not a current GPU rental offer. Tera Compute now rents dedicated GPU nodes and finds colocation for AI startups. Visit [Tera Compute](https://www.tera.gw/). No sunset date is stated here; contact your Tera representative about migration timing.
+</Warning>
+
+When you accept Tera's [Terms of Service](https://tera.gw/legal/tos), you also agree to the terms of service of each model's underlying provider, for any model whose provider is not Tera.
+
+## How this works
+
+Tera serves models in two ways:
+
+- **Models on Tera's own infrastructure.** Tera holds the weights and serves inference directly. Your API interaction is governed by Tera's Terms of Service. The model's open-weight license still governs anything you do downstream with the outputs (redistribution, fine-tuning, derivative works).
+
+- **Models routed to an upstream provider.** For some models, Tera forwards requests to the originating provider's API. In that case, both Tera's Terms of Service and that provider's terms of service apply to your use.
+
+The table below lists the upstream provider for each model family, along with the applicable license or terms URL. Platform terms of service entries marked **TBD** will be linked once the provider URLs are confirmed.
+
+## Provider terms
+
+| Provider | Models | License / Terms |
+|---|---|---|
+| DeepSeek | DeepSeek-R1-0528, DeepSeek-V3.1, DeepSeek-V3.2, DeepSeek-V4-Flash, DeepSeek-V4-Pro | MIT (R1 series), DeepSeek License Agreement (V3 and V4 series). [Terms of Use](https://cdn.deepseek.com/policies/en-US/deepseek-terms-of-use.html) |
+| Google | gemma-4-26B-A4B-it | [Gemma Terms of Use](https://ai.google.dev/gemma/terms) |
+| Meta | Llama-3.3-70B-Instruct, Llama-4 | [Llama 3.3 Community License](https://github.com/meta-llama/llama-models/blob/main/models/llama3_3/LICENSE) and [Acceptable Use Policy](https://www.llama.com/llama3_3/use-policy) (Llama 3.3); [Llama 4 Community License](https://github.com/meta-llama/llama-models/blob/main/models/llama4/LICENSE) and [Acceptable Use Policy](https://www.llama.com/llama4/use-policy) (Llama 4). Built with Llama. |
+| MiniMax | MiniMax-M2 | Modified MIT license. Platform ToS: TBD. |
+| Moonshot AI | Kimi-K2.5, Kimi-K2.6, Kimi-K2-thinking | Platform ToS: TBD. |
+| OpenAI | gpt-oss-20b, gpt-oss-120b | Platform ToS: TBD. |
+| Qwen (Alibaba) | Qwen3-235B-A22B-Instruct-2507, Qwen3-Coder-480B-A35B-Instruct, Qwen3-Next-80B-A3B-Instruct, Qwen3-Next-80B-A3B-Thinking | Apache 2.0. Platform ToS: TBD. |
+| ZAI-org (Zhipu AI) | GLM-4.7, GLM-5 | MIT. Platform ToS: TBD. |
+
+<Note>
+  Platform ToS links marked TBD are pending URL confirmation from each provider. This table will be updated once those URLs are verified.
+</Note>
+
+## Tera's commitments
+
+Regardless of which model you use, Tera's own data handling commitments apply to Tera's portion of the request lifecycle: no retention of prompt or completion content, no training on your traffic, no human review in the normal course of operations. For details on what Tera logs and where data lives, see [Privacy](/privacy).
+
+
+### Deprecated: Chat completions
+
+Source: https://docs.tera.gw/api-reference/chat-completions.md
+<Warning>
+The Tera inference API is being deprecated. This page is a legacy reference for existing customers, not a current GPU rental offer. Tera Compute now rents dedicated GPU nodes and finds colocation for AI startups. Visit [Tera Compute](https://www.tera.gw/). No sunset date is stated here; contact your Tera representative about migration timing.
+</Warning>
+
+
+### Deprecated: Text completions
+
+Source: https://docs.tera.gw/api-reference/completions.md
+<Warning>
+The Tera inference API is being deprecated. This page is a legacy reference for existing customers, not a current GPU rental offer. Tera Compute now rents dedicated GPU nodes and finds colocation for AI startups. Visit [Tera Compute](https://www.tera.gw/). No sunset date is stated here; contact your Tera representative about migration timing.
+</Warning>
+
+
+### Deprecated: List models
+
+Source: https://docs.tera.gw/api-reference/models.md
+<Warning>
+The Tera inference API is being deprecated. This page is a legacy reference for existing customers, not a current GPU rental offer. Tera Compute now rents dedicated GPU nodes and finds colocation for AI startups. Visit [Tera Compute](https://www.tera.gw/). No sunset date is stated here; contact your Tera representative about migration timing.
+</Warning>
+
+
+### Deprecated: Text to speech
+
+Source: https://docs.tera.gw/api-reference/audio-speech.md
+<Warning>
+The Tera inference API is being deprecated. This page is a legacy reference for existing customers, not a current GPU rental offer. Tera Compute now rents dedicated GPU nodes and finds colocation for AI startups. Visit [Tera Compute](https://www.tera.gw/). No sunset date is stated here; contact your Tera representative about migration timing.
+</Warning>
+
+
+### Deprecated: Models overview
+
+Source: https://docs.tera.gw/models/overview.md
+<Warning>
+The Tera inference API is being deprecated. This page is a legacy reference for existing customers, not a current GPU rental offer. Tera Compute now rents dedicated GPU nodes and finds colocation for AI startups. Visit [Tera Compute](https://www.tera.gw/). No sunset date is stated here; contact your Tera representative about migration timing.
+</Warning>
+
+Tera serves open-weight models through a single OpenAI-compatible API surface. Pick a model id and pass it as the `model` field.
+
+This page is regenerated from the live model catalog. The authoritative source is [`GET /v1/models`](/api-reference/models).
+
+## Available now
+
+<CardGroup cols={2}>
+  <Card title="gpt-oss-20b" icon="microchip" href="/models/gpt-oss-20b">
+    OpenAI open-weight 20B. 131k context, MXFP4. Cheapest tokens on Tera.
+  </Card>
+  <Card title="gpt-oss-120b" icon="microchip" href="/models/gpt-oss-120b">
+    OpenAI open-weight 120B. 131k context, MXFP4. Reasoning + tool calling.
+  </Card>
+  <Card title="DeepSeek-V4-Flash" icon="bolt" href="/models/deepseek-v4-flash">
+    DeepSeek's fast 1M-context model. Tools, JSON mode, reasoning.
+  </Card>
+  <Card title="DeepSeek-V4-Pro" icon="brain" href="/models/deepseek-v4-pro">
+    DeepSeek's flagship 1M-context model. Full feature set.
+  </Card>
+  <Card title="Qwen3-Coder-480B" icon="code" href="/models/qwen3-coder-480b-a35b-instruct">
+    480B MoE coding model. 262k context. Structured outputs.
+  </Card>
+  <Card title="DeepSeek-R1-0528" icon="brain" href="/models/deepseek-r1-0528">
+    DeepSeek's reasoning flagship. 163k context, chain-of-thought output.
+  </Card>
+</CardGroup>
+
+## Choosing a model
+
+| If you want... | Use |
+|---|---|
+| Cheapest tokens | [gpt-oss-20b](/models/gpt-oss-20b) |
+| Long context (1M tokens) | [DeepSeek-V4-Flash](/models/deepseek-v4-flash) |
+| Long context, highest quality | [DeepSeek-V4-Pro](/models/deepseek-v4-pro) |
+| Code generation | [Qwen3-Coder-480B](/models/qwen3-coder-480b-a35b-instruct) |
+| Reasoning / math / planning | [DeepSeek-R1-0528](/models/deepseek-r1-0528) |
+| OpenAI open-weight, large | [gpt-oss-120b](/models/gpt-oss-120b) |
+| Kimi reasoning | [kimi-k2-thinking](/models/kimi-k2-thinking) |
+
+## Pricing
+
+See the [pricing table](/pricing) for per-million-token rates across all 19 models.
+
+## Don't see what you need?
+
+We add models as customers ask for them. Email [hello@tera.gw](mailto:hello@tera.gw) with the HuggingFace id and we'll evaluate.
+
+
+### Deprecated: claude-fable-5
+
+Source: https://docs.tera.gw/models/claude-fable-5.md
+<Warning>
+The Tera inference API is being deprecated. This page is a legacy reference for existing customers, not a current GPU rental offer. Tera Compute now rents dedicated GPU nodes and finds colocation for AI startups. Visit [Tera Compute](https://www.tera.gw/). No sunset date is stated here; contact your Tera representative about migration timing.
+</Warning>
+
+<Info>
+  Model id: `anthropic/claude-fable-5` — pass this as the `model` field in API requests.
+</Info>
+
+## Spec
+
+| | |
+|---|---|
+| **Provider** | Anthropic |
+| **Context length** | 200,000 tokens |
+| **Max output** | 8,192 tokens |
+| **Quantization** | `managed` |
+| **Input modalities** | text |
+| **Output modalities** | text |
+
+## Pricing
+
+| | per million tokens |
+|---|---|
+| Input  | $10.00 |
+| Output | $50.00 |
+| Cache Read | $1.00 |
+
+## Supported features
+
+`tools`
+
+## Sampling parameters
+
+`top_p`, `top_k`, `max_tokens`, `stop`
+
+## Example
+
+```bash
+curl https://api.tera.gw/v1/chat/completions \
+  -H "Content-Type: application/json" \
+  -H "Authorization: Bearer $TERA_API_KEY" \
+  -d '{
+    "model": "anthropic/claude-fable-5",
+    "messages": [{"role": "user", "content": "Hello"}],
+    "max_tokens": 256
+  }'
+```
+
+
+### Deprecated: claude-opus-4-8
+
+Source: https://docs.tera.gw/models/claude-opus-4-8.md
+<Warning>
+The Tera inference API is being deprecated. This page is a legacy reference for existing customers, not a current GPU rental offer. Tera Compute now rents dedicated GPU nodes and finds colocation for AI startups. Visit [Tera Compute](https://www.tera.gw/). No sunset date is stated here; contact your Tera representative about migration timing.
+</Warning>
+
+<Info>
+  Model id: `anthropic/claude-opus-4-8` — pass this as the `model` field in API requests.
+</Info>
+
+## Spec
+
+| | |
+|---|---|
+| **Provider** | Anthropic |
+| **Context length** | 200,000 tokens |
+| **Max output** | 8,192 tokens |
+| **Quantization** | `managed` |
+| **Input modalities** | text |
+| **Output modalities** | text |
+
+## Pricing
+
+| | per million tokens |
+|---|---|
+| Input  | $5.00 |
+| Output | $25.00 |
+| Cache Read | $0.50 |
+
+## Supported features
+
+`tools`
+
+## Sampling parameters
+
+`top_p`, `top_k`, `max_tokens`, `stop`
+
+## Example
+
+```bash
+curl https://api.tera.gw/v1/chat/completions \
+  -H "Content-Type: application/json" \
+  -H "Authorization: Bearer $TERA_API_KEY" \
+  -d '{
+    "model": "anthropic/claude-opus-4-8",
+    "messages": [{"role": "user", "content": "Hello"}],
+    "max_tokens": 256
+  }'
+```
+
+
+### Deprecated: claude-sonnet-5
+
+Source: https://docs.tera.gw/models/claude-sonnet-5.md
+<Warning>
+The Tera inference API is being deprecated. This page is a legacy reference for existing customers, not a current GPU rental offer. Tera Compute now rents dedicated GPU nodes and finds colocation for AI startups. Visit [Tera Compute](https://www.tera.gw/). No sunset date is stated here; contact your Tera representative about migration timing.
+</Warning>
+
+<Info>
+  Model id: `anthropic/claude-sonnet-5` — pass this as the `model` field in API requests.
+</Info>
+
+## Spec
+
+| | |
+|---|---|
+| **Provider** | Anthropic |
+| **Context length** | 200,000 tokens |
+| **Max output** | 8,192 tokens |
+| **Quantization** | `managed` |
+| **Input modalities** | text |
+| **Output modalities** | text |
+
+## Pricing
+
+| | per million tokens |
+|---|---|
+| Input  | $2.00 |
+| Output | $10.00 |
+| Cache Read | $0.20 |
+
+## Supported features
+
+`tools`
+
+## Sampling parameters
+
+`top_p`, `top_k`, `max_tokens`, `stop`
+
+## Example
+
+```bash
+curl https://api.tera.gw/v1/chat/completions \
+  -H "Content-Type: application/json" \
+  -H "Authorization: Bearer $TERA_API_KEY" \
+  -d '{
+    "model": "anthropic/claude-sonnet-5",
+    "messages": [{"role": "user", "content": "Hello"}],
+    "max_tokens": 256
+  }'
+```
+
+
+### Deprecated: DeepSeek-R1-0528
+
+Source: https://docs.tera.gw/models/deepseek-r1-0528.md
+<Warning>
+The Tera inference API is being deprecated. This page is a legacy reference for existing customers, not a current GPU rental offer. Tera Compute now rents dedicated GPU nodes and finds colocation for AI startups. Visit [Tera Compute](https://www.tera.gw/). No sunset date is stated here; contact your Tera representative about migration timing.
+</Warning>
+
+<Info>
+  Model id: `deepseek-ai/DeepSeek-R1-0528` — pass this as the `model` field in API requests.
+</Info>
+
+## Spec
+
+| | |
+|---|---|
+| **Provider** | deepseek-ai |
+| **HuggingFace** | [`deepseek-ai/DeepSeek-R1-0528`](https://huggingface.co/deepseek-ai/DeepSeek-R1-0528) |
+| **Context length** | 163,840 tokens |
+| **Max output** | 4,096 tokens |
+| **Quantization** | `managed` |
+| **Input modalities** | text |
+| **Output modalities** | text |
+
+## Pricing
+
+| | per million tokens |
+|---|---|
+| Input  | $1.35 |
+| Output | $5.40 |
+
+## Supported features
+
+`tools`, `json_mode`, `structured_outputs`, `reasoning`
+
+## Sampling parameters
+
+`temperature`, `top_p`, `top_k`, `max_tokens`, `stop`, `seed`, `frequency_penalty`, `presence_penalty`, `repetition_penalty`, `logprobs`, `top_logprobs`
+
+## Example
+
+```bash
+curl https://api.tera.gw/v1/chat/completions \
+  -H "Content-Type: application/json" \
+  -H "Authorization: Bearer $TERA_API_KEY" \
+  -d '{
+    "model": "deepseek-ai/DeepSeek-R1-0528",
+    "messages": [{"role": "user", "content": "Hello"}],
+    "max_tokens": 256
+  }'
+```
+
+
+### Deprecated: DeepSeek-V3.1
+
+Source: https://docs.tera.gw/models/deepseek-v3-1.md
+<Warning>
+The Tera inference API is being deprecated. This page is a legacy reference for existing customers, not a current GPU rental offer. Tera Compute now rents dedicated GPU nodes and finds colocation for AI startups. Visit [Tera Compute](https://www.tera.gw/). No sunset date is stated here; contact your Tera representative about migration timing.
+</Warning>
+
+<Info>
+  Model id: `deepseek-ai/DeepSeek-V3.1` — pass this as the `model` field in API requests.
+</Info>
+
+## Spec
+
+| | |
+|---|---|
+| **Provider** | deepseek-ai |
+| **HuggingFace** | [`deepseek-ai/DeepSeek-V3.1`](https://huggingface.co/deepseek-ai/DeepSeek-V3.1) |
+| **Context length** | 163,840 tokens |
+| **Max output** | 4,096 tokens |
+| **Quantization** | `managed` |
+| **Input modalities** | text |
+| **Output modalities** | text |
+
+## Pricing
+
+| | per million tokens |
+|---|---|
+| Input  | $0.60 |
+| Output | $1.70 |
+| Cache Read | $0.06 |
+
+## Supported features
+
+`tools`, `json_mode`, `structured_outputs`, `reasoning`
+
+## Sampling parameters
+
+`temperature`, `top_p`, `top_k`, `max_tokens`, `stop`, `seed`, `frequency_penalty`, `presence_penalty`, `repetition_penalty`, `logprobs`, `top_logprobs`
+
+## Example
+
+```bash
+curl https://api.tera.gw/v1/chat/completions \
+  -H "Content-Type: application/json" \
+  -H "Authorization: Bearer $TERA_API_KEY" \
+  -d '{
+    "model": "deepseek-ai/DeepSeek-V3.1",
+    "messages": [{"role": "user", "content": "Hello"}],
+    "max_tokens": 256
+  }'
+```
+
+
+### Deprecated: DeepSeek-V3.2
+
+Source: https://docs.tera.gw/models/deepseek-v3-2.md
+<Warning>
+The Tera inference API is being deprecated. This page is a legacy reference for existing customers, not a current GPU rental offer. Tera Compute now rents dedicated GPU nodes and finds colocation for AI startups. Visit [Tera Compute](https://www.tera.gw/). No sunset date is stated here; contact your Tera representative about migration timing.
+</Warning>
+
+<Info>
+  Model id: `deepseek-ai/DeepSeek-V3.2` — pass this as the `model` field in API requests.
+</Info>
+
+## Spec
+
+| | |
+|---|---|
+| **Provider** | deepseek-ai |
+| **HuggingFace** | [`deepseek-ai/DeepSeek-V3.2`](https://huggingface.co/deepseek-ai/DeepSeek-V3.2) |
+| **Context length** | 163,840 tokens |
+| **Max output** | 4,096 tokens |
+| **Quantization** | `managed` |
+| **Input modalities** | text |
+| **Output modalities** | text |
+
+## Pricing
+
+| | per million tokens |
+|---|---|
+| Input  | $0.56 |
+| Output | $1.68 |
+| Cache Read | $0.056 |
+
+## Supported features
+
+`tools`, `json_mode`, `structured_outputs`, `reasoning`
+
+## Sampling parameters
+
+`temperature`, `top_p`, `top_k`, `max_tokens`, `stop`, `seed`, `frequency_penalty`, `presence_penalty`, `repetition_penalty`, `logprobs`, `top_logprobs`
+
+## Example
+
+```bash
+curl https://api.tera.gw/v1/chat/completions \
+  -H "Content-Type: application/json" \
+  -H "Authorization: Bearer $TERA_API_KEY" \
+  -d '{
+    "model": "deepseek-ai/DeepSeek-V3.2",
+    "messages": [{"role": "user", "content": "Hello"}],
+    "max_tokens": 256
+  }'
+```
+
+
+### Deprecated: DeepSeek-V4-Flash
+
+Source: https://docs.tera.gw/models/deepseek-v4-flash.md
+<Warning>
+The Tera inference API is being deprecated. This page is a legacy reference for existing customers, not a current GPU rental offer. Tera Compute now rents dedicated GPU nodes and finds colocation for AI startups. Visit [Tera Compute](https://www.tera.gw/). No sunset date is stated here; contact your Tera representative about migration timing.
+</Warning>
+
+<Info>
+  Model id: `deepseek-ai/DeepSeek-V4-Flash` — pass this as the `model` field in API requests.
+</Info>
+
+## Spec
+
+| | |
+|---|---|
+| **Provider** | deepseek-ai |
+| **HuggingFace** | [`deepseek-ai/DeepSeek-V4-Flash`](https://huggingface.co/deepseek-ai/DeepSeek-V4-Flash) |
+| **Context length** | 1,048,576 tokens |
+| **Max output** | 4,096 tokens |
+| **Quantization** | `managed` |
+| **Input modalities** | text |
+| **Output modalities** | text |
+
+## Pricing
+
+| | per million tokens |
+|---|---|
+| Input  | $0.19 |
+| Output | $0.51 |
+| Cache Read | $0.028 |
+
+## Supported features
+
+`tools`, `json_mode`, `structured_outputs`, `reasoning`
+
+## Sampling parameters
+
+`temperature`, `top_p`, `max_tokens`, `stop`, `seed`, `frequency_penalty`, `presence_penalty`, `logprobs`, `top_logprobs`
+
+## Example
+
+```bash
+curl https://api.tera.gw/v1/chat/completions \
+  -H "Content-Type: application/json" \
+  -H "Authorization: Bearer $TERA_API_KEY" \
+  -d '{
+    "model": "deepseek-ai/DeepSeek-V4-Flash",
+    "messages": [{"role": "user", "content": "Hello"}],
+    "max_tokens": 256
+  }'
+```
+
+
+### Deprecated: DeepSeek-V4-Pro
+
+Source: https://docs.tera.gw/models/deepseek-v4-pro.md
+<Warning>
+The Tera inference API is being deprecated. This page is a legacy reference for existing customers, not a current GPU rental offer. Tera Compute now rents dedicated GPU nodes and finds colocation for AI startups. Visit [Tera Compute](https://www.tera.gw/). No sunset date is stated here; contact your Tera representative about migration timing.
+</Warning>
+
+<Info>
+  Model id: `deepseek-ai/DeepSeek-V4-Pro` — pass this as the `model` field in API requests.
+</Info>
+
+## Spec
+
+| | |
+|---|---|
+| **Provider** | deepseek-ai |
+| **HuggingFace** | [`deepseek-ai/DeepSeek-V4-Pro`](https://huggingface.co/deepseek-ai/DeepSeek-V4-Pro) |
+| **Context length** | 1,048,576 tokens |
+| **Max output** | 4,096 tokens |
+| **Quantization** | `managed` |
+| **Input modalities** | text |
+| **Output modalities** | text |
+
+## Pricing
+
+| | per million tokens |
+|---|---|
+| Input  | $1.74 |
+| Output | $3.48 |
+| Cache Read | $0.145 |
+
+## Supported features
+
+`tools`, `json_mode`, `structured_outputs`, `reasoning`
+
+## Sampling parameters
+
+`temperature`, `top_p`, `top_k`, `max_tokens`, `stop`, `seed`, `frequency_penalty`, `presence_penalty`, `repetition_penalty`, `logprobs`, `top_logprobs`
+
+## Example
+
+```bash
+curl https://api.tera.gw/v1/chat/completions \
+  -H "Content-Type: application/json" \
+  -H "Authorization: Bearer $TERA_API_KEY" \
+  -d '{
+    "model": "deepseek-ai/DeepSeek-V4-Pro",
+    "messages": [{"role": "user", "content": "Hello"}],
+    "max_tokens": 256
+  }'
+```
+
+
+### Deprecated: gemma-4-26B-A4B-it
+
+Source: https://docs.tera.gw/models/gemma-4-26b-a4b-it.md
+<Warning>
+The Tera inference API is being deprecated. This page is a legacy reference for existing customers, not a current GPU rental offer. Tera Compute now rents dedicated GPU nodes and finds colocation for AI startups. Visit [Tera Compute](https://www.tera.gw/). No sunset date is stated here; contact your Tera representative about migration timing.
+</Warning>
+
+<Info>
+  Model id: `google/gemma-4-26B-A4B-it` — pass this as the `model` field in API requests.
+</Info>
+
+## Spec
+
+| | |
+|---|---|
+| **Provider** | google |
+| **HuggingFace** | [`google/gemma-4-26B-A4B-it`](https://huggingface.co/google/gemma-4-26B-A4B-it) |
+| **Context length** | 262,144 tokens |
+| **Max output** | 4,096 tokens |
+| **Quantization** | `managed` |
+| **Input modalities** | text |
+| **Output modalities** | text |
+
+## Pricing
+
+| | per million tokens |
+|---|---|
+| Input  | $0.15 |
+| Output | $0.60 |
+| Cache Read | $0.015 |
+
+## Supported features
+
+`tools`, `json_mode`, `structured_outputs`
+
+## Sampling parameters
+
+`temperature`, `top_p`, `top_k`, `max_tokens`, `stop`, `seed`, `frequency_penalty`, `presence_penalty`, `repetition_penalty`, `logprobs`, `top_logprobs`
+
+## Example
+
+```bash
+curl https://api.tera.gw/v1/chat/completions \
+  -H "Content-Type: application/json" \
+  -H "Authorization: Bearer $TERA_API_KEY" \
+  -d '{
+    "model": "google/gemma-4-26B-A4B-it",
+    "messages": [{"role": "user", "content": "Hello"}],
+    "max_tokens": 256
+  }'
+```
+
+
+### Deprecated: GLM-4.7
+
+Source: https://docs.tera.gw/models/glm-4-7.md
+<Warning>
+The Tera inference API is being deprecated. This page is a legacy reference for existing customers, not a current GPU rental offer. Tera Compute now rents dedicated GPU nodes and finds colocation for AI startups. Visit [Tera Compute](https://www.tera.gw/). No sunset date is stated here; contact your Tera representative about migration timing.
+</Warning>
+
+<Info>
+  Model id: `zai-org/GLM-4.7` — pass this as the `model` field in API requests.
+</Info>
+
+## Spec
+
+| | |
+|---|---|
+| **Provider** | Z.ai |
+| **HuggingFace** | [`zai-org/GLM-4.7`](https://huggingface.co/zai-org/GLM-4.7) |
+| **Context length** | 200,000 tokens |
+| **Max output** | 4,096 tokens |
+| **Quantization** | `managed` |
+| **Input modalities** | text |
+| **Output modalities** | text |
+
+## Pricing
+
+| | per million tokens |
+|---|---|
+| Input  | $0.60 |
+| Output | $2.20 |
+
+## Supported features
+
+`tools`, `json_mode`, `structured_outputs`
+
+## Sampling parameters
+
+`temperature`, `top_p`, `top_k`, `max_tokens`, `stop`, `seed`, `frequency_penalty`, `presence_penalty`, `repetition_penalty`, `logprobs`, `top_logprobs`
+
+## Example
+
+```bash
+curl https://api.tera.gw/v1/chat/completions \
+  -H "Content-Type: application/json" \
+  -H "Authorization: Bearer $TERA_API_KEY" \
+  -d '{
+    "model": "zai-org/GLM-4.7",
+    "messages": [{"role": "user", "content": "Hello"}],
+    "max_tokens": 256
+  }'
+```
+
+
+### Deprecated: GLM-5
+
+Source: https://docs.tera.gw/models/glm-5.md
+<Warning>
+The Tera inference API is being deprecated. This page is a legacy reference for existing customers, not a current GPU rental offer. Tera Compute now rents dedicated GPU nodes and finds colocation for AI startups. Visit [Tera Compute](https://www.tera.gw/). No sunset date is stated here; contact your Tera representative about migration timing.
+</Warning>
+
+<Info>
+  Model id: `zai-org/GLM-5` — pass this as the `model` field in API requests.
+</Info>
+
+## Spec
+
+| | |
+|---|---|
+| **Provider** | Z.ai |
+| **HuggingFace** | [`zai-org/GLM-5`](https://huggingface.co/zai-org/GLM-5) |
+| **Context length** | 200,000 tokens |
+| **Max output** | 4,096 tokens |
+| **Quantization** | `managed` |
+| **Input modalities** | text |
+| **Output modalities** | text |
+
+## Pricing
+
+| | per million tokens |
+|---|---|
+| Input  | $1.00 |
+| Output | $3.20 |
+| Cache Read | $0.10 |
+
+## Supported features
+
+`tools`, `json_mode`, `structured_outputs`
+
+## Sampling parameters
+
+`temperature`, `top_p`, `top_k`, `max_tokens`, `stop`, `seed`, `frequency_penalty`, `presence_penalty`, `repetition_penalty`, `logprobs`, `top_logprobs`
+
+## Example
+
+```bash
+curl https://api.tera.gw/v1/chat/completions \
+  -H "Content-Type: application/json" \
+  -H "Authorization: Bearer $TERA_API_KEY" \
+  -d '{
+    "model": "zai-org/GLM-5",
+    "messages": [{"role": "user", "content": "Hello"}],
+    "max_tokens": 256
+  }'
+```
+
+
+### Deprecated: GLM-5.1
+
+Source: https://docs.tera.gw/models/glm-5-1.md
+<Warning>
+The Tera inference API is being deprecated. This page is a legacy reference for existing customers, not a current GPU rental offer. Tera Compute now rents dedicated GPU nodes and finds colocation for AI startups. Visit [Tera Compute](https://www.tera.gw/). No sunset date is stated here; contact your Tera representative about migration timing.
+</Warning>
+
+<Info>
+  Model id: `zai-org/GLM-5.1` — pass this as the `model` field in API requests.
+</Info>
+
+## Spec
+
+| | |
+|---|---|
+| **Provider** | Z.ai |
+| **HuggingFace** | [`zai-org/GLM-5.1`](https://huggingface.co/zai-org/GLM-5.1) |
+| **Context length** | 202,752 tokens |
+| **Max output** | 4,096 tokens |
+| **Quantization** | `managed` |
+| **Input modalities** | text |
+| **Output modalities** | text |
+
+## Pricing
+
+| | per million tokens |
+|---|---|
+| Input  | $1.54 |
+| Output | $4.84 |
+| Cache Read | $0.286 |
+
+## Supported features
+
+`reasoning`, `tools`, `json_mode`, `structured_outputs`
+
+## Sampling parameters
+
+`temperature`, `top_p`, `top_k`, `max_tokens`, `stop`, `seed`, `frequency_penalty`, `presence_penalty`, `repetition_penalty`
+
+## Example
+
+```bash
+curl https://api.tera.gw/v1/chat/completions \
+  -H "Content-Type: application/json" \
+  -H "Authorization: Bearer $TERA_API_KEY" \
+  -d '{
+    "model": "zai-org/GLM-5.1",
+    "messages": [{"role": "user", "content": "Hello"}],
+    "max_tokens": 256
+  }'
+```
+
+
+### Deprecated: GLM-5.2
+
+Source: https://docs.tera.gw/models/glm-5-2.md
+<Warning>
+The Tera inference API is being deprecated. This page is a legacy reference for existing customers, not a current GPU rental offer. Tera Compute now rents dedicated GPU nodes and finds colocation for AI startups. Visit [Tera Compute](https://www.tera.gw/). No sunset date is stated here; contact your Tera representative about migration timing.
+</Warning>
+
+<Info>
+  Model id: `zai-org/GLM-5.2` — pass this as the `model` field in API requests.
+</Info>
+
+## Spec
+
+| | |
+|---|---|
+| **Provider** | Z.ai |
+| **HuggingFace** | [`zai-org/GLM-5.2`](https://huggingface.co/zai-org/GLM-5.2) |
+| **Context length** | 262,144 tokens |
+| **Max output** | 4,096 tokens |
+| **Quantization** | `managed` |
+| **Input modalities** | text |
+| **Output modalities** | text |
+
+## Pricing
+
+| | per million tokens |
+|---|---|
+| Input  | $1.49 |
+| Output | $4.62 |
+| Cache Read | $0.27 |
+
+## Supported features
+
+`reasoning`, `tools`, `json_mode`, `structured_outputs`
+
+## Sampling parameters
+
+`temperature`, `top_p`, `max_tokens`, `stop`, `seed`, `frequency_penalty`, `presence_penalty`
+
+## Example
+
+```bash
+curl https://api.tera.gw/v1/chat/completions \
+  -H "Content-Type: application/json" \
+  -H "Authorization: Bearer $TERA_API_KEY" \
+  -d '{
+    "model": "zai-org/GLM-5.2",
+    "messages": [{"role": "user", "content": "Hello"}],
+    "max_tokens": 256
+  }'
+```
+
+
+### Deprecated: gpt-5.5
+
+Source: https://docs.tera.gw/models/gpt-5-5.md
+<Warning>
+The Tera inference API is being deprecated. This page is a legacy reference for existing customers, not a current GPU rental offer. Tera Compute now rents dedicated GPU nodes and finds colocation for AI startups. Visit [Tera Compute](https://www.tera.gw/). No sunset date is stated here; contact your Tera representative about migration timing.
+</Warning>
+
+<Info>
+  Model id: `openai/gpt-5.5` — pass this as the `model` field in API requests.
+</Info>
+
+## Spec
+
+| | |
+|---|---|
+| **Provider** | openai |
+| **Context length** | 1,050,000 tokens |
+| **Max output** | 4,096 tokens |
+| **Quantization** | `managed` |
+| **Input modalities** | text, image |
+| **Output modalities** | text |
+
+## Pricing
+
+| | per million tokens |
+|---|---|
+| Input  | $5.00 |
+| Output | $30.00 |
+| Cache Read | $0.50 |
+
+## Supported features
+
+`reasoning`
+
+## Sampling parameters
+
+`max_completion_tokens`, `reasoning_effort`
+
+## Example
+
+```bash
+curl https://api.tera.gw/v1/chat/completions \
+  -H "Content-Type: application/json" \
+  -H "Authorization: Bearer $TERA_API_KEY" \
+  -d '{
+    "model": "openai/gpt-5.5",
+    "messages": [{"role": "user", "content": "Hello"}],
+    "max_completion_tokens": 256
+  }'
+```
+
+
+### Deprecated: gpt-5.6-luna
+
+Source: https://docs.tera.gw/models/gpt-5-6-luna.md
+<Warning>
+The Tera inference API is being deprecated. This page is a legacy reference for existing customers, not a current GPU rental offer. Tera Compute now rents dedicated GPU nodes and finds colocation for AI startups. Visit [Tera Compute](https://www.tera.gw/). No sunset date is stated here; contact your Tera representative about migration timing.
+</Warning>
+
+<Info>
+  Model id: `openai/gpt-5.6-luna` — pass this as the `model` field in API requests.
+</Info>
+
+## Spec
+
+| | |
+|---|---|
+| **Provider** | openai |
+| **Context length** | 1,050,000 tokens |
+| **Max output** | 4,096 tokens |
+| **Quantization** | `managed` |
+| **Input modalities** | text, image |
+| **Output modalities** | text |
+
+## Pricing
+
+| | per million tokens |
+|---|---|
+| Input  | $0.20 |
+| Output | $1.20 |
+| Cache Read | $0.02 |
+
+## Supported features
+
+—
+
+## Sampling parameters
+
+`top_p`, `max_completion_tokens`, `stop`
+
+## Example
+
+```bash
+curl https://api.tera.gw/v1/chat/completions \
+  -H "Content-Type: application/json" \
+  -H "Authorization: Bearer $TERA_API_KEY" \
+  -d '{
+    "model": "openai/gpt-5.6-luna",
+    "messages": [{"role": "user", "content": "Hello"}],
+    "max_completion_tokens": 256
+  }'
+```
+
+
+### Deprecated: gpt-5.6-sol
+
+Source: https://docs.tera.gw/models/gpt-5-6-sol.md
+<Warning>
+The Tera inference API is being deprecated. This page is a legacy reference for existing customers, not a current GPU rental offer. Tera Compute now rents dedicated GPU nodes and finds colocation for AI startups. Visit [Tera Compute](https://www.tera.gw/). No sunset date is stated here; contact your Tera representative about migration timing.
+</Warning>
+
+<Info>
+  Model id: `openai/gpt-5.6-sol` — pass this as the `model` field in API requests.
+</Info>
+
+## Spec
+
+| | |
+|---|---|
+| **Provider** | openai |
+| **Context length** | 1,050,000 tokens |
+| **Max output** | 4,096 tokens |
+| **Quantization** | `managed` |
+| **Input modalities** | text, image |
+| **Output modalities** | text |
+
+## Pricing
+
+| | per million tokens |
+|---|---|
+| Input  | $5.00 |
+| Output | $30.00 |
+| Cache Read | $0.50 |
+
+## Supported features
+
+—
+
+## Sampling parameters
+
+`top_p`, `max_completion_tokens`, `stop`
+
+## Example
+
+```bash
+curl https://api.tera.gw/v1/chat/completions \
+  -H "Content-Type: application/json" \
+  -H "Authorization: Bearer $TERA_API_KEY" \
+  -d '{
+    "model": "openai/gpt-5.6-sol",
+    "messages": [{"role": "user", "content": "Hello"}],
+    "max_completion_tokens": 256
+  }'
+```
+
+
+### Deprecated: gpt-5.6-terra
+
+Source: https://docs.tera.gw/models/gpt-5-6-terra.md
+<Warning>
+The Tera inference API is being deprecated. This page is a legacy reference for existing customers, not a current GPU rental offer. Tera Compute now rents dedicated GPU nodes and finds colocation for AI startups. Visit [Tera Compute](https://www.tera.gw/). No sunset date is stated here; contact your Tera representative about migration timing.
+</Warning>
+
+<Info>
+  Model id: `openai/gpt-5.6-terra` — pass this as the `model` field in API requests.
+</Info>
+
+## Spec
+
+| | |
+|---|---|
+| **Provider** | openai |
+| **Context length** | 1,050,000 tokens |
+| **Max output** | 4,096 tokens |
+| **Quantization** | `managed` |
+| **Input modalities** | text, image |
+| **Output modalities** | text |
+
+## Pricing
+
+| | per million tokens |
+|---|---|
+| Input  | $2.00 |
+| Output | $12.00 |
+| Cache Read | $0.20 |
+
+## Supported features
+
+—
+
+## Sampling parameters
+
+`top_p`, `max_completion_tokens`, `stop`
+
+## Example
+
+```bash
+curl https://api.tera.gw/v1/chat/completions \
+  -H "Content-Type: application/json" \
+  -H "Authorization: Bearer $TERA_API_KEY" \
+  -d '{
+    "model": "openai/gpt-5.6-terra",
+    "messages": [{"role": "user", "content": "Hello"}],
+    "max_completion_tokens": 256
+  }'
+```
+
+
+### Deprecated: gpt-oss-120b
+
+Source: https://docs.tera.gw/models/gpt-oss-120b.md
+<Warning>
+The Tera inference API is being deprecated. This page is a legacy reference for existing customers, not a current GPU rental offer. Tera Compute now rents dedicated GPU nodes and finds colocation for AI startups. Visit [Tera Compute](https://www.tera.gw/). No sunset date is stated here; contact your Tera representative about migration timing.
+</Warning>
+
+<Info>
+  Model id: `openai/gpt-oss-120b` — pass this as the `model` field. The API surface is the OpenAI Chat Completions API; existing OpenAI SDKs and any gateway that abstracts over OpenAI-compatible providers work without code changes.
+</Info>
+
+## At a glance
+
+| | |
+|---|---|
+| **Model id** | `openai/gpt-oss-120b` |
+| **Provider** | openai |
+| **HuggingFace** | [`openai/gpt-oss-120b`](https://huggingface.co/openai/gpt-oss-120b) |
+| **Context length** | 131,072 tokens |
+| **Max output** | 4,096 tokens |
+| **Quantization** | `mxfp4` (native) |
+| **Reasoning** | Emits `reasoning` (OpenAI gpt-oss parser) |
+| **Tool calling** | OpenAI-format, auto tool choice enabled |
+
+## Pricing
+
+{/* sync:pricing:start */}
+
+| | per million tokens |
+|---|---|
+| Input  | $0.09 |
+| Output | $0.36 |
+
+{/* sync:pricing:end */}
+
+Reasoning tokens count toward output. See [How billing works](/pricing#how-billing-works).
+
+## Quickstart
+
+Set `base_url` to `https://api.tera.gw/v1` and pass your `sk-tera-...` key. No other code change.
+
+<CodeGroup>
+
+```python python
+from openai import OpenAI
+
+client = OpenAI(
+    base_url="https://api.tera.gw/v1",
+    api_key="sk-tera-...",
+)
+
+resp = client.chat.completions.create(
+    model="openai/gpt-oss-120b",
+    messages=[{"role": "user", "content": "Summarize the gpt-oss license in 2 sentences."}],
+    max_tokens=512,
+)
+print(resp.choices[0].message.content)
+```
+
+```javascript node
+import OpenAI from "openai";
+
+const client = new OpenAI({
+  baseURL: "https://api.tera.gw/v1",
+  apiKey: process.env.TERA_API_KEY,
+});
+
+const resp = await client.chat.completions.create({
+  model: "openai/gpt-oss-120b",
+  messages: [{ role: "user", content: "Summarize the gpt-oss license in 2 sentences." }],
+  max_tokens: 512,
+});
+
+console.log(resp.choices[0].message.content);
+```
+
+```bash curl
+curl https://api.tera.gw/v1/chat/completions \
+  -H "Content-Type: application/json" \
+  -H "Authorization: Bearer $TERA_API_KEY" \
+  -d '{
+    "model": "openai/gpt-oss-120b",
+    "messages": [{"role": "user", "content": "Summarize the gpt-oss license in 2 sentences."}],
+    "max_tokens": 512
+  }'
+```
+
+</CodeGroup>
+
+## Reasoning
+
+gpt-oss-120b runs with the OpenAI gpt-oss reasoning parser. Chain-of-thought tokens are returned in a separate `reasoning` field so they don't pollute `content`. OpenAI SDKs that expect a plain `content` string continue to work.
+
+<Note>
+  Some providers expose this as `reasoning_content`. We follow OpenAI's recommendation and use `reasoning`. If you're porting code that expects `reasoning_content`, treat the two as aliases.
+</Note>
+
+<CodeGroup>
+
+```json non-streaming
+{
+  "choices": [{
+    "message": {
+      "role": "assistant",
+      "reasoning": "The user is asking about... I should think about...",
+      "content": "The final answer is X."
+    },
+    "finish_reason": "stop"
+  }]
+}
+```
+
+```text streaming
+data: {"choices":[{"delta":{"role":"assistant","reasoning":"The user is"}}]}
+data: {"choices":[{"delta":{"reasoning":" asking about"}}]}
+...
+data: {"choices":[{"delta":{"content":"The final answer is"}}]}
+data: {"choices":[{"delta":{"content":" X."}}]}
+data: {"choices":[{"delta":{},"finish_reason":"stop"}]}
+data: [DONE]
+```
+
+</CodeGroup>
+
+See [Reasoning models](/concepts/reasoning) for the streaming Python loop and rendering patterns.
+
+## Tool calling
+
+gpt-oss-120b runs with the OpenAI tool-call parser and `enable_auto_tool_choice=true`. The request and response shapes match the OpenAI Chat Completions API 1:1.
+
+```python
+tools = [{
+    "type": "function",
+    "function": {
+        "name": "get_weather",
+        "description": "Get the current weather in a city.",
+        "parameters": {
+            "type": "object",
+            "properties": {
+                "city": {"type": "string"},
+                "unit": {"type": "string", "enum": ["celsius", "fahrenheit"]},
+            },
+            "required": ["city"],
+        },
+    },
+}]
+
+# Turn 1: model decides to call the tool
+first = client.chat.completions.create(
+    model="openai/gpt-oss-120b",
+    messages=[{"role": "user", "content": "What's the weather in Paris?"}],
+    tools=tools,
+)
+tool_call = first.choices[0].message.tool_calls[0]
+
+# Turn 2: provide tool output, get final answer
+final = client.chat.completions.create(
+    model="openai/gpt-oss-120b",
+    messages=[
+        {"role": "user", "content": "What's the weather in Paris?"},
+        first.choices[0].message,
+        {"role": "tool", "tool_call_id": tool_call.id, "content": "18C, partly cloudy"},
+    ],
+    tools=tools,
+)
+print(final.choices[0].message.content)
+```
+
+`tool_choice` accepts `"auto"` (default), `"none"`, `"required"`, or `{"type": "function", "function": {"name": "..."}}`. Parallel tool calls are supported — the response can contain multiple entries in `tool_calls`. Streaming tool calls arrive as `delta.tool_calls[i].function.arguments` JSON fragments that must be concatenated by call index.
+
+See [Tool calling](/concepts/tool-calling) for the full streaming reconstruction example.
+
+## Structured outputs / JSON mode
+
+Pass `response_format` to constrain the assistant's output.
+
+```python
+# JSON mode — guarantees valid JSON, schema not enforced
+resp = client.chat.completions.create(
+    model="openai/gpt-oss-120b",
+    messages=[{"role": "user", "content": "List 3 colors as JSON."}],
+    response_format={"type": "json_object"},
+)
+
+# Structured outputs — JSON Schema enforced
+resp = client.chat.completions.create(
+    model="openai/gpt-oss-120b",
+    messages=[{"role": "user", "content": "Extract: 'Alice is 30 years old.'"}],
+    response_format={
+        "type": "json_schema",
+        "json_schema": {
+            "name": "person",
+            "strict": True,
+            "schema": {
+                "type": "object",
+                "properties": {
+                    "name": {"type": "string"},
+                    "age": {"type": "integer"},
+                },
+                "required": ["name", "age"],
+                "additionalProperties": False,
+            },
+        },
+    },
+)
+```
+
+## Streaming
+
+Set `"stream": true` and consume Server-Sent Events on the same endpoint. See [Streaming](/concepts/streaming) for the wire format.
+
+```python
+stream = client.chat.completions.create(
+    model="openai/gpt-oss-120b",
+    messages=[{"role": "user", "content": "Count to five."}],
+    stream=True,
+)
+
+for chunk in stream:
+    delta = chunk.choices[0].delta
+    if reasoning := getattr(delta, "reasoning", None):
+        print(f"[think] {reasoning}", end="", flush=True)
+    if content := delta.content:
+        print(content, end="", flush=True)
+```
+
+## Sampling parameters
+
+`temperature`, `top_p`, `top_k`, `max_tokens`, `stop`, `seed`, `frequency_penalty`, `presence_penalty`, `repetition_penalty`, `logprobs`, `top_logprobs`
+
+`seed` is honored for deterministic sampling. `top_k`, `repetition_penalty`, and `min_p` are vLLM extensions beyond OpenAI's surface — ignored by clients that don't pass them.
+
+## Supported features
+
+`tools`, `json_mode`, `structured_outputs`, `reasoning`, `logprobs`
+
+## OpenAI compatibility matrix
+
+| Field / behavior | Status | Notes |
+|---|---|---|
+| `messages` (system / user / assistant / tool) | ✅ | Standard OpenAI shape |
+| `tools` / `tool_choice` / `tool_calls` | ✅ | Auto tool choice enabled |
+| `response_format` (`json_object`, `json_schema`) | ✅ | Strict schema enforcement supported |
+| `stream` (SSE) | ✅ | Terminated by `data: [DONE]` |
+| `seed` | ✅ | Deterministic |
+| `logprobs` / `top_logprobs` | ✅ | |
+| `reasoning` field | ✅ | Sibling of `content`; OpenAI-spec field for chain-of-thought. Some providers use `reasoning_content` as an alias. |
+| `OpenAI-Organization`, `OpenAI-Project` headers | ➖ | Accepted and ignored |
+| `/v1/moderations` | ❌ | Not offered |
+| `/v1/embeddings`, `/v1/images/*`, `/v1/fine_tuning/*` | ❌ | Not offered |
+| Image inputs | ❌ | Text-only today |
+
+## Reliability and routing
+
+For gateways that route across multiple providers (Respan, OpenRouter, in-house abstractions), the relevant behaviors:
+
+- **Cold start**: The first request after a backend cold-boot is slow (~2–12s TTFT) because vLLM compiles CUDA graphs on first traffic. Subsequent requests are warm. Schedule a warmup probe before routing real traffic if you can.
+- **Gateway-side retry**: 5xx errors trigger automatic retry across healthy replicas within the Tera gateway before being returned to you. You'll see a single response.
+- **Health-aware routing**: Unhealthy backends are taken out of rotation automatically; clients don't need to manage this.
+- **Concurrency**: Per-key concurrency and throughput are sized to your workload. Reach out for higher provisioned envelopes.
+- **Idempotency**: Requests are not deduplicated server-side. If you retry a request that may have succeeded, you may be billed for both.
+- **Streaming cancellation**: If the client disconnects mid-stream, generation is cancelled on the backend.
+
+## Observability
+
+Every response carries headers and a body useful for trace correlation.
+
+| Surface | Value |
+|---|---|
+| `X-Tera-Request-ID` response header | Unique per request. Quote this in support emails. |
+| `usage.prompt_tokens` | Input tokens billed |
+| `usage.completion_tokens` | Output tokens billed (includes reasoning) |
+| `usage.total_tokens` | Sum |
+| `choices[0].finish_reason` | `stop`, `length`, or `tool_calls` |
+
+Read the header with the OpenAI Python SDK via the `with_raw_response` accessor:
+
+```python
+raw = client.chat.completions.with_raw_response.create(
+    model="openai/gpt-oss-120b",
+    messages=[{"role": "user", "content": "hi"}],
+)
+request_id = raw.http_response.headers.get("X-Tera-Request-ID")
+resp = raw.parse()
+```
+
+## Errors
+
+All errors return a JSON body of the shape:
+
+```json
+{ "error": { "message": "...", "type": "...", "code": "..." } }
+```
+
+| HTTP | `error.type` | When | Retry? |
+|---|---|---|---|
+| `400` | `invalid_request_error` | Malformed body, unknown sampling parameter values | No — fix the request |
+| `401` | `authentication_error` | Missing or invalid API key | No — rotate the key |
+| `403` | `permission_error` | Key not scoped to this model | No — request scope |
+| `404` | `model_not_found` | `model` field not in the catalog | No — check `/v1/models` |
+| `429` | `rate_limit_error` | Per-key concurrency / token-rate limit hit | Yes — honor `Retry-After` header |
+| `500` | `server_error` | Gateway-side failure after backend retries exhausted | Yes — bounded retry with backoff |
+| `503` | `service_unavailable` | Backend cold or no healthy replica | Yes — first request after long idle may hit this |
+
+## Rate limits
+
+Per-key concurrency and tokens-per-second are provisioned to your expected workload. Tell us the shape — peak QPS, sustained concurrency, rough token volumes — and we'll size accordingly. Bursts beyond your provisioned envelope return `429` with `Retry-After`.
+
+## Cost example
+
+{/* sync:cost-example:start */}
+
+Typical agentic turn with a tool call (1,000 input tokens, 600 output tokens):
+
+| Stage | Tokens | Cost |
+|---|---:|---:|
+| User prompt + system | 700 in | $0.0000630 |
+| Reasoning + tool call | 400 out | $0.0001440 |
+| Tool result + final answer | 300 in / 200 out | $0.0000990 |
+| **Per turn** |  | **~$0.000306** |
+
+At 50,000 turns/day this runs ~$15.30/day (~$459/month). Volume committed-use pricing available — email [hello@tera.gw](mailto:hello@tera.gw).
+
+{/* sync:cost-example:end */}
+
+## Onboard
+
+1. Email [hello@tera.gw](mailto:hello@tera.gw?subject=Tera%20API%20access%20%E2%80%94%20gpt-oss-120b) — tell us expected concurrency, peak QPS, and rough token volumes.
+2. We issue an `sk-tera-...` key.
+3. Smoke-test against `https://api.tera.gw/v1` from your gateway.
+4. Ramp.
+
+Bring the `X-Tera-Request-ID` of any failing request and we can trace it end-to-end.
+
+
+### Deprecated: gpt-oss-20b
+
+Source: https://docs.tera.gw/models/gpt-oss-20b.md
+<Warning>
+The Tera inference API is being deprecated. This page is a legacy reference for existing customers, not a current GPU rental offer. Tera Compute now rents dedicated GPU nodes and finds colocation for AI startups. Visit [Tera Compute](https://www.tera.gw/). No sunset date is stated here; contact your Tera representative about migration timing.
+</Warning>
+
+<Info>
+  Model id: `openai/gpt-oss-20b` — pass this as the `model` field. The API surface is the OpenAI Chat Completions API; existing OpenAI SDKs and any gateway that abstracts over OpenAI-compatible providers work without code changes.
+</Info>
+
+## At a glance
+
+| | |
+|---|---|
+| **Model id** | `openai/gpt-oss-20b` |
+| **Provider** | openai |
+| **HuggingFace** | [`openai/gpt-oss-20b`](https://huggingface.co/openai/gpt-oss-20b) |
+| **Context length** | 131,072 tokens |
+| **Max output** | 4,096 tokens |
+| **Quantization** | `mxfp4` (native), prefix caching enabled |
+| **Reasoning** | Emits `reasoning` (OpenAI gpt-oss parser) |
+| **Tool calling** | OpenAI-format, auto tool choice enabled |
+
+## Pricing
+
+{/* sync:pricing:start */}
+
+| | per million tokens |
+|---|---|
+| Input  | $0.07 |
+| Output | $0.25 |
+
+{/* sync:pricing:end */}
+
+Reasoning tokens count toward output. See [How billing works](/pricing#how-billing-works).
+
+## Quickstart
+
+Set `base_url` to `https://api.tera.gw/v1` and pass your `sk-tera-...` key. No other code change.
+
+<CodeGroup>
+
+```python python
+from openai import OpenAI
+
+client = OpenAI(
+    base_url="https://api.tera.gw/v1",
+    api_key="sk-tera-...",
+)
+
+resp = client.chat.completions.create(
+    model="openai/gpt-oss-20b",
+    messages=[{"role": "user", "content": "Summarize the gpt-oss license in 2 sentences."}],
+    max_tokens=512,
+)
+print(resp.choices[0].message.content)
+```
+
+```javascript node
+import OpenAI from "openai";
+
+const client = new OpenAI({
+  baseURL: "https://api.tera.gw/v1",
+  apiKey: process.env.TERA_API_KEY,
+});
+
+const resp = await client.chat.completions.create({
+  model: "openai/gpt-oss-20b",
+  messages: [{ role: "user", content: "Summarize the gpt-oss license in 2 sentences." }],
+  max_tokens: 512,
+});
+
+console.log(resp.choices[0].message.content);
+```
+
+```bash curl
+curl https://api.tera.gw/v1/chat/completions \
+  -H "Content-Type: application/json" \
+  -H "Authorization: Bearer $TERA_API_KEY" \
+  -d '{
+    "model": "openai/gpt-oss-20b",
+    "messages": [{"role": "user", "content": "Summarize the gpt-oss license in 2 sentences."}],
+    "max_tokens": 512
+  }'
+```
+
+</CodeGroup>
+
+## Reasoning
+
+gpt-oss-20b runs with the OpenAI gpt-oss reasoning parser. Chain-of-thought tokens are returned in a separate `reasoning` field so they don't pollute `content`. OpenAI SDKs that expect a plain `content` string continue to work.
+
+<Note>
+  Some providers expose this as `reasoning_content`. We follow OpenAI's recommendation and use `reasoning`. If you're porting code that expects `reasoning_content`, treat the two as aliases.
+</Note>
+
+<CodeGroup>
+
+```json non-streaming
+{
+  "choices": [{
+    "message": {
+      "role": "assistant",
+      "reasoning": "The user is asking about... I should think about...",
+      "content": "The final answer is X."
+    },
+    "finish_reason": "stop"
+  }]
+}
+```
+
+```text streaming
+data: {"choices":[{"delta":{"role":"assistant","reasoning":"The user is"}}]}
+data: {"choices":[{"delta":{"reasoning":" asking about"}}]}
+...
+data: {"choices":[{"delta":{"content":"The final answer is"}}]}
+data: {"choices":[{"delta":{"content":" X."}}]}
+data: {"choices":[{"delta":{},"finish_reason":"stop"}]}
+data: [DONE]
+```
+
+</CodeGroup>
+
+See [Reasoning models](/concepts/reasoning) for the streaming Python loop and rendering patterns.
+
+## Tool calling
+
+gpt-oss-20b runs with the OpenAI tool-call parser and `enable_auto_tool_choice=true`. The request and response shapes match the OpenAI Chat Completions API 1:1.
+
+```python
+tools = [{
+    "type": "function",
+    "function": {
+        "name": "get_weather",
+        "description": "Get the current weather in a city.",
+        "parameters": {
+            "type": "object",
+            "properties": {
+                "city": {"type": "string"},
+                "unit": {"type": "string", "enum": ["celsius", "fahrenheit"]},
+            },
+            "required": ["city"],
+        },
+    },
+}]
+
+# Turn 1: model decides to call the tool
+first = client.chat.completions.create(
+    model="openai/gpt-oss-20b",
+    messages=[{"role": "user", "content": "What's the weather in Paris?"}],
+    tools=tools,
+)
+tool_call = first.choices[0].message.tool_calls[0]
+
+# Turn 2: provide tool output, get final answer
+final = client.chat.completions.create(
+    model="openai/gpt-oss-20b",
+    messages=[
+        {"role": "user", "content": "What's the weather in Paris?"},
+        first.choices[0].message,
+        {"role": "tool", "tool_call_id": tool_call.id, "content": "18C, partly cloudy"},
+    ],
+    tools=tools,
+)
+print(final.choices[0].message.content)
+```
+
+`tool_choice` accepts `"auto"` (default), `"none"`, `"required"`, or `{"type": "function", "function": {"name": "..."}}`. Parallel tool calls are supported — the response can contain multiple entries in `tool_calls`. Streaming tool calls arrive as `delta.tool_calls[i].function.arguments` JSON fragments that must be concatenated by call index.
+
+See [Tool calling](/concepts/tool-calling) for the full streaming reconstruction example.
+
+## Structured outputs / JSON mode
+
+Pass `response_format` to constrain the assistant's output.
+
+```python
+# JSON mode — guarantees valid JSON, schema not enforced
+resp = client.chat.completions.create(
+    model="openai/gpt-oss-20b",
+    messages=[{"role": "user", "content": "List 3 colors as JSON."}],
+    response_format={"type": "json_object"},
+)
+
+# Structured outputs — JSON Schema enforced
+resp = client.chat.completions.create(
+    model="openai/gpt-oss-20b",
+    messages=[{"role": "user", "content": "Extract: 'Alice is 30 years old.'"}],
+    response_format={
+        "type": "json_schema",
+        "json_schema": {
+            "name": "person",
+            "strict": True,
+            "schema": {
+                "type": "object",
+                "properties": {
+                    "name": {"type": "string"},
+                    "age": {"type": "integer"},
+                },
+                "required": ["name", "age"],
+                "additionalProperties": False,
+            },
+        },
+    },
+)
+```
+
+## Streaming
+
+Set `"stream": true` and consume Server-Sent Events on the same endpoint. See [Streaming](/concepts/streaming) for the wire format.
+
+```python
+stream = client.chat.completions.create(
+    model="openai/gpt-oss-20b",
+    messages=[{"role": "user", "content": "Count to five."}],
+    stream=True,
+)
+
+for chunk in stream:
+    delta = chunk.choices[0].delta
+    if reasoning := getattr(delta, "reasoning", None):
+        print(f"[think] {reasoning}", end="", flush=True)
+    if content := delta.content:
+        print(content, end="", flush=True)
+```
+
+## Sampling parameters
+
+`temperature`, `top_p`, `top_k`, `max_tokens`, `stop`, `seed`, `frequency_penalty`, `presence_penalty`, `repetition_penalty`, `logprobs`, `top_logprobs`
+
+`seed` is honored for deterministic sampling. `top_k`, `repetition_penalty`, and `min_p` are vLLM extensions beyond OpenAI's surface — ignored by clients that don't pass them.
+
+## Supported features
+
+`tools`, `json_mode`, `structured_outputs`, `reasoning`, `logprobs`
+
+## OpenAI compatibility matrix
+
+| Field / behavior | Status | Notes |
+|---|---|---|
+| `messages` (system / user / assistant / tool) | ✅ | Standard OpenAI shape |
+| `tools` / `tool_choice` / `tool_calls` | ✅ | Auto tool choice enabled |
+| `response_format` (`json_object`, `json_schema`) | ✅ | Strict schema enforcement supported |
+| `stream` (SSE) | ✅ | Terminated by `data: [DONE]` |
+| `seed` | ✅ | Deterministic |
+| `logprobs` / `top_logprobs` | ✅ | |
+| `reasoning` field | ✅ | Sibling of `content`; OpenAI-spec field for chain-of-thought. Some providers use `reasoning_content` as an alias. |
+| `OpenAI-Organization`, `OpenAI-Project` headers | ➖ | Accepted and ignored |
+| `/v1/moderations` | ❌ | Not offered |
+| `/v1/embeddings`, `/v1/images/*`, `/v1/fine_tuning/*` | ❌ | Not offered |
+| Image inputs | ❌ | Text-only today |
+
+## Reliability and routing
+
+For gateways that route across multiple providers (Respan, OpenRouter, in-house abstractions), the relevant behaviors:
+
+- **Cold start**: The first request after a backend cold-boot is slow (~2–12s TTFT) because vLLM compiles CUDA graphs on first traffic. Subsequent requests are warm. Schedule a warmup probe before routing real traffic if you can.
+- **Gateway-side retry**: 5xx errors trigger automatic retry across healthy replicas within the Tera gateway before being returned to you. You'll see a single response.
+- **Health-aware routing**: Unhealthy backends are taken out of rotation automatically; clients don't need to manage this.
+- **Concurrency**: Per-key concurrency and throughput are sized to your workload. Reach out for higher provisioned envelopes.
+- **Idempotency**: Requests are not deduplicated server-side. If you retry a request that may have succeeded, you may be billed for both.
+- **Streaming cancellation**: If the client disconnects mid-stream, generation is cancelled on the backend.
+
+## Observability
+
+Every response carries headers and a body useful for trace correlation.
+
+| Surface | Value |
+|---|---|
+| `X-Tera-Request-ID` response header | Unique per request. Quote this in support emails. |
+| `usage.prompt_tokens` | Input tokens billed |
+| `usage.completion_tokens` | Output tokens billed (includes reasoning) |
+| `usage.total_tokens` | Sum |
+| `choices[0].finish_reason` | `stop`, `length`, or `tool_calls` |
+
+Read the header with the OpenAI Python SDK via the `with_raw_response` accessor:
+
+```python
+raw = client.chat.completions.with_raw_response.create(
+    model="openai/gpt-oss-20b",
+    messages=[{"role": "user", "content": "hi"}],
+)
+request_id = raw.http_response.headers.get("X-Tera-Request-ID")
+resp = raw.parse()
+```
+
+## Errors
+
+All errors return a JSON body of the shape:
+
+```json
+{ "error": { "message": "...", "type": "...", "code": "..." } }
+```
+
+| HTTP | `error.type` | When | Retry? |
+|---|---|---|---|
+| `400` | `invalid_request_error` | Malformed body, unknown sampling parameter values | No — fix the request |
+| `401` | `authentication_error` | Missing or invalid API key | No — rotate the key |
+| `403` | `permission_error` | Key not scoped to this model | No — request scope |
+| `404` | `model_not_found` | `model` field not in the catalog | No — check `/v1/models` |
+| `429` | `rate_limit_error` | Per-key concurrency / token-rate limit hit | Yes — honor `Retry-After` header |
+| `500` | `server_error` | Gateway-side failure after backend retries exhausted | Yes — bounded retry with backoff |
+| `503` | `service_unavailable` | Backend cold or no healthy replica | Yes — first request after long idle may hit this |
+
+## Rate limits
+
+Per-key concurrency and tokens-per-second are provisioned to your expected workload. Tell us the shape — peak QPS, sustained concurrency, rough token volumes — and we'll size accordingly. Bursts beyond your provisioned envelope return `429` with `Retry-After`.
+
+## Cost example
+
+{/* sync:cost-example:start */}
+
+Typical agentic turn with a tool call (1,000 input tokens, 600 output tokens):
+
+| Stage | Tokens | Cost |
+|---|---:|---:|
+| User prompt + system | 700 in | $0.0000490 |
+| Reasoning + tool call | 400 out | $0.0001000 |
+| Tool result + final answer | 300 in / 200 out | $0.0000710 |
+| **Per turn** |  | **~$0.000220** |
+
+At 50,000 turns/day this runs ~$11.00/day (~$330/month). Volume committed-use pricing available — email [hello@tera.gw](mailto:hello@tera.gw).
+
+{/* sync:cost-example:end */}
+
+## Onboard
+
+1. Email [hello@tera.gw](mailto:hello@tera.gw?subject=Tera%20API%20access%20%E2%80%94%20gpt-oss-20b) — tell us expected concurrency, peak QPS, and rough token volumes.
+2. We issue an `sk-tera-...` key.
+3. Smoke-test against `https://api.tera.gw/v1` from your gateway.
+4. Ramp.
+
+Bring the `X-Tera-Request-ID` of any failing request and we can trace it end-to-end.
+
+
+### Deprecated: Kimi-K2.5
+
+Source: https://docs.tera.gw/models/kimi-k2-5.md
+<Warning>
+The Tera inference API is being deprecated. This page is a legacy reference for existing customers, not a current GPU rental offer. Tera Compute now rents dedicated GPU nodes and finds colocation for AI startups. Visit [Tera Compute](https://www.tera.gw/). No sunset date is stated here; contact your Tera representative about migration timing.
+</Warning>
+
+<Info>
+  Model id: `moonshotai/Kimi-K2.5` — pass this as the `model` field in API requests.
+</Info>
+
+## Spec
+
+| | |
+|---|---|
+| **Provider** | moonshotai |
+| **HuggingFace** | [`moonshotai/Kimi-K2.5`](https://huggingface.co/moonshotai/Kimi-K2.5) |
+| **Context length** | 262,144 tokens |
+| **Max output** | 4,096 tokens |
+| **Quantization** | `managed` |
+| **Input modalities** | text |
+| **Output modalities** | text |
+
+## Pricing
+
+| | per million tokens |
+|---|---|
+| Input  | $0.60 |
+| Output | $3.00 |
+| Cache Read | $0.10 |
+
+## Supported features
+
+`tools`, `json_mode`, `structured_outputs`, `reasoning`
+
+## Sampling parameters
+
+`temperature`, `top_p`, `max_tokens`, `stop`, `seed`, `frequency_penalty`, `presence_penalty`, `logprobs`, `top_logprobs`
+
+## Example
+
+```bash
+curl https://api.tera.gw/v1/chat/completions \
+  -H "Content-Type: application/json" \
+  -H "Authorization: Bearer $TERA_API_KEY" \
+  -d '{
+    "model": "moonshotai/Kimi-K2.5",
+    "messages": [{"role": "user", "content": "Hello"}],
+    "max_tokens": 256
+  }'
+```
+
+
+### Deprecated: Kimi-K2.6
+
+Source: https://docs.tera.gw/models/kimi-k2-6.md
+<Warning>
+The Tera inference API is being deprecated. This page is a legacy reference for existing customers, not a current GPU rental offer. Tera Compute now rents dedicated GPU nodes and finds colocation for AI startups. Visit [Tera Compute](https://www.tera.gw/). No sunset date is stated here; contact your Tera representative about migration timing.
+</Warning>
+
+<Info>
+  Model id: `moonshotai/Kimi-K2.6` — pass this as the `model` field in API requests.
+</Info>
+
+## Spec
+
+| | |
+|---|---|
+| **Provider** | moonshotai |
+| **HuggingFace** | [`moonshotai/Kimi-K2.6`](https://huggingface.co/moonshotai/Kimi-K2.6) |
+| **Context length** | 262,144 tokens |
+| **Max output** | 4,096 tokens |
+| **Quantization** | `managed` |
+| **Input modalities** | text |
+| **Output modalities** | text |
+
+## Pricing
+
+| | per million tokens |
+|---|---|
+| Input  | $0.95 |
+| Output | $4.00 |
+| Cache Read | $0.16 |
+
+## Supported features
+
+`tools`, `json_mode`, `structured_outputs`, `reasoning`
+
+## Sampling parameters
+
+`temperature`, `top_p`, `top_k`, `max_tokens`, `stop`, `seed`, `frequency_penalty`, `presence_penalty`, `repetition_penalty`, `logprobs`, `top_logprobs`
+
+## Example
+
+```bash
+curl https://api.tera.gw/v1/chat/completions \
+  -H "Content-Type: application/json" \
+  -H "Authorization: Bearer $TERA_API_KEY" \
+  -d '{
+    "model": "moonshotai/Kimi-K2.6",
+    "messages": [{"role": "user", "content": "Hello"}],
+    "max_tokens": 256
+  }'
+```
+
+
+### Deprecated: kimi-k2-thinking
+
+Source: https://docs.tera.gw/models/kimi-k2-thinking.md
+<Warning>
+The Tera inference API is being deprecated. This page is a legacy reference for existing customers, not a current GPU rental offer. Tera Compute now rents dedicated GPU nodes and finds colocation for AI startups. Visit [Tera Compute](https://www.tera.gw/). No sunset date is stated here; contact your Tera representative about migration timing.
+</Warning>
+
+<Info>
+  Model id: `moonshotai/kimi-k2-thinking` — pass this as the `model` field in API requests.
+</Info>
+
+## Spec
+
+| | |
+|---|---|
+| **Provider** | moonshotai |
+| **HuggingFace** | [`moonshotai/kimi-k2-thinking`](https://huggingface.co/moonshotai/kimi-k2-thinking) |
+| **Context length** | 262,144 tokens |
+| **Max output** | 4,096 tokens |
+| **Quantization** | `managed-int4` |
+| **Input modalities** | text |
+| **Output modalities** | text |
+
+## Pricing
+
+| | per million tokens |
+|---|---|
+| Input  | $0.60 |
+| Output | $2.50 |
+| Cache Read | $0.06 |
+
+## Supported features
+
+`tools`, `json_mode`, `structured_outputs`, `reasoning`
+
+## Sampling parameters
+
+`temperature`, `top_p`, `top_k`, `max_tokens`, `stop`, `seed`, `frequency_penalty`, `presence_penalty`, `repetition_penalty`, `logprobs`, `top_logprobs`
+
+## Example
+
+```bash
+curl https://api.tera.gw/v1/chat/completions \
+  -H "Content-Type: application/json" \
+  -H "Authorization: Bearer $TERA_API_KEY" \
+  -d '{
+    "model": "moonshotai/kimi-k2-thinking",
+    "messages": [{"role": "user", "content": "Hello"}],
+    "max_tokens": 256
+  }'
+```
+
+
+### Deprecated: Kimi-K3
+
+Source: https://docs.tera.gw/models/kimi-k3.md
+<Warning>
+The Tera inference API is being deprecated. This page is a legacy reference for existing customers, not a current GPU rental offer. Tera Compute now rents dedicated GPU nodes and finds colocation for AI startups. Visit [Tera Compute](https://www.tera.gw/). No sunset date is stated here; contact your Tera representative about migration timing.
+</Warning>
+
+<Info>
+  Model id: `moonshotai/Kimi-K3` — pass this as the `model` field in API requests.
+</Info>
+
+## Spec
+
+| | |
+|---|---|
+| **Provider** | Moonshot AI |
+| **Context length** | 1,048,576 tokens |
+| **Max output** | 4,096 tokens |
+| **Quantization** | `managed` |
+| **Input modalities** | text, image |
+| **Output modalities** | text |
+
+## Pricing
+
+| | per million tokens |
+|---|---|
+| Input  | $3.00 |
+| Output | $15.00 |
+| Cache Read | $0.30 |
+
+## Supported features
+
+—
+
+## Sampling parameters
+
+`temperature`, `top_p`, `top_k`, `max_completion_tokens`, `frequency_penalty`, `presence_penalty`
+
+## Example
+
+```bash
+curl https://api.tera.gw/v1/chat/completions \
+  -H "Content-Type: application/json" \
+  -H "Authorization: Bearer $TERA_API_KEY" \
+  -d '{
+    "model": "moonshotai/Kimi-K3",
+    "messages": [{"role": "user", "content": "Hello"}],
+    "max_completion_tokens": 256
+  }'
+```
+
+
+### Deprecated: Llama-3.3-70B-Instruct
+
+Source: https://docs.tera.gw/models/llama-3-3-70b-instruct.md
+<Warning>
+The Tera inference API is being deprecated. This page is a legacy reference for existing customers, not a current GPU rental offer. Tera Compute now rents dedicated GPU nodes and finds colocation for AI startups. Visit [Tera Compute](https://www.tera.gw/). No sunset date is stated here; contact your Tera representative about migration timing.
+</Warning>
+
+<Info>
+  Model id: `meta-llama/Llama-3.3-70B-Instruct` — pass this as the `model` field in API requests.
+</Info>
+
+## Spec
+
+| | |
+|---|---|
+| **Provider** | meta-llama |
+| **HuggingFace** | [`meta-llama/Llama-3.3-70B-Instruct`](https://huggingface.co/meta-llama/Llama-3.3-70B-Instruct) |
+| **Context length** | 128,000 tokens |
+| **Max output** | 4,096 tokens |
+| **Quantization** | `managed` |
+| **Input modalities** | text |
+| **Output modalities** | text |
+
+## Pricing
+
+| | per million tokens |
+|---|---|
+| Input  | $0.72 |
+| Output | $0.72 |
+
+## Supported features
+
+`tools`, `json_mode`, `structured_outputs`
+
+## Sampling parameters
+
+`temperature`, `top_p`, `top_k`, `max_tokens`, `stop`, `seed`, `frequency_penalty`, `presence_penalty`, `repetition_penalty`, `logprobs`, `top_logprobs`
+
+## Example
+
+```bash
+curl https://api.tera.gw/v1/chat/completions \
+  -H "Content-Type: application/json" \
+  -H "Authorization: Bearer $TERA_API_KEY" \
+  -d '{
+    "model": "meta-llama/Llama-3.3-70B-Instruct",
+    "messages": [{"role": "user", "content": "Hello"}],
+    "max_tokens": 256
+  }'
+```
+
+
+### Deprecated: MiniMax-M2
+
+Source: https://docs.tera.gw/models/minimax-m2.md
+<Warning>
+The Tera inference API is being deprecated. This page is a legacy reference for existing customers, not a current GPU rental offer. Tera Compute now rents dedicated GPU nodes and finds colocation for AI startups. Visit [Tera Compute](https://www.tera.gw/). No sunset date is stated here; contact your Tera representative about migration timing.
+</Warning>
+
+<Info>
+  Model id: `MiniMaxAI/MiniMax-M2` — pass this as the `model` field in API requests.
+</Info>
+
+## Spec
+
+| | |
+|---|---|
+| **Provider** | minimaxai |
+| **HuggingFace** | [`MiniMaxAI/MiniMax-M2`](https://huggingface.co/MiniMaxAI/MiniMax-M2) |
+| **Context length** | 196,608 tokens |
+| **Max output** | 4,096 tokens |
+| **Quantization** | `managed-fp8` |
+| **Input modalities** | text |
+| **Output modalities** | text |
+
+## Pricing
+
+| | per million tokens |
+|---|---|
+| Input  | $0.30 |
+| Output | $1.20 |
+| Cache Read | $0.03 |
+
+## Supported features
+
+`tools`, `json_mode`, `structured_outputs`, `reasoning`
+
+## Sampling parameters
+
+`temperature`, `top_p`, `top_k`, `max_tokens`, `stop`, `seed`, `frequency_penalty`, `presence_penalty`, `repetition_penalty`, `logprobs`, `top_logprobs`
+
+## Example
+
+```bash
+curl https://api.tera.gw/v1/chat/completions \
+  -H "Content-Type: application/json" \
+  -H "Authorization: Bearer $TERA_API_KEY" \
+  -d '{
+    "model": "MiniMaxAI/MiniMax-M2",
+    "messages": [{"role": "user", "content": "Hello"}],
+    "max_tokens": 256
+  }'
+```
+
+
+### Deprecated: Qwen3-235B-A22B-Instruct-2507
+
+Source: https://docs.tera.gw/models/qwen3-235b-a22b-instruct-2507.md
+<Warning>
+The Tera inference API is being deprecated. This page is a legacy reference for existing customers, not a current GPU rental offer. Tera Compute now rents dedicated GPU nodes and finds colocation for AI startups. Visit [Tera Compute](https://www.tera.gw/). No sunset date is stated here; contact your Tera representative about migration timing.
+</Warning>
+
+<Info>
+  Model id: `Qwen/Qwen3-235B-A22B-Instruct-2507` — pass this as the `model` field in API requests.
+</Info>
+
+## Spec
+
+| | |
+|---|---|
+| **Provider** | qwen |
+| **HuggingFace** | [`Qwen/Qwen3-235B-A22B-Instruct-2507`](https://huggingface.co/Qwen/Qwen3-235B-A22B-Instruct-2507) |
+| **Context length** | 262,144 tokens |
+| **Max output** | 4,096 tokens |
+| **Quantization** | `managed` |
+| **Input modalities** | text |
+| **Output modalities** | text |
+
+## Pricing
+
+| | per million tokens |
+|---|---|
+| Input  | $0.22 |
+| Output | $0.88 |
+
+## Supported features
+
+`tools`, `json_mode`, `structured_outputs`, `reasoning`
+
+## Sampling parameters
+
+`temperature`, `top_p`, `top_k`, `max_tokens`, `stop`, `seed`, `frequency_penalty`, `presence_penalty`, `repetition_penalty`, `logprobs`, `top_logprobs`
+
+## Example
+
+```bash
+curl https://api.tera.gw/v1/chat/completions \
+  -H "Content-Type: application/json" \
+  -H "Authorization: Bearer $TERA_API_KEY" \
+  -d '{
+    "model": "Qwen/Qwen3-235B-A22B-Instruct-2507",
+    "messages": [{"role": "user", "content": "Hello"}],
+    "max_tokens": 256
+  }'
+```
+
+
+### Deprecated: Qwen3-Coder-480B-A35B-Instruct
+
+Source: https://docs.tera.gw/models/qwen3-coder-480b-a35b-instruct.md
+<Warning>
+The Tera inference API is being deprecated. This page is a legacy reference for existing customers, not a current GPU rental offer. Tera Compute now rents dedicated GPU nodes and finds colocation for AI startups. Visit [Tera Compute](https://www.tera.gw/). No sunset date is stated here; contact your Tera representative about migration timing.
+</Warning>
+
+<Info>
+  Model id: `Qwen/Qwen3-Coder-480B-A35B-Instruct` — pass this as the `model` field in API requests.
+</Info>
+
+## Spec
+
+| | |
+|---|---|
+| **Provider** | qwen |
+| **HuggingFace** | [`Qwen/Qwen3-Coder-480B-A35B-Instruct`](https://huggingface.co/Qwen/Qwen3-Coder-480B-A35B-Instruct) |
+| **Context length** | 262,144 tokens |
+| **Max output** | 4,096 tokens |
+| **Quantization** | `managed` |
+| **Input modalities** | text |
+| **Output modalities** | text |
+
+## Pricing
+
+| | per million tokens |
+|---|---|
+| Input  | $0.22 |
+| Output | $1.80 |
+| Cache Read | $0.022 |
+
+## Supported features
+
+`tools`, `json_mode`, `structured_outputs`
+
+## Sampling parameters
+
+`temperature`, `top_p`, `top_k`, `max_tokens`, `stop`, `seed`, `frequency_penalty`, `presence_penalty`, `repetition_penalty`, `logprobs`, `top_logprobs`
+
+## Example
+
+```bash
+curl https://api.tera.gw/v1/chat/completions \
+  -H "Content-Type: application/json" \
+  -H "Authorization: Bearer $TERA_API_KEY" \
+  -d '{
+    "model": "Qwen/Qwen3-Coder-480B-A35B-Instruct",
+    "messages": [{"role": "user", "content": "Hello"}],
+    "max_tokens": 256
+  }'
+```
+
+
+### Deprecated: Qwen3-Next-80B-A3B-Instruct
+
+Source: https://docs.tera.gw/models/qwen3-next-80b-a3b-instruct.md
+<Warning>
+The Tera inference API is being deprecated. This page is a legacy reference for existing customers, not a current GPU rental offer. Tera Compute now rents dedicated GPU nodes and finds colocation for AI startups. Visit [Tera Compute](https://www.tera.gw/). No sunset date is stated here; contact your Tera representative about migration timing.
+</Warning>
+
+<Info>
+  Model id: `Qwen/Qwen3-Next-80B-A3B-Instruct` — pass this as the `model` field in API requests.
+</Info>
+
+## Spec
+
+| | |
+|---|---|
+| **Provider** | qwen |
+| **HuggingFace** | [`Qwen/Qwen3-Next-80B-A3B-Instruct`](https://huggingface.co/Qwen/Qwen3-Next-80B-A3B-Instruct) |
+| **Context length** | 262,144 tokens |
+| **Max output** | 4,096 tokens |
+| **Quantization** | `managed` |
+| **Input modalities** | text |
+| **Output modalities** | text |
+
+## Pricing
+
+| | per million tokens |
+|---|---|
+| Input  | $0.15 |
+| Output | $1.20 |
+
+## Supported features
+
+`tools`, `json_mode`, `structured_outputs`
+
+## Sampling parameters
+
+`temperature`, `top_p`, `top_k`, `max_tokens`, `stop`, `seed`, `frequency_penalty`, `presence_penalty`, `repetition_penalty`, `logprobs`, `top_logprobs`
+
+## Example
+
+```bash
+curl https://api.tera.gw/v1/chat/completions \
+  -H "Content-Type: application/json" \
+  -H "Authorization: Bearer $TERA_API_KEY" \
+  -d '{
+    "model": "Qwen/Qwen3-Next-80B-A3B-Instruct",
+    "messages": [{"role": "user", "content": "Hello"}],
+    "max_tokens": 256
+  }'
+```
+
+
+### Deprecated: Qwen3-Next-80B-A3B-Thinking
+
+Source: https://docs.tera.gw/models/qwen3-next-80b-a3b-thinking.md
+<Warning>
+The Tera inference API is being deprecated. This page is a legacy reference for existing customers, not a current GPU rental offer. Tera Compute now rents dedicated GPU nodes and finds colocation for AI startups. Visit [Tera Compute](https://www.tera.gw/). No sunset date is stated here; contact your Tera representative about migration timing.
+</Warning>
+
+<Info>
+  Model id: `Qwen/Qwen3-Next-80B-A3B-Thinking` — pass this as the `model` field in API requests.
+</Info>
+
+## Spec
+
+| | |
+|---|---|
+| **Provider** | qwen |
+| **HuggingFace** | [`Qwen/Qwen3-Next-80B-A3B-Thinking`](https://huggingface.co/Qwen/Qwen3-Next-80B-A3B-Thinking) |
+| **Context length** | 262,144 tokens |
+| **Max output** | 4,096 tokens |
+| **Quantization** | `managed` |
+| **Input modalities** | text |
+| **Output modalities** | text |
+
+## Pricing
+
+| | per million tokens |
+|---|---|
+| Input  | $0.15 |
+| Output | $1.20 |
+
+## Supported features
+
+`tools`, `json_mode`, `structured_outputs`, `reasoning`
+
+## Sampling parameters
+
+`temperature`, `top_p`, `top_k`, `max_tokens`, `stop`, `seed`, `frequency_penalty`, `presence_penalty`, `repetition_penalty`, `logprobs`, `top_logprobs`
+
+## Example
+
+```bash
+curl https://api.tera.gw/v1/chat/completions \
+  -H "Content-Type: application/json" \
+  -H "Authorization: Bearer $TERA_API_KEY" \
+  -d '{
+    "model": "Qwen/Qwen3-Next-80B-A3B-Thinking",
+    "messages": [{"role": "user", "content": "Hello"}],
+    "max_tokens": 256
+  }'
+```
+

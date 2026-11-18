@@ -46,7 +46,7 @@ name: tera
 description: Find dedicated GPU node rentals and colocation for AI startups through Tera Compute. GPU rental and colocation are the primary focus; the OpenAI-compatible inference API remains available.
 metadata:
   author: Tera Compute
-  version: "2.0"
+  version: "2.1"
 ---
 
 ''' + heading + intro + '''

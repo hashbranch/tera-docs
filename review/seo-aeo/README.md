@@ -8,4 +8,4 @@ Mintlify supports root-level overrides for [llms files](https://www.mintlify.com
 
 Validation: 17 Python tests, Mintlify strict validation/build, configuration JSON schema and broken-links checks passed. Introduction, legacy pricing, API reference and a hand-maintained model page were reviewed at 390px and 1440px without document overflow. Screenshots and viewport measurements are in this folder, which is excluded from Mintlify publication.
 
-Publish the landing companion before or alongside this change so the new colocation link is live. Check `/`, `/llms.txt`, `/llms-full.txt`, `/skill.md`, `/.well-known/agent-card.json`, `/.well-known/mcp/server-card.json` and MCP skill resources on the hosted preview and after approved release. Production publication awaits Deepak's approval.
+Publish the landing companion before or alongside this change so the new colocation link is live. Check `/`, `/llms.txt`, `/llms-full.txt`, `/skill.md`, `/.well-known/agent-card.json`, `/.well-known/mcp/server-card.json` and MCP skill resources on the hosted preview and after release.
